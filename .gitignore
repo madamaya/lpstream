@@ -1,0 +1,9 @@
+.idea
+.DS_Store
+flink-1.17.1
+kafka_2.12-3.4.1
+data
+lib/*jar
+target
+dependency-reduced-pom.xml
+l3stream.iml
