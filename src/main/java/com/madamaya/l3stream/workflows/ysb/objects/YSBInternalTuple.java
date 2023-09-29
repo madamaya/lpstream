@@ -1,16 +1,13 @@
 package com.madamaya.l3stream.workflows.ysb.objects;
 
-public class YSBInputTuple {
-    // {"user_id", "page_id", "ad_id", "ad_type", "event_type", "event_time", "ip_address", "campaign_id"}
+public class YSBInternalTuple {
     private String adId;
-    private String adType;
-    private String compaignId;
+    private String campaignId;
     private Long eventtime;
 
-    public YSBInputTuple(String adId, String adType, String compaignId, Long eventtime) {
+    public YSBInternalTuple(String adId, String campaignId, Long eventtime) {
         this.adId = adId;
-        this.adType = adType;
-        this.compaignId = compaignId;
+        this.campaignId = campaignId;
         this.eventtime = eventtime;
     }
 
@@ -22,20 +19,12 @@ public class YSBInputTuple {
         this.adId = adId;
     }
 
-    public String getAdType() {
-        return adType;
+    public String getCampaignId() {
+        return campaignId;
     }
 
-    public void setAdType(String adType) {
-        this.adType = adType;
-    }
-
-    public String getCompaignId() {
-        return compaignId;
-    }
-
-    public void setCompaignId(String compaignId) {
-        this.compaignId = compaignId;
+    public void setCampaignId(String campaignId) {
+        this.campaignId = campaignId;
     }
 
     public Long getEventtime() {
@@ -48,10 +37,9 @@ public class YSBInputTuple {
 
     @Override
     public String toString() {
-        return "YSBInputTuple{" +
+        return "YSBInternalTuple{" +
                 "adId='" + adId + '\'' +
-                ", adType='" + adType + '\'' +
-                ", compaignId='" + compaignId + '\'' +
+                ", campaignId='" + campaignId + '\'' +
                 ", eventtime=" + eventtime +
                 '}';
     }

@@ -1,27 +1,28 @@
-package com.madamaya.l3stream.workflows.nyc.utils;
+package com.madamaya.l3stream.workflows.nyc.ops;
 
+import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import org.apache.flink.api.common.eventtime.*;
 import org.apache.flink.api.common.time.Time;
 
-public class WatermarkStrategyNYC implements WatermarkStrategy<LinearRoadInputTuple> {
+public class WatermarkStrategyNYC implements WatermarkStrategy<NYCInputTuple> {
 
     @Override
-    public TimestampAssigner<LinearRoadInputTuple> createTimestampAssigner(TimestampAssignerSupplier.Context context) {
-        return new TimestampAssigner<LinearRoadInputTuple>() {
+    public TimestampAssigner<NYCInputTuple> createTimestampAssigner(TimestampAssignerSupplier.Context context) {
+        return new TimestampAssigner<NYCInputTuple>() {
             @Override
-            public long extractTimestamp(LinearRoadInputTuple linearRoadInputTuple, long l) {
-                return Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds();
+            public long extractTimestamp(NYCInputTuple tuple, long l) {
+                return tuple.getDropoffTime();
             }
         };
     }
 
     @Override
-    public WatermarkGenerator<LinearRoadInputTuple> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
-        return new WatermarkGenerator<LinearRoadInputTuple>() {
+    public WatermarkGenerator<NYCInputTuple> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
+        return new WatermarkGenerator<NYCInputTuple>() {
             @Override
-            public void onEvent(LinearRoadInputTuple linearRoadInputTuple, long l, WatermarkOutput watermarkOutput) {
-                watermarkOutput.emitWatermark(new Watermark(Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds() - 1));
+            public void onEvent(NYCInputTuple tuple, long l, WatermarkOutput watermarkOutput) {
+                watermarkOutput.emitWatermark(new Watermark(tuple.getDropoffTime() - 1));
             }
 
             @Override
