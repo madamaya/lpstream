@@ -1,8 +1,8 @@
 #!/bin/bash
 
 EXE_CMD="../flink-1.17.1/bin/flink run -d \
--s /Users/yamada-aist/workspace/l3stream/data/checkpoints/_checkpoints/598b3c81901648a2debd7293c9cf9e25/chk-20 \
---parallelism 4 \
+-s /Users/yamada-aist/workspace/l3stream/data/checkpoints/_checkpoints/af8d945a9401d86607f8bbaffa282f5d/chk-20 \
+--parallelism 2 \
 --allowNonRestoredState \
 --class com.madamaya.l3stream.workflows.linearroad.noprovenance.wqs.LinearRoadAccident \
 ../target/l3stream-1.0-SNAPSHOT.jar \
