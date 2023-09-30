@@ -20,11 +20,14 @@ public class DataLoader {
         String dataPath = args[0];
         String topic = args[1];
 
+        System.out.println("dataPath=" + dataPath + ", topic=" + topic);
+
         Properties properties = new Properties();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
+ //       KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
         File f = new File(dataPath);
