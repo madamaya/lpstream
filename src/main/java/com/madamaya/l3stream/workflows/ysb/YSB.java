@@ -1,7 +1,10 @@
 package com.madamaya.l3stream.workflows.ysb;
 
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
-import com.madamaya.l3stream.workflows.ysb.ops.*;
+import com.madamaya.l3stream.workflows.ysb.ops.CountYSB;
+import com.madamaya.l3stream.workflows.ysb.ops.DataParserYSB;
+import com.madamaya.l3stream.workflows.ysb.ops.ProjectAttributeYSB;
+import com.madamaya.l3stream.workflows.ysb.ops.WatermarkStrategyYSB;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -39,8 +42,8 @@ public class YSB {
         /* Query */
         env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest())
                 .map(new DataParserYSB())
-                .assignTimestampsAndWatermarks(new WatermarkStrategyYSB())
-                .filter(t -> t.getAdType() == "view")
+                .assignTimestampsAndWatermarks(new WatermarkStrategyYSB()).disableChaining()
+                .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSB())
                 .keyBy(t -> t.getCampaignId())
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
@@ -53,5 +56,6 @@ public class YSB {
                     }
                 }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
 
+        env.execute("Query: " + queryFlag);
     }
 }

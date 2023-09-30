@@ -34,6 +34,14 @@ public class NYCInputTuple {
         this.dropoffLocationId = Long.parseLong(elements[8]);
     }
 
+    public NYCInputTuple(String line, Long ts) {
+        String[] elements = line.split(",");
+        this.vendorId = Integer.parseInt(elements[0]);
+        this.dropoffTime = ts;
+        this.tripDistance = Double.parseDouble(elements[4]);
+        this.dropoffLocationId = Long.parseLong(elements[8]);
+    }
+
     public int getVendorId() {
         return vendorId;
     }

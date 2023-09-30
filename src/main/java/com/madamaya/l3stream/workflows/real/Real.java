@@ -1,9 +1,19 @@
 package com.madamaya.l3stream.workflows.real;
 
+import com.madamaya.l3stream.workflows.synUtils.objects.SynInternalTuple;
+import com.madamaya.l3stream.workflows.synUtils.ops.DataParserSyn;
+import com.madamaya.l3stream.workflows.synUtils.ops.SentimentClassificationSyn;
+import com.madamaya.l3stream.workflows.synUtils.ops.WatermarkStrategySyn;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
+import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
 import org.apache.flink.streaming.util.serialization.JSONKeyValueDeserializationSchema;
+import org.apache.kafka.clients.producer.ProducerRecord;
 
+import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class Real {
@@ -28,15 +38,17 @@ public class Real {
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */
-        env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest());
-
-                /*
-                .addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<YSBResultTuple>() {
+        env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest())
+                .map(new DataParserSyn())
+                .assignTimestampsAndWatermarks(new WatermarkStrategySyn())
+                .map(new SentimentClassificationSyn()).disableChaining()
+                .addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<SynInternalTuple>() {
                     @Override
-                    public ProducerRecord<byte[], byte[]> serialize(YSBResultTuple tuple, @Nullable Long aLong) {
+                    public ProducerRecord<byte[], byte[]> serialize(SynInternalTuple tuple, @Nullable Long aLong) {
                         return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
                     }
                 }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
-                 */
+
+        env.execute("Query: " + queryFlag);
     }
 }

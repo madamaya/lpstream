@@ -1,9 +1,12 @@
 package com.madamaya.l3stream.workflows.nyc;
 
+import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTuple;
 import com.madamaya.l3stream.workflows.nyc.ops.CountAndAvgDistance;
 import com.madamaya.l3stream.workflows.nyc.ops.DataParserNYC;
 import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
@@ -44,7 +47,12 @@ public class NYC {
                 .map(new DataParserNYC())
                 .assignTimestampsAndWatermarks(new WatermarkStrategyNYC())
                 .filter(t -> t.getTripDistance() > 5)
-                .keyBy(t -> Tuple2.of(t.getVendorId(), t.getDropoffLocationId()))
+                .keyBy(new KeySelector<NYCInputTuple, Tuple2<Integer, Long>>() {
+                    @Override
+                    public Tuple2<Integer, Long> getKey(NYCInputTuple tuple) throws Exception {
+                        return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
+                    }
+                })
                 .window(TumblingEventTimeWindows.of(Time.seconds(2)))
                 .aggregate(new CountAndAvgDistance())
                 .addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<NYCResultTuple>() {
@@ -54,5 +62,6 @@ public class NYC {
                     }
                 }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
 
+        env.execute("Query: " + queryFlag);
     }
 }

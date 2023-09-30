@@ -3,13 +3,13 @@ package com.madamaya.l3stream.workflows.ysb.objects;
 public class YSBInputTuple {
     // {"user_id", "page_id", "ad_id", "ad_type", "event_type", "event_time", "ip_address", "campaign_id"}
     private String adId;
-    private String adType;
+    private String eventType;
     private String campaignId;
     private Long eventtime;
 
-    public YSBInputTuple(String adId, String adType, String campaignId, Long eventtime) {
+    public YSBInputTuple(String adId, String eventType, String campaignId, Long eventtime) {
         this.adId = adId;
-        this.adType = adType;
+        this.eventType = eventType;
         this.campaignId = campaignId;
         this.eventtime = eventtime;
     }
@@ -22,12 +22,12 @@ public class YSBInputTuple {
         this.adId = adId;
     }
 
-    public String getAdType() {
-        return adType;
+    public String getEventType() {
+        return eventType;
     }
 
-    public void setAdType(String adType) {
-        this.adType = adType;
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 
     public String getCampaignId() {
@@ -50,7 +50,7 @@ public class YSBInputTuple {
     public String toString() {
         return "YSBInputTuple{" +
                 "adId='" + adId + '\'' +
-                ", adType='" + adType + '\'' +
+                ", eventType='" + eventType + '\'' +
                 ", campaignId='" + campaignId + '\'' +
                 ", eventtime=" + eventtime +
                 '}';

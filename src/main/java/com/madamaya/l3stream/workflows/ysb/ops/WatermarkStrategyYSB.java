@@ -1,9 +1,7 @@
 package com.madamaya.l3stream.workflows.ysb.ops;
 
 import com.madamaya.l3stream.workflows.ysb.objects.YSBInputTuple;
-import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import org.apache.flink.api.common.eventtime.*;
-import org.apache.flink.api.common.time.Time;
 
 public class WatermarkStrategyYSB implements WatermarkStrategy<YSBInputTuple> {
 

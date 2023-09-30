@@ -1,7 +1,6 @@
 package com.madamaya.l3stream.workflows.nyc.ops;
 
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
-import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 

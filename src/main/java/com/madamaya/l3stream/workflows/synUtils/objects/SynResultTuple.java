@@ -1,11 +1,13 @@
 package com.madamaya.l3stream.workflows.synUtils.objects;
 
-public class SynInternalResult {
+public class SynResultTuple {
     private String asin;
+    private int sentiment;
     private long count;
 
-    public SynInternalResult(String asin, long count) {
+    public SynResultTuple(String asin, int sentiment, long count) {
         this.asin = asin;
+        this.sentiment = sentiment;
         this.count = count;
     }
 
@@ -15,6 +17,14 @@ public class SynInternalResult {
 
     public void setAsin(String asin) {
         this.asin = asin;
+    }
+
+    public int getSentiment() {
+        return sentiment;
+    }
+
+    public void setSentiment(int sentiment) {
+        this.sentiment = sentiment;
     }
 
     public long getCount() {
@@ -27,8 +37,9 @@ public class SynInternalResult {
 
     @Override
     public String toString() {
-        return "SynInternalResult{" +
+        return "SynResultTuple{" +
                 "asin='" + asin + '\'' +
+                ", sentiment=" + sentiment +
                 ", count=" + count +
                 '}';
     }

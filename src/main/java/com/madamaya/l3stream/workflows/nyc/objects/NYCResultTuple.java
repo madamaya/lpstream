@@ -5,12 +5,14 @@ public class NYCResultTuple {
     private long dropoffLocationId;
     private long count;
     private double avgDistance;
+    private long ts;
 
-    public NYCResultTuple(int vendorId, long dropoffLocationId, long count, double avgDistance) {
+    public NYCResultTuple(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts) {
         this.vendorId = vendorId;
         this.dropoffLocationId = dropoffLocationId;
         this.count = count;
         this.avgDistance = avgDistance;
+        this.ts = ts;
     }
 
     public int getVendorId() {
@@ -45,6 +47,14 @@ public class NYCResultTuple {
         this.avgDistance = avgDistance;
     }
 
+    public long getTs() {
+        return ts;
+    }
+
+    public void setTs(long ts) {
+        this.ts = ts;
+    }
+
     @Override
     public String toString() {
         return "NYCResultTuple{" +
@@ -52,6 +62,7 @@ public class NYCResultTuple {
                 ", dropoffLocationId=" + dropoffLocationId +
                 ", count=" + count +
                 ", avgDistance=" + avgDistance +
+                ", ts=" + ts +
                 '}';
     }
 }
