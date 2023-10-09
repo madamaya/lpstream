@@ -8,6 +8,7 @@ import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -43,7 +44,7 @@ public class NYC {
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */
-        env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest())
+        DataStream<NYCResultTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
                 .map(new DataParserNYC())
                 .assignTimestampsAndWatermarks(new WatermarkStrategyNYC())
                 .filter(t -> t.getTripDistance() > 5)
@@ -53,14 +54,14 @@ public class NYC {
                         return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
                     }
                 })
-                .window(TumblingEventTimeWindows.of(Time.seconds(2)))
-                .aggregate(new CountAndAvgDistance())
-                .addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<NYCResultTuple>() {
-                    @Override
-                    public ProducerRecord<byte[], byte[]> serialize(NYCResultTuple tuple, @Nullable Long aLong) {
-                        return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
-                    }
-                }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+                .window(TumblingEventTimeWindows.of(Time.minutes(30)))
+                .aggregate(new CountAndAvgDistance());
+        ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<NYCResultTuple>() {
+            @Override
+            public ProducerRecord<byte[], byte[]> serialize(NYCResultTuple tuple, @Nullable Long aLong) {
+                return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
+            }
+        }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
 
         env.execute("Query: " + queryFlag);
     }

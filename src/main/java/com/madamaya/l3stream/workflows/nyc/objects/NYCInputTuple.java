@@ -84,7 +84,7 @@ public class NYCInputTuple {
                 '}';
     }
 
-    private long convertDateFormat(String dateLine) {
+    public static long convertDateFormat(String dateLine) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date;
         Calendar calendar;
@@ -96,6 +96,6 @@ public class NYCInputTuple {
             throw new RuntimeException(e);
         }
 
-        return calendar.getTimeInMillis() / 1000;
+        return calendar.getTimeInMillis();
     }
 }

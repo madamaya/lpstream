@@ -5,6 +5,7 @@ import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLR;
 import io.palyvos.provenance.usecases.CountTuple;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadAccidentAggregate;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadVehicleAggregate;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -41,7 +42,7 @@ public class LR {
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */
-        env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest())
+        DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
                 .map(new DataParserLR())
                 .assignTimestampsAndWatermarks(new WatermarkStrategyLR())
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
@@ -55,13 +56,14 @@ public class LR {
                         ACCIDENT_WINDOW_SLIDE))
                 .aggregate(new LinearRoadAccidentAggregate())
                 //.slotSharingGroup(settings.secondSlotSharingGroup())
-                .filter(t -> t.getCount() > 1)
-                .addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<CountTuple>() {
-                    @Override
-                    public ProducerRecord<byte[], byte[]> serialize(CountTuple tuple, @Nullable Long aLong) {
-                        return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
-                    }
-                }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+                .filter(t -> t.getCount() > 1);
+
+        ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<CountTuple>() {
+            @Override
+            public ProducerRecord<byte[], byte[]> serialize(CountTuple tuple, @Nullable Long aLong) {
+                return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
+            }
+        }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
 
         env.execute("Query: " + queryFlag);
     }

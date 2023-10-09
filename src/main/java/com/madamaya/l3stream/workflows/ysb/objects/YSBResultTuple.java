@@ -3,10 +3,12 @@ package com.madamaya.l3stream.workflows.ysb.objects;
 public class YSBResultTuple {
     private String campaignId;
     private long count;
+    private long ts;
 
-    public YSBResultTuple(String campaignId, long count) {
+    public YSBResultTuple(String campaignId, long count, long ts) {
         this.campaignId = campaignId;
         this.count = count;
+        this.ts = ts;
     }
 
     public String getCampaignId() {
@@ -25,11 +27,20 @@ public class YSBResultTuple {
         this.count = count;
     }
 
+    public long getTs() {
+        return ts;
+    }
+
+    public void setTs(long ts) {
+        this.ts = ts;
+    }
+
     @Override
     public String toString() {
         return "YSBResultTuple{" +
                 "campaignId='" + campaignId + '\'' +
                 ", count=" + count +
+                ", ts=" + ts +
                 '}';
     }
 }

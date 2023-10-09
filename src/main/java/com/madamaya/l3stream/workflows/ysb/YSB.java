@@ -5,6 +5,7 @@ import com.madamaya.l3stream.workflows.ysb.ops.CountYSB;
 import com.madamaya.l3stream.workflows.ysb.ops.DataParserYSB;
 import com.madamaya.l3stream.workflows.ysb.ops.ProjectAttributeYSB;
 import com.madamaya.l3stream.workflows.ysb.ops.WatermarkStrategyYSB;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -40,21 +41,22 @@ public class YSB {
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */
-        env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest())
+        DataStream<YSBResultTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
                 .map(new DataParserYSB())
-                .assignTimestampsAndWatermarks(new WatermarkStrategyYSB()).disableChaining()
+                .assignTimestampsAndWatermarks(new WatermarkStrategyYSB())
                 .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSB())
                 .keyBy(t -> t.getCampaignId())
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
                 // .trigger(new TriggerYSB())
-                .aggregate(new CountYSB())
-                .addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<YSBResultTuple>() {
-                    @Override
-                    public ProducerRecord<byte[], byte[]> serialize(YSBResultTuple tuple, @Nullable Long aLong) {
-                        return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
-                    }
-                }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+                .aggregate(new CountYSB());
+
+        ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<YSBResultTuple>() {
+            @Override
+            public ProducerRecord<byte[], byte[]> serialize(YSBResultTuple tuple, @Nullable Long aLong) {
+                return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
+            }
+        }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
 
         env.execute("Query: " + queryFlag);
     }
