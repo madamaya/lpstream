@@ -1,5 +1,6 @@
 package com.madamaya.l3stream.cpstore;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.flink.api.common.JobID;
 
 import java.io.BufferedReader;
@@ -12,6 +13,8 @@ import java.net.Socket;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CpManagerServer {
     public static void main(String[] args) throws Exception {
@@ -53,7 +56,15 @@ public class CpManagerServer {
         br.close();
         socket.close();
 
-        return Long.parseLong(checkpointIDstr);
+        // Validation
+        String rstr = "^[0-9]+$";
+        Pattern p = Pattern.compile(rstr);
+        Matcher m = p.matcher(checkpointIDstr);
+        if (m.matches()) {
+            return Long.parseLong(checkpointIDstr);
+        } else {
+            return -2;
+        }
     }
 
     private static void createDir(CpManagementConfig config) throws Exception {
@@ -70,6 +81,8 @@ public class CpManagerServer {
     private static void retainCheckpoint(CpManagementConfig config, long checkpointId) throws Exception {
 
         System.out.println("checkpointID = " + checkpointId);
+        if (checkpointId == -2)
+            return;
 
         String jobPath = config.getCheckpointDir() + "/" + config.getJobID();
         String pJobPath = config.getCheckpointDir() + "/_checkpoints/" + config.getJobID();
