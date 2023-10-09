@@ -58,6 +58,11 @@
             <version>${jcommander.version}</version>
         </dependency>
         <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+        <dependency>
             <groupId>io.palyvos</groupId>
             <artifactId>ananke</artifactId>
             <version>1.0</version>

@@ -4,7 +4,7 @@ flink-1.17.1
 kafka_2.12-3.4.1
 data/checkpoints
 data/output
-/data/input/YSB/streaming-benchmarks/
+data/input/YSB/streaming-benchmarks/
 data/datagen
 data/log*
 data/test0918
@@ -17,3 +17,8 @@ lib/*jar
 target
 dependency-reduced-pom.xml
 l3stream.iml
+data/input/Nexmark/nexmark/
+data/input/Nexmark/*.sql
+data/input/Nexmark/*.json
+
+script/autoReplayOutCheck/**/*.log
