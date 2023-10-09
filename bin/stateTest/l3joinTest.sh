@@ -2,15 +2,17 @@
 
 EXE_CMD="../../flink-1.17.1/bin/flink run -d \
 --parallelism 1 \
---class com.madamaya.l3stream.tests.L3RichFlatMapTest \
+--class com.madamaya.l3stream.workflows.joinTest.L3JoinTest \
 ../../target/l3stream-1.0-SNAPSHOT.jar \
 --statisticsFolder fuga \
 --outputFile neko \
 --sourcesNumber 1 \
 --CpMServerIP localhost \
 --CpMServerPort 10010 \
---lineageMode Lineage \
+--lineageMode nonLineage \
 --aggregateStrategy sortedPtr \
---latencyFlag 2"
+--cpmProcessing \
+--latencyFlag 1"
+
 echo "${EXE_CMD}"
 eval ${EXE_CMD}
