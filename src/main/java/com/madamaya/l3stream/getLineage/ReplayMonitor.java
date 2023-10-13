@@ -1,0 +1,151 @@
+package com.madamaya.l3stream.getLineage;
+
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
+public class ReplayMonitor {
+    public static void main(String[] args) throws Exception {
+        String jobid;
+        long outputTs;
+        String outputTopic;
+        String outputValue = "";
+
+        if (args.length == 3) {
+            jobid = args[0];
+            outputTs = Long.parseLong(args[1]);
+            outputTopic = args[2];
+        } else if (args.length == 4) {
+            jobid = args[0];
+            outputTs = Long.parseLong(args[1]);
+            outputTopic = args[2];
+            outputValue = args[3];
+        } else {
+            throw new IllegalArgumentException();
+        }
+
+        Properties properties = new Properties();
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "replaymonitor");
+        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
+        String topicName = outputTopic.split("-")[0] + "-l";
+        System.out.println(topicName);
+        consumer.subscribe(Arrays.asList(topicName));
+
+        int count = 0;
+        boolean run = true;
+        // CNFM: このままの実装だと，前の実行時のあまりを受け取る？（要確認）のでcancelを先にやって，N秒入力が来なかったらみたいにする．
+        while (run) {
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+            for (ConsumerRecord record : records) {
+                count++;
+                String recordValue = (String) record.value();
+                if (count % 1000 == 0) {
+                    System.out.println("count = " + count);
+                }
+                if (checkSame(recordValue, outputValue, outputTs)) {
+                    writeLineage((String) record.value());
+                    cancelJob();
+                    run = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    /* Sample data (recordValue) */
+    // {
+    //  "OUT":"NYCResultTuple{vendorId=1, dropoffLocationId=164, count=3, avgDistance=13.666666666666666, ts=1642839653000}",
+    //  "TS":"1642839653000",
+    //  "CPID":"-1",
+    //  "LINEAGE":[
+    //        {"value":"1,2022-01-22 16:34:03,2022-01-22 17:14:32,1.0,17.5,2.0,N,132,164,1,52.0,2.5,0.5,15.45,6.55,0.3,77.3,2.5,0.0","metadata":{"offset":429563,"topic":"NYC-i","partition":3}},
+    //        {"value":"1,2022-01-22 16:42:16,2022-01-22 17:20:53,1.0,18.0,2.0,N,132,164,1,52.0,3.75,0.5,10.0,6.55,0.3,73.1,2.5,1.25","metadata":{"offset":429777,"topic":"NYC-i","partition":3}},
+    //        {"value":"1,2022-01-22 16:42:11,2022-01-22 17:09:25,2.0,5.5,1.0,Y,151,164,1,23.0,2.5,0.5,5.25,0.0,0.3,31.55,2.5,0.0","metadata":{"offset":412428,"topic":"NYC-i","partition":2}}
+    //  ],
+    //  "FLAG":"true"
+    // }
+    public static Tuple2<String, Long> extractOutAndTs(String recordValue) throws JsonProcessingException {
+        JsonNode jsonNode = new ObjectMapper().readTree(recordValue);
+        return Tuple2.of(jsonNode.get("OUT").asText(), jsonNode.get("TS").asLong());
+    }
+
+    public static boolean checkSame(String recordValue, String outputValue, long outputTs) throws JsonProcessingException {
+        Tuple2<String, Long> t2 = extractOutAndTs(recordValue);
+        if (outputValue.length() < 1) {
+            // Only check timestamp
+            return t2.f1 == outputTs;
+        } else {
+            // check timestamp & value
+            return t2.f1 == outputTs && t2.f0.equals(outputValue);
+        }
+    }
+
+    public static void writeLineage(String recordValue) {
+        System.out.println("!!! This is a tentative implementation of writeLineage (ReplayMonitor.java). !!!");
+        System.out.println("!!! This writer must be implemented. !!!");
+
+        String filePath = "/Users/yamada-aist/workspace/l3stream/data/tmpLineage/" + System.currentTimeMillis() + ".txt";
+        try {
+            BufferedWriter bf = new BufferedWriter(new FileWriter(filePath));
+            bf.write(recordValue);
+            bf.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Lienage = " + recordValue);
+    }
+
+    public static void cancelJob() throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newBuilder().build();
+
+        // Create running jobid list, which should be canceled
+        HttpRequest request = HttpRequest
+                .newBuilder()
+                .uri(URI.create("http://localhost:8081/jobs/overview"))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonNode jsonNode = new ObjectMapper().readTree(response.body());
+        List<String> endIDs = new ArrayList<>();
+        for (int idx = 0; idx < jsonNode.get("jobs").size(); idx++) {
+            JsonNode current = jsonNode.get("jobs").get(idx);
+            String currentState = current.get("state").asText();
+            String currentName = current.get("name").asText().split(",")[0];
+            if (currentState.equals("RUNNING") && currentName.equals("LineageMode")) {
+                endIDs.add(current.get("jid").asText());
+            }
+        }
+
+        // Cancel flink job via REST API
+        for (int idx = 0; idx < endIDs.size(); idx++) {
+            request = HttpRequest
+                    .newBuilder()
+                    .uri(URI.create("http://localhost:8081/jobs/" + endIDs.get(idx)))
+                    .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                    .build();
+            client.send(request, HttpResponse.BodyHandlers.ofString());
+        }
+    }
+}
