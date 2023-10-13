@@ -2,7 +2,7 @@
 
 EXE_CMD="../../flink-1.17.1/bin/flink run -d \
 --parallelism 4 \
---class com.madamaya.l3stream.workflows.linearroad.noprovenance.qs.provenance.LinearRoadCombined \
+--class com.madamaya.l3stream.workflows.linearroad.noprovenance.qs.provenance.LinearRoadCombinedShort \
 ../../target/l3stream-1.0-SNAPSHOT.jar \
 --statisticsFolder fuga \
 --outputFile neko \

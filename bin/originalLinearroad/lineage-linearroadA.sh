@@ -10,6 +10,7 @@ EXE_CMD="../../flink-1.17.1/bin/flink run -d \
 --CpMServerIP localhost \
 --CpMServerPort 10010 \
 --lineageMode Lineage \
---aggregateStrategy sortedPtr"
+--aggregateStrategy sortedPtr \
+--cpmProcessing"
 echo "${EXE_CMD}"
 eval ${EXE_CMD}
