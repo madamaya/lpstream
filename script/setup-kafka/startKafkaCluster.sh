@@ -13,7 +13,7 @@ cd ${kafkaHome}
 # Create topics
 for i in LR NYC YSB Nexmark
 do
-  for j in i o
+  for j in i o l
   do
     ./bin/kafka-topics.sh --create --topic ${i}-${j} --bootstrap-server localhost:9092 --partitions 4
   done
