@@ -1,13 +1,11 @@
 #!/bin/bash
 
-source $(dirname $0)/../config.sh
-
-EXE_CMD="${FLINK_HOME}/bin/flink run -d \
--s ${L3_HOME}/data/checkpoints/_checkpoints/${1}/chk-${2} \
+EXE_CMD="../../flink-1.17.1/bin/flink run -d \
+-s /Users/yamada-aist/workspace/l3stream/data/checkpoints/_checkpoints/084ad4ffd06e617f6368500872d6e555/chk-1 \
 --parallelism 1 \
 --allowNonRestoredState \
 --class com.madamaya.l3stream.workflows.nyc.L3NYC \
-${L3_HOME}/target/l3stream-1.0-SNAPSHOT.jar \
+../../target/l3stream-1.0-SNAPSHOT.jar \
 --statisticsFolder fuga \
 --outputFile neko \
 --sourcesNumber 1 \

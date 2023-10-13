@@ -12,7 +12,7 @@ EXE_CMD="../../flink-1.17.1/bin/flink run -d \
 --CpMServerPort 10010 \
 --lineageMode nonLineage \
 --aggregateStrategy sortedPtr \
---cpmProcessing \
+
 --latencyFlag 1"
 
 echo "${EXE_CMD}"

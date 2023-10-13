@@ -6,7 +6,7 @@ EXE_CMD="${FLINK_HOME}/bin/flink run -d \
 -s ${L3_HOME}/data/checkpoints/_checkpoints/${1}/chk-${2} \
 --parallelism 1 \
 --allowNonRestoredState \
---class com.madamaya.l3stream.workflows.nyc.L3NYC \
+--class com.madamaya.l3stream.workflows.ysb.L3YSB \
 ${L3_HOME}/target/l3stream-1.0-SNAPSHOT.jar \
 --statisticsFolder fuga \
 --outputFile neko \
