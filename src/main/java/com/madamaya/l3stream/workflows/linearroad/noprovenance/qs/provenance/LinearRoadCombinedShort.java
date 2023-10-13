@@ -4,20 +4,18 @@ import com.madamaya.l3stream.workflows.linearroad.noprovenance.utils.ObjectNodeC
 import io.palyvos.provenance.ananke.functions.ProvenanceFunctionFactory;
 import io.palyvos.provenance.ananke.functions.ProvenanceTupleContainer;
 import io.palyvos.provenance.genealog.GenealogGraphTraverser;
-import io.palyvos.provenance.genealog.GenealogTuple;
 import io.palyvos.provenance.l3stream.util.FormatLineage;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
-import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadSource;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadVehicleAggregate;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.VehicleTuple;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.FlinkSerializerActivator;
-import io.palyvos.provenance.util.ProvenanceActivator;
 import io.palyvos.provenance.util.TimestampConverter;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
@@ -31,13 +29,12 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Properties;
 import java.util.function.Function;
 
 import static io.palyvos.provenance.usecases.linearroad.LinearRoadConstants.*;
 
-public class LinearRoadCombined {
+public class LinearRoadCombinedShort {
 
   public static void main(String[] args) throws Exception {
     ExperimentSettings settings = ExperimentSettings.newInstance(args);
@@ -61,7 +58,7 @@ public class LinearRoadCombined {
   kafkaProperties.setProperty("group.id", "myGROUP");
   kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
-      DataStream<ProvenanceTupleContainer<VehicleTuple>> sourceStream = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest())
+      SingleOutputStreamOperator<ProvenanceTupleContainer<VehicleTuple>> sourceStream = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest())
             .map(new ObjectNodeConverter())
             .assignTimestampsAndWatermarks(
                 new AscendingTimestampExtractor<LinearRoadInputTuple>() {
@@ -85,6 +82,8 @@ public class LinearRoadCombined {
                 GL.aggregate(
                     new LinearRoadVehicleAggregate()));
       sourceStream.print();
+
+      /*
     sourceStream.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<ProvenanceTupleContainer<VehicleTuple>>() {
         GenealogGraphTraverser ggt = new GenealogGraphTraverser(settings.aggregateStrategySupplier().get());
         @Override
@@ -95,6 +94,7 @@ public class LinearRoadCombined {
             return new ProducerRecord<>(outputTopicName, ret.getBytes(StandardCharsets.UTF_8));
         }
     }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+       */
 
     env.execute("LinearRoadCombined");
   }

@@ -19,6 +19,7 @@ public class WatermarkStrategyBidNex implements WatermarkStrategy<NexmarkBidTupl
     @Override
     public WatermarkGenerator<NexmarkBidTuple> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<NexmarkBidTuple>() {
+
             @Override
             public void onEvent(NexmarkBidTuple tuple, long l, WatermarkOutput watermarkOutput) {
                 // CNFM: ほんとにこれでいい？

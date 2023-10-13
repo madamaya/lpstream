@@ -38,7 +38,7 @@ public class Real {
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */
-        env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest())
+        env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
                 .map(new DataParserSyn())
                 .assignTimestampsAndWatermarks(new WatermarkStrategySyn())
                 .map(new SentimentClassificationSyn()).disableChaining()

@@ -8,6 +8,16 @@ import org.apache.flink.api.common.time.Time;
 public class LrWatermark implements WatermarkStrategy<LinearRoadInputTuple> {
 
     @Override
+    public TimestampAssigner<LinearRoadInputTuple> createTimestampAssigner(TimestampAssignerSupplier.Context context) {
+        return new TimestampAssigner<LinearRoadInputTuple>() {
+            @Override
+            public long extractTimestamp(LinearRoadInputTuple linearRoadInputTuple, long l) {
+                return Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds();
+            }
+        };
+    }
+
+    @Override
     public WatermarkGenerator<LinearRoadInputTuple> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<LinearRoadInputTuple>() {
             @Override

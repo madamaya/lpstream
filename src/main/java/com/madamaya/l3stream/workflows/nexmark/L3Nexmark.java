@@ -40,7 +40,7 @@ public class L3Nexmark {
 
         final String queryFlag = "Nexmark";
         final String inputTopicName = queryFlag + "-i";
-        final String outputTopicName = queryFlag + "-o";
+        final String outputTopicName = queryFlag + settings.getTopicSuffix();
 
         boolean local = true;
         Properties kafkaProperties = new Properties();
@@ -52,13 +52,12 @@ public class L3Nexmark {
             kafkaProperties.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
             kafkaProperties2.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
         }
-        kafkaProperties.setProperty("group.id", "myGROUP");
-        kafkaProperties2.setProperty("group.id", "myGROUP2");
+        kafkaProperties.setProperty("group.id", "myGROUP" + settings.getTopicSuffix());
+        kafkaProperties.setProperty("group.id", "myGROUP2" + settings.getTopicSuffix());
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
         kafkaProperties2.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */
-        // CNFM: updateTsWMのredisでバグるので修正 → 修正した
         DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
                 .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("2")
                 .map(L3.map(new AuctionDataParserNex())).uid("3")
@@ -71,7 +70,6 @@ public class L3Nexmark {
                 .map(L3.updateTsWM(new WatermarkStrategyBidNex(), settings.getRedisIp(), 1)).uid("9")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.numOfInstanceWM())).uid("10");
 
-        // CNFM: JOINでバグるので修正→一応した
         DataStream<L3StreamTupleContainer<NexmarkJoinedTuple>> joined = auction.keyBy(L3.keyBy(new KeySelector<NexmarkAuctionTuple, Integer>() {
                 @Override
                 public Integer getKey(NexmarkAuctionTuple tuple) throws Exception {
@@ -101,6 +99,6 @@ public class L3Nexmark {
                     .map(new CpManagerClient(settings)).uid("101").setParallelism(1);
         }
 
-        env.execute("Query: " + queryFlag);
+        env.execute(settings.getLineageMode() + "," + queryFlag);
     }
 }

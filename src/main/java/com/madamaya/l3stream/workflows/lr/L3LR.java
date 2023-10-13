@@ -42,7 +42,7 @@ public class L3LR {
 
         final String queryFlag = "LR";
         final String inputTopicName = queryFlag + "-i";
-        final String outputTopicName = queryFlag + "-o";
+        final String outputTopicName = queryFlag + settings.getTopicSuffix();
 
         boolean local = true;
         Properties kafkaProperties = new Properties();
@@ -51,7 +51,7 @@ public class L3LR {
         } else {
             kafkaProperties.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
         }
-        kafkaProperties.setProperty("group.id", "myGROUP");
+        kafkaProperties.setProperty("group.id", "myGROUP" + settings.getTopicSuffix());
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */
@@ -85,6 +85,6 @@ public class L3LR {
                     .map(new CpManagerClient(settings)).uid("101").setParallelism(1);
         }
 
-        env.execute("Query: " + queryFlag);
+        env.execute(settings.getLineageMode() + "," + queryFlag);
     }
 }
