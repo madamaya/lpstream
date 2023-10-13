@@ -88,13 +88,13 @@ public class CpManagerClient extends RichMapFunction<ObjectNode, ObjectNode> imp
             if ((t2 = hm.get(cpid)) == null) {
                 hm.put(cpid, Tuple2.of(ts, 1));
             } else {
-                hm.put(cpid, Tuple2.of(Math.min(t2.f0, ts), t2.f1 + 1));
+                hm.put(cpid, Tuple2.of(Math.max(t2.f0, ts), t2.f1 + 1));
             }
         }
 
         for (Map.Entry<String, Tuple2<Long, Integer>> e : hm.entrySet()) {
             if (e.getValue().f1 != (pallarelism * numOfSOp)) {
-                retry(jedis, e.getKey(), pallarelism, numOfSOp);
+                // retry(jedis, e.getKey(), pallarelism, numOfSOp);
             }
             jedis.set(e.getKey(), String.valueOf(e.getValue().f0));
         }
@@ -106,7 +106,7 @@ public class CpManagerClient extends RichMapFunction<ObjectNode, ObjectNode> imp
             Tuple2<Long, Integer> t2 = Tuple2.of(Long.MAX_VALUE, 0);
             for (String key : keys) {
                 if (!key.contains(",")) continue;
-                t2.f0 = Math.min(t2.f0, Long.parseLong(jedis.get(key)));
+                t2.f0 = Math.max(t2.f0, Long.parseLong(jedis.get(key)));
                 t2.f1++;
             }
 
