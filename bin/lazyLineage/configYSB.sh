@@ -1,4 +1,4 @@
 #!/bin/zsh
 
 testName="YSB"
-maxWindowSize=1
+maxWindowSize=10000

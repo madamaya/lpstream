@@ -2,8 +2,14 @@
 
 source $(dirname $0)/../config.sh
 
+if [ $2 -eq 0 ]; then
+CHK_ARG=""
+else
+CHK_ARG="-s ${L3_HOME}/data/checkpoints/_checkpoints/${1}/chk-${2}"
+fi
+
 EXE_CMD="${FLINK_HOME}/bin/flink run -d \
--s ${L3_HOME}/data/checkpoints/_checkpoints/${1}/chk-${2} \
+${CHK_ARG} \
 --parallelism 1 \
 --allowNonRestoredState \
 --class com.madamaya.l3stream.workflows.nexmark.L3Nexmark \

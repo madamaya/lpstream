@@ -12,7 +12,7 @@ binHome="${L3_HOME}/bin"
 checkpointHome="${L3_HOME}/data/checkpoints"
 autocheckHome=`pwd`
 
-if [ $# -ne 1 ]; then
+if [ $# -eq 1 ]; then
 testCaseName=$1
 else
 # manual
@@ -20,8 +20,8 @@ testCaseName="NYC"
 fi
 
 
-#echo "redis-cli FLUSHDB"
-#redis-cli FLUSHDB
+echo "redis-cli FLUSHDB"
+redis-cli FLUSHDB
 
 #**** premise: Flink, Kafka, and Redis cluster has been started. ****#
 logDir="./log/${testCaseName}"

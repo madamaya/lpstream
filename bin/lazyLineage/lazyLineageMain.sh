@@ -1,8 +1,8 @@
 #!/bin/zsh
 
-source ./configNYC.sh
+#source ./configNYC.sh
 #source ./configYSB.sh
-#source ./configLR.sh
+source ./configLR.sh
 #source ./configNexmark.sh
 
 outputTopic="${testName}-l"
@@ -11,7 +11,7 @@ initDir=`pwd`
 
 # generate target tuples
 cd ../sampling
-#./sampling.sh ${testName}
+./sampling.sh ${testName}
 
 # get jobid
 jobid=`cat jobid.txt`

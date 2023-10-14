@@ -1,4 +1,4 @@
 #!/bin/zsh
 
 testName="LR"
-maxWindowSize=1
+maxWindowSize=120000
