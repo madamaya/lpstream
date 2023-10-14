@@ -25,4 +25,4 @@ ${L3_HOME}/target/l3stream-1.0-SNAPSHOT.jar \
 --latencyFlag 2"
 
 echo "${EXE_CMD}"
-#eval ${EXE_CMD}
+eval ${EXE_CMD}
