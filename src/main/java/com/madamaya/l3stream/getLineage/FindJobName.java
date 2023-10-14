@@ -33,9 +33,6 @@ public class FindJobName {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8081/jobs/" + jobid)).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        // System.out.println(response.statusCode());
-        // System.out.println(response.body());
-
         JsonNode jsonNode = new ObjectMapper().readTree(response.body());
         return jsonNode.get("name").asText();
     }

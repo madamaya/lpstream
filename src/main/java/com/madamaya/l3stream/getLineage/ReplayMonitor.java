@@ -1,6 +1,6 @@
 package com.madamaya.l3stream.getLineage;
 
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +12,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -25,38 +24,35 @@ import java.util.Properties;
 
 public class ReplayMonitor {
     public static void main(String[] args) throws Exception {
-        String jobid;
         long outputTs;
         String outputTopic;
         String outputValue = "";
 
-        if (args.length == 3) {
-            jobid = args[0];
-            outputTs = Long.parseLong(args[1]);
-            outputTopic = args[2];
-        } else if (args.length == 4) {
-            jobid = args[0];
-            outputTs = Long.parseLong(args[1]);
-            outputTopic = args[2];
-            outputValue = args[3];
+        if (args.length == 2) {
+            outputTs = Long.parseLong(args[0]);
+            outputTopic = args[1];
+        } else if (args.length == 3) {
+            outputTs = Long.parseLong(args[0]);
+            outputTopic = args[1];
+            // CNFM
+            outputValue = args[2].substring(0, args[2].length()-1).substring(1);
         } else {
             throw new IllegalArgumentException();
         }
 
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "replaymonitor");
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "replaymonitor-" + System.currentTimeMillis());
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
         String topicName = outputTopic.split("-")[0] + "-l";
-        System.out.println(topicName);
         consumer.subscribe(Arrays.asList(topicName));
 
         int count = 0;
         boolean run = true;
-        // CNFM: このままの実装だと，前の実行時のあまりを受け取る？（要確認）のでcancelを先にやって，N秒入力が来なかったらみたいにする．
+        // CNFM: 直前の実行の結果を受け取らないように修正した方がベター
         while (run) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
             for (ConsumerRecord record : records) {
@@ -87,23 +83,24 @@ public class ReplayMonitor {
     //  ],
     //  "FLAG":"true"
     // }
-    public static Tuple2<String, Long> extractOutAndTs(String recordValue) throws JsonProcessingException {
+    public static Tuple3<String, Long, Boolean> extractOutTsFlag(String recordValue) throws JsonProcessingException {
         JsonNode jsonNode = new ObjectMapper().readTree(recordValue);
-        return Tuple2.of(jsonNode.get("OUT").asText(), jsonNode.get("TS").asLong());
+        return Tuple3.of(jsonNode.get("OUT").asText(), jsonNode.get("TS").asLong(), jsonNode.get("FLAG").asBoolean());
     }
 
     public static boolean checkSame(String recordValue, String outputValue, long outputTs) throws JsonProcessingException {
-        Tuple2<String, Long> t2 = extractOutAndTs(recordValue);
+        Tuple3<String, Long, Boolean> t3 = extractOutTsFlag(recordValue);
         if (outputValue.length() < 1) {
-            // Only check timestamp
-            return t2.f1 == outputTs;
+            // check timestamp and flag
+            return t3.f1 == outputTs && t3.f2;
         } else {
-            // check timestamp & value
-            return t2.f1 == outputTs && t2.f0.equals(outputValue);
+            // check timestamp, value, and flag
+            return t3.f0.equals(outputValue) && t3.f1 == outputTs && t3.f2;
         }
     }
 
     public static void writeLineage(String recordValue) {
+        // CNFM
         System.out.println("!!! This is a tentative implementation of writeLineage (ReplayMonitor.java). !!!");
         System.out.println("!!! This writer must be implemented. !!!");
 

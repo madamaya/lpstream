@@ -1,11 +1,12 @@
 package com.madamaya.l3stream.getLineage;
 
-import org.apache.flink.api.java.tuple.Tuple2;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-import java.util.*;
-import java.util.regex.Matcher;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class FindReplayCPID {
@@ -57,15 +58,11 @@ public class FindReplayCPID {
     }
 
     public static int findID(List<Integer> validKeys, Jedis jedis, long timestamp) {
-        // List<Tuple2<Integer, Long>> list = new ArrayList<>();
         for (int idx = 0; idx < validKeys.size(); idx++) {
             long ts = Long.parseLong(jedis.get(String.valueOf(validKeys.get(idx))));
             if (ts < timestamp) {
-                // list.add(Tuple2.of(validKeys.get(idx), ts));
-                // System.out.println("getReplayID: list = " + list);
                 return validKeys.get(idx);
             }
-            // list.add(Tuple2.of(validKeys.get(idx), ts));
         }
         return 0;
     }

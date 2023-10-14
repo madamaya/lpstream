@@ -15,6 +15,7 @@ public class TriggerReplay {
 
         // Restart
         String binPath = System.getProperty("user.dir");
+        System.out.println("Replay from CpID = " + replayID + " of the job (" + jobid + ")");
         Runtime.getRuntime().exec(binPath + "/" + queryName + "/l3" + queryName + "FromState.sh " + jobid + " " + replayID);
     }
 }
