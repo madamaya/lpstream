@@ -12,8 +12,9 @@ binHome="${L3_HOME}/bin"
 checkpointHome="${L3_HOME}/data/checkpoints"
 autocheckHome=`pwd`
 
-if [ $# -eq 1 ]; then
+if [ $# -eq 2 ]; then
 testCaseName=$1
+mainpath=$2
 else
 # manual
 testCaseName="NYC"
@@ -39,8 +40,9 @@ startCpMServer ${binHome} ${checkpointHome}
 
 ## submit Flink job
 echo "submit Flink job"
-cd ${binHome}/${(L)testCaseName}/replayTest/
-./l3${(L)testCaseName}.sh
+#cd ${binHome}/${(L)testCaseName}/replayTest/
+cd ${binHome}/templates
+./nonlineage.sh $2 ${cpmIP} ${cpmPort} ${redisIP} ${redisPort} ${parallelism}
 
 cd ${autocheckHome}
 

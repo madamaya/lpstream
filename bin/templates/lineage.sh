@@ -2,23 +2,23 @@
 
 source $(dirname $0)/../config.sh
 
-if [ $2 -eq 0 ]; then
+# $1: main path, $2: jobID, $3: chkID, $4: parallelism of nonlienage mode, $5: lineageTopicName
+if [ ${3} -eq 0 ]; then
 CHK_ARG=""
 else
-CHK_ARG="-s ${L3_HOME}/data/checkpoints/_checkpoints/${1}/chk-${2}"
+CHK_ARG="-s ${L3_HOME}/data/checkpoints/_checkpoints/${2}/chk-${3}"
 fi
 
 EXE_CMD="${FLINK_HOME}/bin/flink run -d \
 ${CHK_ARG} \
 --parallelism 1 \
 --allowNonRestoredState \
---class com.madamaya.l3stream.workflows.nexmark.L3Nexmark \
+--class ${1} \
 ${L3_HOME}/target/l3stream-1.0-SNAPSHOT.jar \
---sourcesNumber 2 \
---maxParallelism 4 \
+--maxParallelism ${4} \
 --lineageMode Lineage \
 --aggregateStrategy sortedPtr \
---lineageTopic ${3} \
+--lineageTopic ${5} \
 --latencyFlag 2"
 
 echo "${EXE_CMD}"

@@ -1,11 +1,13 @@
 #!/bin/zsh
 
+source ../config.sh
+
 function startCpMServer() {
   binHome=$1
   checkpointHome=$2
   cd ${binHome}
-  echo "./startCpMServer.sh localhost ${checkpointHome}"
-  ./startCpMServer.sh "localhost" ${checkpointHome} > /dev/null &
+  echo "./startCpMServer.sh ${cpmIP} ${cpmPort} ${checkpointHome}"
+  ./startCpMServer.sh ${cpmIP} ${cpmPort} ${checkpointHome} > /dev/null &
 }
 
 function stopCpMServer() {
