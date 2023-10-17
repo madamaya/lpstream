@@ -41,7 +41,7 @@ public class L3YSB {
 
         final String queryFlag = "YSB";
         final String inputTopicName = queryFlag + "-i";
-        final String outputTopicName = queryFlag + settings.getTopicSuffix();
+        final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
 
         boolean local = true;
         Properties kafkaProperties = new Properties();
@@ -57,7 +57,7 @@ public class L3YSB {
         DataStream<L3StreamTupleContainer<YSBResultTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
                 .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("2")
                 .map(L3.map(new DataParserYSB())).uid("3")
-                .map(L3.updateTsWM(new WatermarkStrategyYSB(), settings.getRedisIp(), 0)).uid("4")
+                .map(L3.updateTsWM(new WatermarkStrategyYSB(), settings, 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyYSB(), settings.numOfInstanceWM())).uid("5")
                 .filter(L3.filter(t -> t.getEventType().equals("view"))).uid("6")
                 .map(L3.map(new ProjectAttributeYSB())).uid("7")

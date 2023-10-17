@@ -40,7 +40,7 @@ public class L3Nexmark {
 
         final String queryFlag = "Nexmark";
         final String inputTopicName = queryFlag + "-i";
-        final String outputTopicName = queryFlag + settings.getTopicSuffix();
+        final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
 
         boolean local = true;
         Properties kafkaProperties = new Properties();
@@ -61,13 +61,13 @@ public class L3Nexmark {
         DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
                 .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("2")
                 .map(L3.map(new AuctionDataParserNex())).uid("3")
-                .map(L3.updateTsWM(new WatermarkStrategyAuctionNex(), settings.getRedisIp(), 0)).uid("4")
+                .map(L3.updateTsWM(new WatermarkStrategyAuctionNex(), settings, 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.numOfInstanceWM())).uid("5");
 
         DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("6")
                 .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("7")
                 .map(L3.map(new BidderDataParserNex())).uid("8")
-                .map(L3.updateTsWM(new WatermarkStrategyBidNex(), settings.getRedisIp(), 1)).uid("9")
+                .map(L3.updateTsWM(new WatermarkStrategyBidNex(), settings, 1)).uid("9")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.numOfInstanceWM())).uid("10");
 
         DataStream<L3StreamTupleContainer<NexmarkJoinedTuple>> joined = auction.keyBy(L3.keyBy(new KeySelector<NexmarkAuctionTuple, Integer>() {
