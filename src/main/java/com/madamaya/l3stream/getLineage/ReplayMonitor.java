@@ -25,16 +25,16 @@ import java.util.Properties;
 public class ReplayMonitor {
     public static void main(String[] args) throws Exception {
         long outputTs;
-        String outputTopic;
+        String lineageTopic;
         String outputValue = "";
 
         if (args.length == 2) {
             outputTs = Long.parseLong(args[0]);
-            outputTopic = args[1];
+            lineageTopic = args[1];
         } else if (args.length == 3) {
             outputTs = Long.parseLong(args[0]);
-            outputTopic = args[1];
-            // CNFM
+            lineageTopic = args[1];
+            // remove "\"" from beginnig and end of the input
             outputValue = args[2].substring(0, args[2].length()-1).substring(1);
         } else {
             throw new IllegalArgumentException();
@@ -47,8 +47,7 @@ public class ReplayMonitor {
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
-        String topicName = outputTopic.split("-")[0] + "-l";
-        consumer.subscribe(Arrays.asList(topicName));
+        consumer.subscribe(Arrays.asList(lineageTopic));
 
         int count = 0;
         boolean run = true;
@@ -59,7 +58,7 @@ public class ReplayMonitor {
                 count++;
                 String recordValue = (String) record.value();
                 if (count % 1000 == 0) {
-                    System.out.println("count = " + count);
+                    System.out.print("\rcount = " + count);
                 }
                 if (checkSame(recordValue, outputValue, outputTs)) {
                     writeLineage((String) record.value());
@@ -101,6 +100,7 @@ public class ReplayMonitor {
 
     public static void writeLineage(String recordValue) {
         // CNFM
+        System.out.println();
         System.out.println("!!! This is a tentative implementation of writeLineage (ReplayMonitor.java). !!!");
         System.out.println("!!! This writer must be implemented. !!!");
 
