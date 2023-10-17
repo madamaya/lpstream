@@ -9,9 +9,9 @@ public class CpManagementConfig {
     private String checkpointDir;
     @Parameter(names = "--jobID")
     private JobID jobID;
-    @Parameter(names = "--ip")
+    @Parameter(names = "--CpMServerIP")
     private String ip = "localhost";
-    @Parameter(names = "--port")
+    @Parameter(names = "--CpMServerPort")
     private int port = 10010;
 
     public String getCheckpointDir() {
