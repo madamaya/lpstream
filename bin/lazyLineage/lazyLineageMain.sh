@@ -3,7 +3,7 @@
 source ../config.sh
 #source ./configNYC.sh
 #source ./configYSB.sh
-#source ./configLR.sh
+source ./configLR.sh
 #source ./configNexmark.sh
 
 outputTopic="${testName}-l"

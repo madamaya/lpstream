@@ -6,10 +6,10 @@ source cpmanager.sh
 source notifyEnd.sh
 source flinkJob.sh
 
-flinkHome="${L3_HOME}/flink-1.17.1"
-kafkaHome="${L3_HOME}/kafka_2.12-3.4.1"
-binHome="${L3_HOME}/bin"
-checkpointHome="${L3_HOME}/data/checkpoints"
+flinkHome="${FLINK_HOME}"
+kafkaHome="${KAFKA_HOME}"
+binHome="${BIN_DIR}"
+checkpointHome="${CHECKPOINT_DIR}"
 autocheckHome=`pwd`
 
 if [ $# -eq 2 ]; then
@@ -19,7 +19,6 @@ else
 # manual
 testCaseName="NYC"
 fi
-
 
 echo "redis-cli FLUSHDB"
 redis-cli FLUSHDB
@@ -34,15 +33,17 @@ logFile=${logDir}/${testCaseName}.log
 echo "start Kafka logger"
 startLogger ${testCaseName} ${checkpointID} ${logDir} ${logFile} > /dev/null
 
+cd ..
+./lineageManager.sh normal ${JAR_PATH} ${mainPath} ${}
 ## start checkpoint manager server
-echo "startCpMServer"
-startCpMServer ${binHome} ${checkpointHome}
+#echo "startCpMServer"
+#startCpMServer ${binHome} ${checkpointHome}
 
 ## submit Flink job
-echo "submit Flink job"
+#echo "submit Flink job"
 #cd ${binHome}/${(L)testCaseName}/replayTest/
-cd ${binHome}/templates
-./nonlineage.sh $2 ${cpmIP} ${cpmPort} ${redisIP} ${redisPort} ${parallelism}
+#cd ${binHome}/templates
+#./nonlineage.sh $2 ${cpmIP} ${cpmPort} ${redisIP} ${redisPort} ${parallelism}
 
 cd ${autocheckHome}
 
