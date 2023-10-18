@@ -19,14 +19,14 @@ import java.util.Set;
 
 public class CpManagerClient extends RichMapFunction<ObjectNode, ObjectNode> implements CheckpointListener {
     ExperimentSettings settings;
-    JedisPool jp;
-    Jedis jedis;
-    int pallarelism;
-    int numOfSOp;
+    // JedisPool jp;
+    // Jedis jedis;
+    // int pallarelism;
+    // int numOfSOp;
     public CpManagerClient(ExperimentSettings settings) {
         this.settings = settings;
-        this.pallarelism = settings.maxParallelism();
-        this.numOfSOp = settings.sourcesNumber();
+        // this.pallarelism = settings.maxParallelism();
+        // this.numOfSOp = settings.sourcesNumber();
     }
 
     @Override
@@ -39,12 +39,14 @@ public class CpManagerClient extends RichMapFunction<ObjectNode, ObjectNode> imp
         super.open(parameters);
         sendMessage(settings, getRuntimeContext().getJobId().toHexString());
 
-        jp = new JedisPool(settings.getRedisIp(), 6379);
+        /*
+        jp = new JedisPool(settings.getRedisIp(), settings.getRedisPort());
         try {
             jedis = jp.getResource();
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
         }
+         */
     }
 
     @Override

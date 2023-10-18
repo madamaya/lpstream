@@ -10,9 +10,9 @@ public class CpManagementConfig {
     @Parameter(names = "--jobID")
     private JobID jobID;
     @Parameter(names = "--CpMServerIP")
-    private String ip = "localhost";
+    private String CpMServerIP = "localhost";
     @Parameter(names = "--CpMServerPort")
-    private int port = 10010;
+    private int CpMServerPort = 10010;
 
     public String getCheckpointDir() {
         return checkpointDir;
@@ -30,19 +30,20 @@ public class CpManagementConfig {
         this.jobID = jobID;
     }
 
-    public String getIp() {
-        return ip;
+    public String getCpMServerIP() {
+        return CpMServerIP;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-    public int getPort() {
-        return port;
+    public void setCpMServerIP(String cpMServerIP) {
+        CpMServerIP = cpMServerIP;
     }
 
-    public void setPort(int port) {
-        this.port = port;
+    public int getCpMServerPort() {
+        return CpMServerPort;
+    }
+
+    public void setCpMServerPort(int cpMServerPort) {
+        CpMServerPort = cpMServerPort;
     }
 
     public static CpManagementConfig newInstance(String[] args) {

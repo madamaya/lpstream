@@ -1,5 +1,6 @@
 package com.madamaya.l3stream.cpstore;
 
+import com.madamaya.l3stream.conf.L3Config;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.flink.api.common.JobID;
 
@@ -23,7 +24,7 @@ public class CpManagerServer {
         createDir(config);
 
         try (ServerSocket serverSocket = new ServerSocket()) {
-            serverSocket.bind(new InetSocketAddress(config.getIp(), config.getPort()));
+            serverSocket.bind(new InetSocketAddress(config.getCpMServerIP(), config.getCpMServerPort()));
 
             System.out.println("Waiting - JobID");
             config.setJobID(getJobID(serverSocket));
