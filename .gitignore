@@ -26,3 +26,4 @@ data/input/Nexmark/*.sql
 data/input/Nexmark/*.json
 
 script/autoReplayOutCheck/**/*.log
+/bin/lineageManagerConfig.sh
