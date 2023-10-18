@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Properties;
 
-public class DataLoader {
+public class L3DataLoader {
     public static void main(String[] args) {
 
         if (args.length != 2) {
@@ -45,7 +45,7 @@ public class DataLoader {
                         });
                 count++;
                 if (count % 100000 == 0) {
-                    System.out.println(count);
+                    System.out.print("\r" + count);
                 }
             }
         } catch (Exception e) {
@@ -54,6 +54,6 @@ public class DataLoader {
 
         producer.close();
 
-        System.out.println("END WRITE: " + count + " data were written.");
+        System.out.println(" [END WRITE: " + count + " data were written.]");
     }
 }
