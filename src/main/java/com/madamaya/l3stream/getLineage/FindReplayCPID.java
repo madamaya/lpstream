@@ -1,5 +1,6 @@
 package com.madamaya.l3stream.getLineage;
 
+import com.madamaya.l3stream.conf.L3Config;
 import org.apache.flink.api.java.tuple.Tuple2;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -43,7 +44,7 @@ public class FindReplayCPID {
     }
      */
 
-    private static int findID(Jedis jedis, int pallarelism, int numOfSOp, long timestamp) throws InterruptedException {
+    private static int findID(Jedis jedis, int numOfSOp, long timestamp) throws InterruptedException {
         Set<String> keys = jedis.keys("*");
         HashMap<Integer, Tuple2<Long, Integer>> hm = new HashMap<>();
         int cpidMax = Integer.MIN_VALUE;
@@ -67,7 +68,7 @@ public class FindReplayCPID {
 
         for (int cpid = cpidMax; cpid > 0; cpid--) {
             Tuple2<Long, Integer> element = hm.get(cpid);
-            if (element != null && element.f1 == (pallarelism * numOfSOp) && element.f0 < timestamp) {
+            if (element != null && element.f1 == (L3Config.PARALLELISM * numOfSOp) && element.f0 < timestamp) {
                 return cpid;
             }
         }
@@ -98,13 +99,13 @@ public class FindReplayCPID {
     }
 
     // defalut: redisIP = "localhost", redisPort = 6379
-    public static int getReplayID(long outputTs, long maxWindowSize, int parallelism, int numOfSource, String redisIP, int redisPort) {
-        JedisPool pool = new JedisPool(redisIP, redisPort);
+    public static int getReplayID(long outputTs, long maxWindowSize, int numOfSource) {
+        JedisPool pool = new JedisPool(L3Config.REDIS_IP, L3Config.REDIS_PORT);
         try (Jedis jedis = pool.getResource()) {
             Set<String> keys = jedis.keys("*");
             List<Integer> validKeyds = getValidKeys(keys);
             // return findID(validKeyds, jedis, outputTs - maxWindowSize);
-            return findID(jedis, parallelism, numOfSource, outputTs - maxWindowSize);
+            return findID(jedis, numOfSource, outputTs - maxWindowSize);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

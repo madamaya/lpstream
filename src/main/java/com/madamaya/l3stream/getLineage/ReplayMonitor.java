@@ -1,5 +1,6 @@
 package com.madamaya.l3stream.getLineage;
 
+import com.madamaya.l3stream.conf.L3Config;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
@@ -41,7 +42,7 @@ public class ReplayMonitor {
         }
 
         Properties properties = new Properties();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, L3Config.BOOTSTRAP_IP_PORT);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, "replaymonitor-" + System.currentTimeMillis());
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
@@ -51,7 +52,6 @@ public class ReplayMonitor {
 
         int count = 0;
         boolean run = true;
-        // CNFM: 直前の実行の結果を受け取らないように修正した方がベター
         while (run) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
             for (ConsumerRecord record : records) {
@@ -121,7 +121,7 @@ public class ReplayMonitor {
         // Create running jobid list, which should be canceled
         HttpRequest request = HttpRequest
                 .newBuilder()
-                .uri(URI.create("http://localhost:8081/jobs/overview"))
+                .uri(URI.create("http://" + L3Config.FLINK_IP + ":" + L3Config.FLINK_PORT + "/jobs/overview"))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         JsonNode jsonNode = new ObjectMapper().readTree(response.body());
@@ -139,7 +139,7 @@ public class ReplayMonitor {
         for (int idx = 0; idx < endIDs.size(); idx++) {
             request = HttpRequest
                     .newBuilder()
-                    .uri(URI.create("http://localhost:8081/jobs/" + endIDs.get(idx)))
+                    .uri(URI.create("http://" + L3Config.FLINK_IP + ":" + L3Config.FLINK_PORT + "/jobs/" + endIDs.get(idx)))
                     .method("PATCH", HttpRequest.BodyPublishers.noBody())
                     .build();
             client.send(request, HttpResponse.BodyHandlers.ofString());
