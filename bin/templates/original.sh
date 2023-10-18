@@ -2,11 +2,11 @@
 
 source $(dirname $0)/../config.sh
 
-# $1: main path, $2: parallelism
+# $1: jar path, $2: main path
 EXE_CMD="${FLINK_HOME}/flink-1.17.1/bin/flink run -d \
---parallelism ${2} \
---class ${1} \
-../../target/l3stream-1.0-SNAPSHOT.jar"
+--parallelism ${parallelism} \
+--class ${2} \
+${1}";
 
 echo "${EXE_CMD}"
 eval ${EXE_CMD}
