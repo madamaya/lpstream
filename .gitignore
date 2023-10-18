@@ -13,8 +13,12 @@ data/datagen
 data/log*
 data/test0918
 data/**/*csv
+data/**/*csv.1
+data/**/*csv.2
 data/**/*parquet
 data/**/*json
+data/**/*json.1
+data/**/*json.2
 data/**/*txt
 
 lib/*jar
