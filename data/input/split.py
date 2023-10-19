@@ -1,11 +1,10 @@
 import sys
 
 if __name__ == "__main__":
-    assert len(sys.argv) == 2
+    assert len(sys.argv) == 3
 
-    file = sys.argv[0]
-    numOfLines = 59149718
-    exit(1)
+    file = sys.argv[1]
+    numOfLines = int(sys.argv[2])
     numOf1File = numOfLines // 2
     numOf2File = numOfLines - numOf1File
 
