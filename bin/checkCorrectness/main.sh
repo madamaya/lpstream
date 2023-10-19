@@ -6,13 +6,32 @@ source ../utils/logger.sh
 source ../utils/flinkJob.sh
 source ../utils/notifyEnd.sh
 
-#source ./config/configLR.sh
-#source ./config/configNexmark.sh
-source ./config/configNYC.sh
-#source ./config/configYSB.sh
+startCpID=1
 
-logDir="/Users/yamada-aist/workspace/l3stream/bin/checkCorrectness/log/${testName}"
+if [ $# -ne 1 ]; then
+  echo "Illegal Args"
+  exit 1
+fi
+
+if [ $1 -eq 1 ]; then
+  echo "****************** LR ******************"
+  source ./config/configLR.sh
+elif [ $1 -eq 2 ]; then
+  echo "****************** Nexmark ******************"
+  source ./config/configNexmark.sh
+elif [ $1 -eq 3 ]; then
+  echo "****************** NYC ******************"
+  source ./config/configNYC.sh
+elif [ $1 -eq 4 ]; then
+  echo "****************** YSB ******************"
+  source ./config/configYSB.sh
+fi
+
+logDir="${BIN_DIR}/checkCorrectness/log/${testName}"
 logFile="${logDir}/all_baseline.log"
+
+./dataLoader.sh 3 ${testName}-o
+./dataLoader.sh 4 ${testName}-l
 
 ./dataLoader.sh 0 ${inputTopicName} ${inputFilePath}
 
@@ -90,7 +109,7 @@ startKafkaLogger ${logDir} ${logFile} ${testName}-l > /dev/null
 
 # submit job
 echo "sumbit job"
-./lineage.sh ${JAR_PATH} ${mainPath} ${jobid} 1 ${testName}-l
+./lineage.sh ${JAR_PATH} ${mainPath} ${jobid} ${startCpID} ${testName}-l
 
 cd ../checkCorrectness
 ./dataLoader.sh 2 ${inputTopicName} ${inputFilePath} > /dev/null &
@@ -122,4 +141,4 @@ echo "(stopLogger)"
 stopLogger
 
 cd ../checkCorrectness/log
-python ${cmpPythonName} ${logDir}/all_baseline.log ${logDir}/split_baseline.log ${logDir}/split_from_chk.log 1
+python ${cmpPythonName} ${logDir}/all_baseline.log ${logDir}/split_baseline.log ${logDir}/split_from_chk.log ${startCpID} ${parseFlag}

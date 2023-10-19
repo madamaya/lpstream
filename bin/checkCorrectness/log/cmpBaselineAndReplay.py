@@ -6,6 +6,12 @@ def getOutputList(filePath):
     with open(filePath) as f:
         return [line.replace("\n", "") for line in f.readlines()]
 
+def parseNYCOutputAndRoundAvg(line):
+    jdata = json.loads(line.replace("NYCResultTuple", "").replace("vendorId", "\"vendorId\"").replace("dropoffLocationId", "\"dropoffLocationId\"").replace("count", "\"count\"").replace("avgDistance", "\"avgDistance\"").replace("ts", "\"ts\"").replace("=", ":"))
+    # jdata["avgDistance"] = round(jdata["avgDistance"], 2)
+    jdata["avgDistance"] = 0
+    return json.dumps(jdata)
+
 if __name__ == "__main__":
     # assert len(sys.argv) == 4
 
@@ -14,23 +20,30 @@ if __name__ == "__main__":
     baselineSPLITpath = sys.argv[2]
     replayPath = sys.argv[3]
     startingCheckpointID = int(sys.argv[4])
+    parseFlag = int(sys.argv[5])
 
     # Create baseline output set
     baselineALLset = set()
     baselineALLlist = getOutputList(baselineALLpath)
     print("*** CREATE BASELINE OUTPUT SET ***")
     for line in tqdm(baselineALLlist):
-        baselineALLset.add(json.loads(line)["OUT"])
+        if parseFlag == 1:
+            baselineALLset.add(parseNYCOutputAndRoundAvg(json.loads(line)["OUT"]))
+        else:
+            baselineALLset.add(json.loads(line)["OUT"])
 
-    # Check split output
+    # TEST1: BASELINE(ALL) -> BASELINE(SPLIT)
+    print("*** TEST1: BASELINE(ALL) -> BASELINE(SPLIT) ***")
     idx = 0
     removedIdx = []
     removedOut = []
     baselineSPLITset = set()
     baselineSPLITlist = []
-    print("*** CHECK SPLIT OUTPUT ***")
     for line in tqdm(getOutputList(baselineSPLITpath)):
-        output = json.loads(line)["OUT"]
+        if parseFlag == 1:
+            output = parseNYCOutputAndRoundAvg(json.loads(line)["OUT"])
+        else:
+            output = json.loads(line)["OUT"]
         baselineSPLITset.add(output)
         cpid = int(json.loads(line)["CPID"])
         idx = idx + 1
@@ -39,48 +52,71 @@ if __name__ == "__main__":
             removedOut.append(output)
         if cpid > startingCheckpointID:
             baselineSPLITlist.append(output)
-    # print("removedIdx = {}".format(removedIdx))
 
+    # TEST2: BASELINE(SPLIT) -> BASELINE(ALL)
+    print("*** TEST2: BASELINE(SPLIT) -> BASELINE(ALL) ***")
     idx2 = 0
     removedIdx2 = []
     removedOut2 = []
     for line in tqdm(getOutputList(baselineALLpath)):
         idx2 = idx2 + 1
-        output = json.loads(line)["OUT"]
+        if parseFlag == 1:
+            output = parseNYCOutputAndRoundAvg(json.loads(line)["OUT"])
+        else:
+            output = json.loads(line)["OUT"]
         if output not in baselineSPLITset:
             removedIdx2.append(idx2)
             removedOut2.append(output)
 
-    # Check replay output
+    # TEST3: REPLAY -> BASELINE(SPLIT)
+    print("*** TEST3: REPLAY -> BASELINE(SPLIT) ***")
+    print("(ARE ALL SPLIT OUTPUTS INCLUDED IN BASELINE ONES?)")
     idx3 = 0
     removedIdx3 = []
     removedOut3 = []
     replaySet = set()
-    print("*** CHECK SPLIT OUTPUT ***")
-    print("*** PHASE1: ARE ALL SPLIT OUTPUTS INCLUDED IN BASELINE ONES? ***")
     for line in tqdm(getOutputList(replayPath)):
-        output = json.loads(line)["OUT"]
+        if parseFlag == 1:
+            output = parseNYCOutputAndRoundAvg(json.loads(line)["OUT"])
+        else:
+            output = json.loads(line)["OUT"]
         replaySet.add(output)
         idx3 = idx3 + 1
         if output not in baselineSPLITset:
             removedIdx3.append(idx3)
             removedOut3.append(output)
-    # print("removedIdx = {}".format(removedIdx))
 
+    # BASELINE(SPLIT(cpid > idx)) -> REPLAY
+    print("*** TEST4: BASELINE(SPLIT(cpid > idx)) -> REPLAY ***")
+    print("(ARE ALL BASELINE OUTPUTS, WHOSE CPID IS GREATER THAN startingCheckpointID, INCLUDED IN SPLIT ONES?)")
     idx4 = 0
     removedIdx4 = []
     removedOut4 = []
-    print("*** PHASE2: ARE ALL BASELINE OUTPUTS, WHOSE CPID IS GREATER THAN startingCheckpointID, INCLUDED IN SPLIT ONES? ***")
     for output in tqdm(baselineSPLITlist):
         idx4 = idx4 + 1
         if output not in replaySet:
             removedIdx4.append(idx4)
             removedOut4.append(output)
 
-    print("RESULT::: len(removedIdx) = {}, len(removedIdx2) = {}, len(removedIdx3) = {}, len(removedIdx4) = {}".format(len(removedIdx), len(removedIdx2), len(removedIdx3), len(removedIdx4)))
-    print("( len(baselineALLlist) = {}, len(baselineALLset) = {}, len(baselineSPLITlist) = {}, len(baselineSPLITset) = {}, len(replaySet) = {})".format(len(baselineALLlist), len(baselineALLset), len(baselineSPLITlist), len(baselineSPLITset), len(replaySet)))
+    print("RESULT:::")
+    print("  [ BASELINE(ALL) -> BASELINE(SPLIT) ] len(removedIdx) = {},".format(len(removedIdx)))
+    print("  [ BASELINE(SPLIT) -> BASELINE(ALL) ] len(removedIdx2) = {},".format(len(removedIdx2)))
+    print("  [ REPLAY -> BASELINE(SPLIT) ] len(removedIdx3) = {},".format(len(removedIdx3)))
+    print("  [ BASELINE(SPLIT(cpid > idx)) -> REPLAY ] len(removedIdx4) = {}".format(len(removedIdx4)))
+    print()
+    print("VALIABLES:::")
+    print("  len(baselineALLlist) = {},".format(len(baselineALLlist)))
+    print("  len(baselineALLset) = {},".format(len(baselineALLset)))
+    print("  len(baselineSPLITlist) = {},".format(len(baselineSPLITlist)))
+    print("  len(baselineSPLITset) = {},".format(len(baselineSPLITset)))
+    print("  len(replaySet) = {})".format(len(replaySet)))
 
-    if len(removedIdx) == 0 and len(removedIdx2) == 0 and len(removedIdx3) == 0 and len(removedIdx4):
+    # Correctness
+    rule1 = (len(removedIdx) != 0 and len(removedIdx2) == 0) or (len(removedIdx) == 0 and len(removedIdx2) != 0)
+    rule2 = len(baselineALLset) == len(baselineSPLITset)
+    rule3 = len(removedIdx3) == 0 and len(removedIdx4) == 0
+
+    if (rule1 ^ rule2) and rule3:
         print("✅")
     else:
         print("❌")
