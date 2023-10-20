@@ -8,10 +8,6 @@ EXE_CMD="${FLINK_HOME}/bin/flink run -d \
 --class ${2} \
 ${1} \
 --maxParallelism ${parallelism} \
---CpMServerIP ${cpmIP} \
---CpMServerPort ${cpmPort} \
---RedisIP ${redisIP} \
---RedisPort ${redisPort} \
 --lineageMode nonLineage \
 --aggregateStrategy sortedPtr \
 --cpmProcessing \

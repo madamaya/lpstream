@@ -29,6 +29,8 @@ if __name__ == "__main__":
     for line in tqdm(baselineALLlist):
         if parseFlag == 1:
             baselineALLset.add(parseNYCOutputAndRoundAvg(json.loads(line)["OUT"]))
+        elif parseFlag == 2:
+            baselineALLset.add(json.loads(line.replace("\\", ""))["OUT"])
         else:
             baselineALLset.add(json.loads(line)["OUT"])
 
@@ -42,10 +44,14 @@ if __name__ == "__main__":
     for line in tqdm(getOutputList(baselineSPLITpath)):
         if parseFlag == 1:
             output = parseNYCOutputAndRoundAvg(json.loads(line)["OUT"])
+            cpid = int(json.loads(line)["CPID"])
+        elif parseFlag == 2:
+            output = json.loads(line.replace("\\", ""))["OUT"]
+            cpid = int(json.loads(line.replace("\\", ""))["CPID"])
         else:
             output = json.loads(line)["OUT"]
+            cpid = int(json.loads(line)["CPID"])
         baselineSPLITset.add(output)
-        cpid = int(json.loads(line)["CPID"])
         idx = idx + 1
         if output not in baselineALLset:
             removedIdx.append(idx)
@@ -62,6 +68,8 @@ if __name__ == "__main__":
         idx2 = idx2 + 1
         if parseFlag == 1:
             output = parseNYCOutputAndRoundAvg(json.loads(line)["OUT"])
+        elif parseFlag == 2:
+            output = json.loads(line.replace("\\", ""))["OUT"]
         else:
             output = json.loads(line)["OUT"]
         if output not in baselineSPLITset:
@@ -78,6 +86,8 @@ if __name__ == "__main__":
     for line in tqdm(getOutputList(replayPath)):
         if parseFlag == 1:
             output = parseNYCOutputAndRoundAvg(json.loads(line)["OUT"])
+        elif parseFlag == 2:
+            output = json.loads(line.replace("\\", ""))["OUT"]
         else:
             output = json.loads(line)["OUT"]
         replaySet.add(output)

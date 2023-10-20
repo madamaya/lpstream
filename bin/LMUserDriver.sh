@@ -2,9 +2,9 @@
 
 source ./config.sh
 
-#source ./workflowConf/configLR.sh
+source ./workflowConf/configLR.sh
 #source ./workflowConf/configNexmark.sh
-source ./workflowConf/configNYC.sh
+#source ./workflowConf/configNYC.sh
 #source ./workflowConf/configYSB.sh
 
 source ./utils/logger.sh
@@ -24,17 +24,31 @@ logDir="${L3_HOME}/data/log/${(L)testName}"
 echo "logFile=\"${logDir}/${testName}.log\""
 logFile="${logDir}/${testName}.log"
 
+## Initialize redis
+echo "*** Initialize redis ***"
+echo "(redis-cli FLUSHDB)"
+redis-cli FLUSHDB
+
 ## Start kafka logger
 echo "*** Start Kafka logger ***"
 echo "(startKafkaLogger ${logDir} ${logFile} ${outputTopicName})"
 startKafkaLogger ${logDir} ${logFile} ${outputTopicName} > /dev/null
 
-## Start Lineage Manager with normal mode
-echo "*** Start Lineage Manager with normal mode ***"
-echo "(./lineageManager.sh normal ${JAR_PATH} ${mainPath} ${numOfSourceOp})"
-./lineageManager.sh normal ${JAR_PATH} ${mainPath} ${numOfSourceOp}
-jobid=`cat currentJobID.txt`
-echo "jobid = ${jobid}"
+## start checkpoint manager server
+echo "*** Start Checkpoint Management Server ***"
+echo "(./startCpMServer.sh > /dev/null &)"
+./startCpMServer.sh > /dev/null &
+
+## submit Flink job
+cd ${BIN_DIR}/templates
+echo "*** Submit Flink job ***"
+echo "(./nonlineage.sh ${JAR_PATH} ${mainPath})"
+./nonlineage.sh ${JAR_PATH} ${mainPath}
+
+cd ${BIN_DIR}
+echo "*** Get jobid ***"
+echo "(jobid=\`getRunningJobID\`)"
+jobid=`getRunningJobID`
 
 ## Notify all outputs were provided.
 echo "*** Notify all outputs were provided ***"
@@ -72,5 +86,5 @@ do
   outputTs=`echo ${LINE} | jq '.TS' | sed -e 's/"//g'`
 
   ## Start Lineage Manager with normal mode
-  ./lineageManager.sh lineage ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName}
+  ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName}
 done < ${FILE}

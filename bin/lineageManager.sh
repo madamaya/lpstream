@@ -4,7 +4,11 @@ source ./config.sh
 source ./utils/flinkJob.sh
 
 mode=$1
+<<COMMENT
 if [ ${mode} = "normal" ]; then
+  echo "normal mode has been deleted."
+  exit 1
+
   if [ $# -ne 4 ]; then
     echo "Illegal Arguments (lineageManager.sh)"
     exit 1
@@ -48,25 +52,28 @@ if [ ${mode} = "normal" ]; then
 
   echo "*** END of lineageManager.sh (normal mode) ***"
 elif [ ${mode} = "lineage" ]; then
-  if [ $# -ne 6 ]; then
-    echo "Illegal Arguments (lineageManager.sh)"
-    exit 1
-  fi
-  # $1: mode, $2: jobid, $3: outputTs, $4: outputValue, $5: maxWsize, $6: lineageTopicName
-  jobid=$2
-  outputTs=$3
-  outputValue=$4
-  maxWindowSize=$5
-  lineageTopicName=$6
-  # read jarPath, mainPath, and numOfSourceOp
-  source ./lineageManagerConfig.sh
-
-  echo "*** Start lineage derivation ***"
-  echo "(./getLineage.sh ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${outputValue} ${numOfSourceOp})"
-  ./getLineage.sh ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${outputValue} ${numOfSourceOp}
-
-  echo "*** END of lineageManager.sh (lineage mode)"
-else
-  echo "Illegal Mode (lineageManager.sh)"
+COMMENT
+if [ $# -ne 7 ]; then
+  echo "Illegal Arguments (lineageManager.sh)"
   exit 1
 fi
+# $1: jarPath, $2: mainPath, $3: jobid, $4: outputTs, $5: outputValue, $6: maxWsize, $7: lineageTopicName
+jarPath=$1
+mainPath=$2
+jobid=$3
+outputTs=$4
+outputValue=$5
+maxWindowSize=$6
+lineageTopicName=$7
+# define numOfSourceOp
+if [[ ${mainPath} == *Nexmark* ]]; then
+  numOfSourceOp=2
+else
+  numOfSourceOp=1
+fi
+
+echo "*** Start lineage derivation ***"
+echo "(./getLineage.sh ${jarPath} ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${outputValue} ${numOfSourceOp})"
+./getLineage.sh ${jarPath} ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${outputValue} ${numOfSourceOp}
+
+echo "*** END of lineageManager.sh "

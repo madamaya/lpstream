@@ -26,8 +26,6 @@ elif [ $1 -eq 3 ]; then
 elif [ $1 -eq 4 ]; then
   echo "****************** YSB ******************"
   source ./config/configYSB.sh
-  echo "do nothing"
-  exit 1
 fi
 
 logDir="${BIN_DIR}/checkCorrectness/log/${testName}"

@@ -28,6 +28,8 @@ if __name__ == "__main__":
     for line in tqdm(baselineList):
         if parseFlag == 1:
             baselineSet.add(parseNYCOutputAndRoundAvg(json.loads(line)["OUT"]))
+        elif parseFlag == 2:
+            baselineSet.add(json.loads(line.replace("\\", ""))["OUT"])
         else:
             baselineSet.add(json.loads(line)["OUT"])
 
@@ -44,10 +46,14 @@ if __name__ == "__main__":
         replayList = getOutputList(replayPath)
         for line in tqdm(replayList):
             idx = idx + 1
-            if parseFlag == 1:
-                output = parseNYCOutputAndRoundAvg(json.loads(line)["OUT"])
+            if parseFlag == 2:
+                jdata = json.loads(line.replace("\\", ""))
             else:
-                output = json.loads(line)["OUT"]
+                jdata = json.loads(line)
+            if parseFlag == 1:
+                output = parseNYCOutputAndRoundAvg(jdata["OUT"])
+            else:
+                output = jdata["OUT"]
             replaySet.add(output)
             if output not in baselineSet:
                 removedIdx.append(idx)
@@ -60,14 +66,16 @@ if __name__ == "__main__":
         removedOut2 = []
         for line in tqdm(baselineList):
             idx2 = idx2 + 1
-            if parseFlag == 1:
-                jdata = json.loads(line)
-                output = parseNYCOutputAndRoundAvg(jdata["OUT"])
-                cpid = int(jdata["CPID"])
+            if parseFlag == 2:
+                jdata = json.loads(line.replace("\\", ""))
             else:
                 jdata = json.loads(line)
+            cpid = int(jdata["CPID"])
+
+            if parseFlag == 1:
+                output = parseNYCOutputAndRoundAvg(jdata["OUT"])
+            else:
                 output = jdata["OUT"]
-                cpid = int(jdata["CPID"])
 
             if cpid > idx and output not in replaySet:
                 removedIdx2.append(idx2)
@@ -90,6 +98,6 @@ if __name__ == "__main__":
             print("idx = {} ❌".format(idx))
 
     if result == True:
-        print("result = ✅".format(idx))
+        print("result = ✅")
     else:
-        print("result = ❌".format(idx))
+        print("result = ❌")

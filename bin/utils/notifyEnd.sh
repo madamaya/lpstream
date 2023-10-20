@@ -1,5 +1,6 @@
 #!/bin/zsh
 
+sleepTimeNotifyEnd=120
 # $1: logFile
 function notifyEnd() {
   logFile=$1
@@ -15,6 +16,6 @@ function notifyEnd() {
     fi
     echo "prev=${prev}, current=${current}"
     prev=${current}
-    sleep 60
+    sleep ${sleepTimeNotifyEnd}
   done
 }
