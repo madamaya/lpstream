@@ -1,9 +1,9 @@
 package com.madamaya.l3stream.workflows.linearroad.noprovenance.wqs;
 
-import com.madamaya.l3stream.cpstore.CpManagerClient;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.linearroad.noprovenance.utils.LrWatermark;
 import com.madamaya.l3stream.workflows.linearroad.noprovenance.utils.ObjectNodeConverter;
+import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
@@ -79,7 +79,7 @@ public class LinearRoadAccidentShort {
 
     if (settings.cpmProcessing()) {
       DataStream<ObjectNode> ds2 =  env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).uid("10").setParallelism(1)
-              .map(new CpManagerClient(settings)).uid("11").setParallelism(1);
+              .map(new CpManagerClient()).uid("11").setParallelism(1);
     }
 
     env.execute("LinearRoadAccidentShort");

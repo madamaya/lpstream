@@ -1,12 +1,12 @@
 package com.madamaya.l3stream.workflows.nexmark;
 
-import com.madamaya.l3stream.cpstore.CpManagerClient;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTuple;
 import com.madamaya.l3stream.workflows.nexmark.ops.*;
 import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
+import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
@@ -52,8 +52,8 @@ public class L3Nexmark {
             kafkaProperties.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
             kafkaProperties2.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
         }
-        kafkaProperties.setProperty("group.id", "myGROUP" + settings.getTopicSuffix());
-        kafkaProperties.setProperty("group.id", "myGROUP2" + settings.getTopicSuffix());
+        kafkaProperties.setProperty("group.id", "1-" + String.valueOf(System.currentTimeMillis()));
+        kafkaProperties.setProperty("group.id", "2-" + String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
         kafkaProperties2.setProperty("transaction.timeout.ms", "540000");
 
@@ -61,13 +61,13 @@ public class L3Nexmark {
         DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
                 .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("2")
                 .map(L3.map(new AuctionDataParserNex())).uid("3")
-                .map(L3.updateTsWM(new WatermarkStrategyAuctionNex(), settings, 0)).uid("4")
+                .map(L3.updateTsWM(new WatermarkStrategyAuctionNex(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.numOfInstanceWM())).uid("5");
 
         DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("6")
                 .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("7")
                 .map(L3.map(new BidderDataParserNex())).uid("8")
-                .map(L3.updateTsWM(new WatermarkStrategyBidNex(), settings, 1)).uid("9")
+                .map(L3.updateTsWM(new WatermarkStrategyBidNex(), 1)).uid("9")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.numOfInstanceWM())).uid("10");
 
         DataStream<L3StreamTupleContainer<NexmarkJoinedTuple>> joined = auction.keyBy(L3.keyBy(new KeySelector<NexmarkAuctionTuple, Integer>() {
@@ -96,7 +96,7 @@ public class L3Nexmark {
 
         if (settings.cpmProcessing()) {
             DataStream<ObjectNode> ds2 = env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).uid("100").setParallelism(1)
-                    .map(new CpManagerClient(settings)).uid("101").setParallelism(1);
+                    .map(new CpManagerClient()).uid("101").setParallelism(1);
         }
 
         env.execute(settings.getLineageMode() + "," + queryFlag);

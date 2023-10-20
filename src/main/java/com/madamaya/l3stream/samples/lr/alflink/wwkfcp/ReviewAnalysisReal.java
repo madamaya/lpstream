@@ -1,8 +1,8 @@
 package com.madamaya.l3stream.samples.lr.alflink.wwkfcp;
 
-import com.madamaya.l3stream.cpstore.CpManagerClient;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.samples.lr.alflink.*;
+import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
@@ -75,7 +75,7 @@ public class ReviewAnalysisReal {
 
 
       DataStream<ObjectNode> ds2 =  env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).setParallelism(1)
-              .map(new CpManagerClient(settings)).setParallelism(1);
+              .map(new CpManagerClient()).setParallelism(1);
 
     // L5
     if (settings.getLineageMode() == "NonLineageMode") {

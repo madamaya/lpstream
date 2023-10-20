@@ -1,10 +1,10 @@
 package com.madamaya.l3stream.workflows.lr;
 
-import com.madamaya.l3stream.cpstore.CpManagerClient;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.lr.ops.DataParserLR;
 import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLR;
 import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
+import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
@@ -51,14 +51,14 @@ public class L3LR {
         } else {
             kafkaProperties.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
         }
-        kafkaProperties.setProperty("group.id", "myGROUP" + settings.getTopicSuffix());
+        kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */
         DataStream<L3StreamTupleContainer<CountTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
                 .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("2")
                 .map(L3.map(new DataParserLR())).uid("3")
-                .map(L3.updateTsWM(new WatermarkStrategyLR(), settings, 0)).uid("4")
+                .map(L3.updateTsWM(new WatermarkStrategyLR(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(), settings.numOfInstanceWM())).uid("5")
                 .filter(L3.filter(t -> t.getType() == 0 && t.getSpeed() == 0)).uid("6")
                 .keyBy(L3.keyBy(t -> t.getKey(), String.class))
@@ -82,7 +82,7 @@ public class L3LR {
 
         if (settings.cpmProcessing()) {
             DataStream<ObjectNode> ds2 = env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).uid("100").setParallelism(1)
-                    .map(new CpManagerClient(settings)).uid("101").setParallelism(1);
+                    .map(new CpManagerClient()).uid("101").setParallelism(1);
         }
 
         env.execute(settings.getLineageMode() + "," + queryFlag);

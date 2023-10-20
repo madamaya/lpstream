@@ -1,6 +1,5 @@
 package com.madamaya.l3stream.workflows.ysb;
 
-import com.madamaya.l3stream.cpstore.CpManagerClient;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
@@ -8,6 +7,7 @@ import com.madamaya.l3stream.workflows.ysb.ops.CountYSB;
 import com.madamaya.l3stream.workflows.ysb.ops.DataParserYSB;
 import com.madamaya.l3stream.workflows.ysb.ops.ProjectAttributeYSB;
 import com.madamaya.l3stream.workflows.ysb.ops.WatermarkStrategyYSB;
+import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
@@ -50,14 +50,15 @@ public class L3YSB {
         } else {
             kafkaProperties.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
         }
-        kafkaProperties.setProperty("group.id", "myGROUP" + settings.getTopicSuffix());
+        // CNFM
+        kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */
         DataStream<L3StreamTupleContainer<YSBResultTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
                 .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("2")
                 .map(L3.map(new DataParserYSB())).uid("3")
-                .map(L3.updateTsWM(new WatermarkStrategyYSB(), settings, 0)).uid("4")
+                .map(L3.updateTsWM(new WatermarkStrategyYSB(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyYSB(), settings.numOfInstanceWM())).uid("5")
                 .filter(L3.filter(t -> t.getEventType().equals("view"))).uid("6")
                 .map(L3.map(new ProjectAttributeYSB())).uid("7")
@@ -75,7 +76,7 @@ public class L3YSB {
 
         if (settings.cpmProcessing()) {
             DataStream<ObjectNode> ds2 = env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).uid("100").setParallelism(1)
-                    .map(new CpManagerClient(settings)).uid("101").setParallelism(1);
+                    .map(new CpManagerClient()).uid("101").setParallelism(1);
         }
 
         env.execute(settings.getLineageMode() + "," + queryFlag);

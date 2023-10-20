@@ -1,11 +1,11 @@
 package com.madamaya.l3stream.workflows.linearroad.noprovenance.qs.provenance;
 
-import com.madamaya.l3stream.cpstore.CpManagerClient;
 import com.madamaya.l3stream.workflows.linearroad.noprovenance.utils.ObjectNodeConverter;
 import io.palyvos.provenance.ananke.functions.ProvenanceFunctionFactory;
 import io.palyvos.provenance.ananke.functions.ProvenanceTupleContainer;
 import io.palyvos.provenance.genealog.GenealogGraphTraverser;
 import io.palyvos.provenance.genealog.GenealogTuple;
+import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.FormatLineage;
 import io.palyvos.provenance.usecases.CountTuple;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.*;
@@ -105,7 +105,7 @@ public class LinearRoadCombined {
 
       if (settings.cpmProcessing()) {
           DataStream<ObjectNode> ds2 = env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).uid("10").setParallelism(1)
-                  .map(new CpManagerClient(settings)).uid("11").setParallelism(1);
+                  .map(new CpManagerClient()).uid("11").setParallelism(1);
       }
 
     env.execute("LinearRoadCombined");

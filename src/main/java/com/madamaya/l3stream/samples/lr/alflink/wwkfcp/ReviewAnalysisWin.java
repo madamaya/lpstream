@@ -1,8 +1,8 @@
 package com.madamaya.l3stream.samples.lr.alflink.wwkfcp;
 
-import com.madamaya.l3stream.cpstore.CpManagerClient;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.samples.lr.alflink.*;
+import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
@@ -79,10 +79,10 @@ public class ReviewAnalysisWin {
                 }
             }))
             .assignTimestampsAndWatermarks(
-                    L3S.assignTimestampsAndWatermarks(new WatermarkGen()).withTimestampAssigner((reviewInputData, l) -> reviewInputData.tuple().getReviewTime())
+                    L3S.assignTimestampsAndWatermarks(new WatermarkGen(), settings.maxParallelism()).withTimestampAssigner((reviewInputData, l) -> reviewInputData.tuple().getReviewTime())
             )
             .map(L3S.map(new ReasonGeneableOperator(params)))
-            .keyBy(L3S.key(new KeySelector<PredictedData, Tuple2<String, Boolean>>() {
+            .keyBy(L3S.keyBy(new KeySelector<PredictedData, Tuple2<String, Boolean>>() {
                 @Override
                 public Tuple2<String, Boolean> getKey(PredictedData value) throws Exception {
                     return Tuple2.of(value.getProductId(), value.isPositive());
@@ -92,7 +92,7 @@ public class ReviewAnalysisWin {
             .aggregate(L3S.aggregate(new CountRecords()));
 
     DataStream<ObjectNode> ds2 =  env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).setParallelism(1)
-            .map(new CpManagerClient(settings)).setParallelism(1);
+            .map(new CpManagerClient()).setParallelism(1);
 
     // L5
     if (settings.getLineageMode() == "NonLineageMode") {

@@ -77,10 +77,10 @@ public class ReviewAnalysisWin {
                 }
             }))
             .assignTimestampsAndWatermarks(
-                    L3S.assignTimestampsAndWatermarks(new WatermarkGen()).withTimestampAssigner((reviewInputData, l) -> reviewInputData.tuple().getReviewTime())
+                    L3S.assignTimestampsAndWatermarks(new WatermarkGen(), settings.maxParallelism()).withTimestampAssigner((reviewInputData, l) -> reviewInputData.tuple().getReviewTime())
             )
             .map(L3S.map(new ReasonGeneableOperator(params)))
-            .keyBy(L3S.key(new KeySelector<PredictedData, Tuple2<String, Boolean>>() {
+            .keyBy(L3S.keyBy(new KeySelector<PredictedData, Tuple2<String, Boolean>>() {
                 @Override
                 public Tuple2<String, Boolean> getKey(PredictedData value) throws Exception {
                     return Tuple2.of(value.getProductId(), value.isPositive());

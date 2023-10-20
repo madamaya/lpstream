@@ -1,9 +1,9 @@
 package com.madamaya.l3stream.workflows.linearroad.noprovenance.wqs;
 
-import com.madamaya.l3stream.cpstore.CpManagerClient;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.linearroad.noprovenance.utils.LrWatermark;
 import com.madamaya.l3stream.workflows.linearroad.noprovenance.utils.ObjectNodeConverter;
+import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
@@ -69,7 +69,7 @@ public class LinearRoadAccident {
         //.map(L3.updateTs(t->t.tuple().getTimestamp())).uid("3.5")
 
         // current version
-        .map(L3.updateTsWM(new LrWatermark(), settings.getRedisIp(), settings.sourcesNumber())).uid("3.5")
+        .map(L3.updateTsWM(new LrWatermark(), settings.sourcesNumber())).uid("3.5")
         .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new LrWatermark(), 4)).uid("4")
         .filter(L3.filter(t -> t.getType() == 0 && t.getSpeed() == 0)).uid("5")
         .keyBy(L3.keyBy(t -> t.getKey()), TypeInformation.of(String.class))
@@ -97,7 +97,7 @@ public class LinearRoadAccident {
 
     if (settings.cpmProcessing()) {
       DataStream<ObjectNode> ds2 = env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).uid("10").setParallelism(1)
-              .map(new CpManagerClient(settings)).uid("11").setParallelism(1);
+              .map(new CpManagerClient()).uid("11").setParallelism(1);
     }
 
     env.execute("LinearRoadAccident");
