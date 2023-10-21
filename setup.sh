@@ -80,6 +80,29 @@ elif [ $1 = "testData" ]; then
   echo "*** END ***"
 elif [ $1 = "setup" ]; then
   ./bin/setupCluster/startCluster.sh
+elif [ $1 = "test" ]; then
+  cd ./bin
+  # LR
+  echo "*** TEST: LR ***"
+  echo "(./LMUserDriver.sh 1)"
+  ./LMUserDriver.sh 1
+  # Nexmark
+  echo "*** TEST: Nexmark ***"
+  echo "(./LMUserDriver.sh 2)"
+  ./LMUserDriver.sh 2
+  # NYC
+  echo "*** TEST: NYC ***"
+  echo "(./LMUserDriver.sh 3)"
+  ./LMUserDriver.sh 3
+  # YSB
+  echo "*** TEST: YSB ***"
+  echo "(./LMUserDriver.sh 4)"
+  ./LMUserDriver.sh 4
+
+  cd ./checkCorrectness
+  echo "*** Start checkCorrectness ***"
+  echo "(./auto.sh)"
+  ./auto.sh
 else
   echo "Illegal Arguments"
   exit 1

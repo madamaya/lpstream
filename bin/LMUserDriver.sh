@@ -2,10 +2,15 @@
 
 source ./config.sh
 
-source ./workflowConf/configLR.sh
-#source ./workflowConf/configNexmark.sh
-#source ./workflowConf/configNYC.sh
-#source ./workflowConf/configYSB.sh
+if [ $1 -eq 1 ]; then
+  source ./workflowConf/configLR.sh
+elif [ $1 -eq 2 ]; then
+  source ./workflowConf/configNexmark.sh
+elif [ $1 -eq 3 ]; then
+  source ./workflowConf/configNYC.sh
+else
+  source ./workflowConf/configYSB.sh
+fi
 
 source ./utils/logger.sh
 source ./utils/notifyEnd.sh
@@ -49,6 +54,7 @@ cd ${BIN_DIR}
 echo "*** Get jobid ***"
 echo "(jobid=\`getRunningJobID\`)"
 jobid=`getRunningJobID`
+echo ${jobid} > latestJobID.log
 
 ## Notify all outputs were provided.
 echo "*** Notify all outputs were provided ***"
@@ -77,6 +83,9 @@ stopLogger
 echo "*** Decide target output for lineage randomly ***"
 echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.Sampling ${logFile} ${numOfSamples})"
 java -cp ${JAR_PATH} com.madamaya.l3stream.utils.Sampling ${logFile} ${numOfSamples}
+
+## Obtain jobid from file.
+#jobid=`cat latestJobID.log`
 
 ## Read target outputs
 FILE="${logFile}.target.txt"

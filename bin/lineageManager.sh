@@ -55,6 +55,7 @@ elif [ ${mode} = "lineage" ]; then
 COMMENT
 if [ $# -ne 7 ]; then
   echo "Illegal Arguments (lineageManager.sh)"
+  echo $1 $2 $3 $4 $5 $6 $7
   exit 1
 fi
 # $1: jarPath, $2: mainPath, $3: jobid, $4: outputTs, $5: outputValue, $6: maxWsize, $7: lineageTopicName
