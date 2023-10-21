@@ -7,16 +7,16 @@ with open("pairs.csv") as f:
     line = f.readline()
     if line == "":
       break
-    
+
     elements = line.split(",")
-    
+
     assert len(elements) == 2
 
     mp[elements[1].replace("\n", "")] = elements[0].replace("\n", "")
 
 # Join
 count = 0
-with open("kafka_input.json") as f:
+with open("generated.json") as f:
   with open("joined_input.json", "w") as w:
     while True:
       line = f.readline()

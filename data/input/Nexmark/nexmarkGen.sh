@@ -1,22 +1,27 @@
 #!/bin/zsh
 
+source $(dirname $0)/../../../bin/config.sh
+
+numTuples=1000000
+if [ $# -eq 1 ]; then
+  numTuples=$1
+fi
+
 echo "=*=*=*=*= Start Nexmark data generation =*=*=*=*="
 
 Nexmark_HOME=`pwd`
-FLINK_HOME=`pwd`'/flink'
-KAFKA_HOME=`pwd`'/kafka'
 
 # download flink
-echo "*** Download flink for Nexmark data generation ***"
-wget https://dlcdn.apache.org/flink/flink-1.17.1/flink-1.17.1-bin-scala_2.12.tgz
-tar xzf flink-1.17.1-bin-scala_2.12.tgz
-mv flink-1.17.1 flink
+#echo "*** Download flink for Nexmark data generation ***"
+#wget https://dlcdn.apache.org/flink/flink-1.17.1/flink-1.17.1-bin-scala_2.12.tgz
+#tar xzf flink-1.17.1-bin-scala_2.12.tgz
+#mv flink-1.17.1 flink
 
 # download kafka
-echo "*** Download kafka for Nexmark data generation ***"
-wget https://downloads.apache.org/kafka/3.5.1/kafka_2.12-3.5.1.tgz
-tar zxf kafka_2.12-3.5.1.tgz
-mv kafka_2.12-3.5.1 kafka
+#echo "*** Download kafka for Nexmark data generation ***"
+#wget https://downloads.apache.org/kafka/3.5.1/kafka_2.12-3.5.1.tgz
+#tar zxf kafka_2.12-3.5.1.tgz
+#mv kafka_2.12-3.5.1 kafka
 
 # download nexmark
 echo "*** Download nexmark and compile it ***"
@@ -27,7 +32,7 @@ echo `pwd`
 tar zxf nexmark-flink.tgz
 mv nexmark-flink nexmark
 
-# install additional flink library
+# Install additional flink library
 echo "*** Install additional libraries for flink ***"
 cp nexmark/lib/nexmark-flink-0.2-SNAPSHOT.jar ${FLINK_HOME}/lib
 wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-kafka/1.17.1/flink-sql-connector-kafka-1.17.1.jar
@@ -74,15 +79,24 @@ ${FLINK_HOME}/bin/sql-client.sh < queries.sql
 
 # start data logger
 echo "*** Start data logger ***"
-python kafkaLogger.py $1
+python kafkaLogger.py ${numTuples}
 
 # stop flink cluster
 echo "*** Stop flink cluster ***"
 ${FLINK_HOME}/bin/stop-cluster.sh
 
+# remove additional flink libraries
+echo "*** Remove additional flink libraries ***"
+rm ${FLINK_HOME}/lib/nexmark-flink-0.2-SNAPSHOT.jar
+rm ${FLINK_HOME}/lib/flink-sql-connector-kafka-1.17.1.jar
+
 # stop kafka cluster
+echo "*** Remove topic ***"
+${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic nexmark --bootstrap-server localhost:9092
+sleep 10
 echo "*** Stop kafka server ***"
 ${KAFKA_HOME}/bin/kafka-server-stop.sh
+sleep 30
 echo "*** Stop zookeeper ***"
 ${KAFKA_HOME}/bin/zookeeper-server-stop.sh
 
