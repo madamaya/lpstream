@@ -73,7 +73,12 @@ echo "*** Stop kafka logger ***"
 echo "(stopLogger)"
 stopLogger
 
-cd ../checkCorrectness
+## Print max TS
+cd ../checkCorrectness/log
+echo "*** Print ts log (ALL) ***"
+python findMaxWMFromTopic.py ${inputTopicName} all_baseline.log ${inputTopicName}
+
+cd ..
 ./dataLoader.sh 1 ${inputTopicName} ${inputFilePath}
 
 cd ..
@@ -141,4 +146,8 @@ echo "(stopLogger)"
 stopLogger
 
 cd ../checkCorrectness/log
+echo "*** Print ts log (SPLIT) ***"
+python findMaxWMFromTopic.py ${inputTopicName} split_baseline.log ${inputTopicName}
+
+echo "*** Cmp outputs ***"
 python ${cmpPythonName} ${logDir}/all_baseline.log ${logDir}/split_baseline.log ${logDir}/split_from_chk.log ${startCpID} ${parseFlag}
