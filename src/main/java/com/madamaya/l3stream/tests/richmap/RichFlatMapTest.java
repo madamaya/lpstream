@@ -1,4 +1,4 @@
-package com.madamaya.l3stream.tests;
+package com.madamaya.l3stream.tests.richmap;
 
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
 import org.apache.flink.api.common.functions.MapFunction;

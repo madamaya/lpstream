@@ -1,7 +1,7 @@
-package com.madamaya.l3stream.tests;
+package com.madamaya.l3stream.tests.richmap;
 
-import com.madamaya.l3stream.cpstore.CpManagerClient;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
+import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
@@ -64,7 +64,7 @@ public class L3RichFlatMapTest {
 
         if (settings.cpmProcessing()) {
             DataStream<ObjectNode> ds2 = env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).uid("subp").setParallelism(1)
-                    .map(new CpManagerClient(settings)).uid("cpmanager").setParallelism(1);
+                    .map(new CpManagerClient()).uid("cpmanager").setParallelism(1);
         }
 
         env.execute("output");
