@@ -35,6 +35,7 @@ if __name__ == "__main__":
             confMap[elements[0]] = elements[1]
 
     javaConfStr = [
+        convertElement2Line("L3_HOME", confMap["L3_HOME"], "String") + "\n",
         convertElement2Line("BIN_DIR", confMap["BIN_DIR"].replace("${L3_HOME}", confMap["L3_HOME"]), "String") + "\n",
         convertElement2Line("REDIS_IP", confMap["redisIP"], "String") + "\n",
         convertElement2Line("REDIS_PORT", confMap["redisPort"], "int") + "\n",
