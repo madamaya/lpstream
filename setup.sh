@@ -17,12 +17,14 @@ if [ $1 = "downloads" ]; then
   wget https://dlcdn.apache.org/flink/flink-1.17.1/flink-1.17.1-bin-scala_2.12.tgz
   tar xzf flink-1.17.1-bin-scala_2.12.tgz
   mv flink-1.17.1 flink
+  rm flink-1.17.1-bin-scala_2.12.tgz
 
   # download kafka
   echo "*** Download kafka ***"
   wget https://downloads.apache.org/kafka/3.5.1/kafka_2.12-3.5.1.tgz
   tar zxf kafka_2.12-3.5.1.tgz
   mv kafka_2.12-3.5.1 kafka
+  rm kafka_2.12-3.5.1.tgz
 
   echo "*** END ***"
 elif [ $1 = "compile" ]; then
@@ -59,16 +61,20 @@ elif [ $1 = "testData" ]; then
   cd ./data/input
 
   ### For LinearRoad
+  echo "*** Generate test data for LR ***"
   python split.py ./LinearRoad/lr.csv
 
   ### For Nexmark
-  python split.py ./Nexmark/nexmark.csv
+  echo "*** Generate test data for Nexmark ***"
+  python split.py ./Nexmark/nexmark.json
 
   ### For NYC
+  echo "*** Generate test data for NYC ***"
   python split.py ./NYC/nyc.csv
 
   ### For YSB
-  python split.py ./YSB/ysb.csv
+  echo "*** Generate test data for YSB ***"
+  python split.py ./YSB/ysb.json
 
   echo "*** END ***"
 elif [ $1 = "setup" ]; then
