@@ -4,17 +4,17 @@ import time
 loop = 1
 tsShipt = 10800
 
-assert len(sys.argv) == 2
-loop = int(sys.argv[1])
+if len(sys.argv) == 2:
+    loop = int(sys.argv[1])
 
-print("read h1.csv")
+print("*** Read h1.csv ***")
 with open("h1.csv") as f:
     _baseLines = f.readlines()
 
-print("create baseLines")
+print("*** Create original data list ***")
 baseLines = [line.rstrip("\n") for line in _baseLines]
 
-print("start writing")
+print("*** Start dataGen ****")
 with open("h1_{}.csv".format(loop), "w") as w:
     stime = time.time()
     ptime = time.time()
@@ -28,9 +28,9 @@ with open("h1_{}.csv".format(loop), "w") as w:
             w.write('"' + line + '"' + "\n")
 
         ctime = time.time()
-        print("Loop {} is finished.".format(i))
-        print("Duration from starting: {}[s]".format(ctime - stime))
-        print("Duration for this loop: {} [s]".format(ctime - ptime))
+        print("- Loop {} is finished.".format(i))
+        print("- Duration from starting: {}[s]".format(ctime - stime))
+        print("- Duration for this loop: {} [s]".format(ctime - ptime))
         ptime = ctime
 
-print("END: {}[s]".format(time.time() - stime))
+print("*** END: {}[s] ***".format(time.time() - stime))

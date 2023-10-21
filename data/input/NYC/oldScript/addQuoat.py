@@ -1,5 +1,5 @@
 with open("_yellow.csv") as f:
-    with open("yellow.csv", "w") as w:
+    with open("../yellow.csv", "w") as w:
         cnt = 0
         while True:
             line = f.readline()

@@ -1,5 +1,6 @@
 import glob
 import time
+from tqdm import tqdm
 
 def str2list(str, delemeter=","):
     return str.split(delemeter)
@@ -11,7 +12,7 @@ if __name__ == "__main__":
     targetDir = "./csv/yellow"
     tmpList = list()
 
-    print("get files")
+    print("*** Get files ***")
     files = glob.glob(targetDir + "/*")
     for file in files:
         print("now reading" + str(file))
@@ -19,13 +20,13 @@ if __name__ == "__main__":
             lines = f.readlines()
             tmpList = tmpList + lines
 
-    print("remove newline code")
-    mainList = [line.rstrip("\n") for line in tmpList]
+    print("*** Remove newline from each data ***")
+    mainList = [line.rstrip("\n") for line in tqdm(tmpList)]
 
-    print("sort mainList")
+    print("*** Sort data ***")
     mainList.sort(key=lambda x: x.split(',')[2])
 
-    print("writing")
+    print("*** Write ***")
     cnt = 0
     lgth = len(mainList)
     numofonepercent = lgth // 100
@@ -45,5 +46,5 @@ if __name__ == "__main__":
                 print("Duration for this one segment: {}[s]".format(current_time - prev_time))
                 prev_time = current_time
 
-    print("End of the program")
-    print("Execution Time: {}[s]".format(time.time() - start_time))
+    print("*** End of the program (sortcsv-y.py) ***")
+    print("*** Execution Time: {}[s] ***".format(time.time() - start_time))

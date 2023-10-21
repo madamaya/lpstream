@@ -1,4 +1,4 @@
-import os
+import os, sys
 import time
 import pandas as pd
 
@@ -19,7 +19,14 @@ def parquet2csv(file_name):
     df2csv(load_parquet(file_name), getbasename(file_name))
 
 if __name__ == "__main__":
-    for year in range(2018, 2024):
+    st = 2018
+    ed = 2023
+
+    if len(sys.argv) == 3:
+        st = int(sys.argv[1])
+        ed = int(sys.argv[2])
+
+    for year in range(st, ed + 1):
         if year == 2023:
             mx = 6
         else:
