@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Properties;
 
 public class ReplayMonitor {
+    public static boolean parseFlag = false;
+
     public static void main(String[] args) throws Exception {
         long outputTs;
         String lineageTopic;
@@ -40,6 +42,7 @@ public class ReplayMonitor {
         } else {
             throw new IllegalArgumentException();
         }
+        parseFlag = lineageTopic.contains("Nexmark");
 
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, L3Config.BOOTSTRAP_IP_PORT);
@@ -57,7 +60,7 @@ public class ReplayMonitor {
             for (ConsumerRecord record : records) {
                 count++;
                 String recordValue = (String) record.value();
-                if (count % 1000 == 0) {
+                if (count % 10 == 0) {
                     System.out.print("\rcount = " + count);
                 }
                 if (checkSame(recordValue, outputValue, outputTs)) {
@@ -83,7 +86,13 @@ public class ReplayMonitor {
     //  "FLAG":"true"
     // }
     public static Tuple3<String, Long, Boolean> extractOutTsFlag(String recordValue) throws JsonProcessingException {
-        JsonNode jsonNode = new ObjectMapper().readTree(recordValue);
+        // CNFM
+        JsonNode jsonNode;
+        if (parseFlag) {
+            jsonNode = new ObjectMapper().readTree(recordValue.replace("\\", ""));
+        } else {
+            jsonNode = new ObjectMapper().readTree(recordValue);
+        }
         return Tuple3.of(jsonNode.get("OUT").asText(), jsonNode.get("TS").asLong(), jsonNode.get("FLAG").asBoolean());
     }
 
@@ -94,17 +103,19 @@ public class ReplayMonitor {
             return t3.f1 == outputTs && t3.f2;
         } else {
             // check timestamp, value, and flag
-            return t3.f0.equals(outputValue) && t3.f1 == outputTs && t3.f2;
+            // CNFM
+            if (parseFlag) {
+                return t3.f0.equals(outputValue.replace("\\", "")) && t3.f1 == outputTs && t3.f2;
+            } else {
+                return t3.f0.equals(outputValue) && t3.f1 == outputTs && t3.f2;
+            }
         }
     }
 
     public static void writeLineage(String recordValue) {
         // CNFM
-        System.out.println();
         System.out.println("!!! This is a tentative implementation of writeLineage (ReplayMonitor.java). !!!");
-        System.out.println("!!! This writer must be implemented. !!!");
-
-        String filePath = "/Users/yamada-aist/workspace/l3stream/data/tmpLineage/" + System.currentTimeMillis() + ".txt";
+        String filePath = L3Config.L3_HOME + "/data/lineage/" + System.currentTimeMillis() + ".txt";
         try {
             BufferedWriter bf = new BufferedWriter(new FileWriter(filePath));
             bf.write(recordValue);
@@ -112,7 +123,7 @@ public class ReplayMonitor {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Lienage = " + recordValue);
+        System.out.println("Lineage = " + recordValue);
     }
 
     public static void cancelJob() throws IOException, InterruptedException {
