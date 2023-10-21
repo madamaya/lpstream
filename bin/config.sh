@@ -2,8 +2,8 @@
 
 # path
 L3_HOME="/Users/yamada-aist/workspace/l3stream"
-FLINK_HOME="${L3_HOME}/flink-1.17.1"
-KAFKA_HOME="${L3_HOME}/kafka_2.12-3.4.1"
+FLINK_HOME="${L3_HOME}/flink"
+KAFKA_HOME="${L3_HOME}/kafka"
 BIN_DIR="${L3_HOME}/bin"
 JAR_PATH="${L3_HOME}/target/l3stream-1.0-SNAPSHOT.jar"
 CHECKPOINT_DIR="${L3_HOME}/data/checkpoints"
