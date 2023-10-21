@@ -11,7 +11,6 @@ data/checkpoints
 data/output
 data/input/YSB/streaming-benchmarks/
 data/datagen
-data/log*
 data/test0918
 data/**/*.csv
 data/**/*.csv.1
