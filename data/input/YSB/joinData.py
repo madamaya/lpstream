@@ -17,7 +17,7 @@ with open("pairs.csv") as f:
 # Join
 count = 0
 with open("generated.json") as f:
-  with open("joined_input.json", "w") as w:
+  with open("ysb.json", "w") as w:
     while True:
       line = f.readline()
       if line == "":

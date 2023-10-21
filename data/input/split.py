@@ -1,10 +1,20 @@
 import sys
 
+def countLines(filePath):
+    count = 0
+    with open(filePath) as f:
+        while True:
+            line = f.readline()
+            if line == "":
+                break
+            count = count + 1
+    return count
+
 if __name__ == "__main__":
-    assert len(sys.argv) == 3
+    assert len(sys.argv) == 2
 
     file = sys.argv[1]
-    numOfLines = int(sys.argv[2])
+    numOfLines = countLines(file)
     numOf1File = numOfLines // 2
     numOf2File = numOfLines - numOf1File
 

@@ -15,7 +15,7 @@ print("*** Create original data list ***")
 baseLines = [line.rstrip("\n") for line in _baseLines]
 
 print("*** Start dataGen ****")
-with open("h1_{}.csv".format(loop), "w") as w:
+with open("lr.csv", "w") as w:
     stime = time.time()
     ptime = time.time()
     ctime = time.time()

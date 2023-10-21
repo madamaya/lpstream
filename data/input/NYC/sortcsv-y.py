@@ -34,7 +34,7 @@ if __name__ == "__main__":
     start_time = time.time()
     prev_time = time.time()
     current_time = time.time()
-    with open("yellow.csv", "w") as w:
+    with open("nyc.csv", "w") as w:
         for line in mainList:
             cnt = cnt + 1
             w.write('"' + line  + '"' + "\n")
