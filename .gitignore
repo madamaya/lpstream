@@ -1,7 +1,8 @@
 .idea
 .DS_Store
-flink-1.17.1
-kafka_2.12-3.4.1
+flink
+kafka
+l3stream-genealog
 bin/**/*.json
 bin/**/*.csv
 bin/**/*.log
