@@ -17,6 +17,7 @@ if [ $1 = "downloads" ]; then
   wget https://dlcdn.apache.org/flink/flink-1.17.1/flink-1.17.1-bin-scala_2.12.tgz
   tar xzf flink-1.17.1-bin-scala_2.12.tgz
   mv flink-1.17.1 flink
+  cp flink-conf.yaml flink/conf/flink-conf.yaml
   rm flink-1.17.1-bin-scala_2.12.tgz
 
   # download kafka
