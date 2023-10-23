@@ -32,3 +32,7 @@ data/input/Nexmark/*.json
 
 script/autoReplayOutCheck/**/*.log
 /bin/lineageManagerConfig.sh
+
+/src/main/java/com/madamaya/l3stream/conf/L3Config.java
+/bin/config.sh
+flink-conf.yaml
