@@ -47,10 +47,12 @@ public class Nexmark {
         /* Query */
         DataStream<NexmarkAuctionTuple> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
                 .map(new AuctionDataParserNex())
+                .filter(t -> t.getEventType() == 1)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex());
 
         DataStream<NexmarkBidTuple> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
                 .map(new BidderDataParserNex())
+                .filter(t -> t.getEventType() == 2)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyBidNex());
 
         DataStream<NexmarkJoinedTuple> joined = auction.keyBy(new KeySelector<NexmarkAuctionTuple, Integer>() {

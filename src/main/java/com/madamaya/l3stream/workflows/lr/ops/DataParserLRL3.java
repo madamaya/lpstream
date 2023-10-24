@@ -4,12 +4,10 @@ import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTup
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class DataParserLR implements MapFunction<ObjectNode, LinearRoadInputTuple> {
+public class DataParserLRL3 implements MapFunction<ObjectNode, LinearRoadInputTuple> {
 
     @Override
     public LinearRoadInputTuple map(ObjectNode jNode) throws Exception {
-        long stimulus = System.nanoTime();
-
         String line = jNode.get("value").textValue();
         String[] elements = ",".split(line.trim());
         LinearRoadInputTuple tuple = new LinearRoadInputTuple(
@@ -21,8 +19,7 @@ public class DataParserLR implements MapFunction<ObjectNode, LinearRoadInputTupl
                 Integer.valueOf(elements[5]),
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
-                Integer.valueOf(elements[8]),
-                stimulus
+                Integer.valueOf(elements[8])
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
         return tuple;

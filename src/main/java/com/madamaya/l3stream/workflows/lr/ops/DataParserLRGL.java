@@ -1,18 +1,19 @@
 package com.madamaya.l3stream.workflows.lr.ops;
 
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
+import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadInputTupleGL;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class DataParserLR implements MapFunction<ObjectNode, LinearRoadInputTuple> {
+public class DataParserLRGL implements MapFunction<ObjectNode, LinearRoadInputTupleGL> {
 
     @Override
-    public LinearRoadInputTuple map(ObjectNode jNode) throws Exception {
+    public LinearRoadInputTupleGL map(ObjectNode jNode) throws Exception {
         long stimulus = System.nanoTime();
 
         String line = jNode.get("value").textValue();
         String[] elements = ",".split(line.trim());
-        LinearRoadInputTuple tuple = new LinearRoadInputTuple(
+        LinearRoadInputTupleGL tuple = new LinearRoadInputTupleGL(
                 Integer.valueOf(elements[0]),
                 Long.valueOf(elements[1]),
                 Integer.valueOf(elements[2]),

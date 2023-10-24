@@ -4,6 +4,14 @@ public class YSBResultTuple {
     private String campaignId;
     private long count;
     private long ts;
+    private long stimulus;
+
+    public YSBResultTuple(String campaignId, long count, long ts, long stimulus) {
+        this.campaignId = campaignId;
+        this.count = count;
+        this.ts = ts;
+        this.stimulus = stimulus;
+    }
 
     public YSBResultTuple(String campaignId, long count, long ts) {
         this.campaignId = campaignId;

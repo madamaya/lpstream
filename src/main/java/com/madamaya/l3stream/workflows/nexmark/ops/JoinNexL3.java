@@ -6,7 +6,7 @@ import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTuple;
 import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
 import org.apache.flink.util.Collector;
 
-public class JoinNex extends ProcessJoinFunction<NexmarkAuctionTuple, NexmarkBidTuple, NexmarkJoinedTuple> {
+public class JoinNexL3 extends ProcessJoinFunction<NexmarkAuctionTuple, NexmarkBidTuple, NexmarkJoinedTuple> {
     @Override
     public void processElement(NexmarkAuctionTuple auctionTuple, NexmarkBidTuple bidTuple, ProcessJoinFunction<NexmarkAuctionTuple, NexmarkBidTuple, NexmarkJoinedTuple>.Context context, Collector<NexmarkJoinedTuple> collector) throws Exception {
         collector.collect(
@@ -26,8 +26,7 @@ public class JoinNex extends ProcessJoinFunction<NexmarkAuctionTuple, NexmarkBid
                         auctionTuple.getExpires(),
                         auctionTuple.getSeller(),
                         auctionTuple.getCategory(),
-                        auctionTuple.getExtra(),
-                        Math.max(bidTuple.getStimulus(), auctionTuple.getStimulus())
+                        auctionTuple.getExtra()
                 )
         );
     }

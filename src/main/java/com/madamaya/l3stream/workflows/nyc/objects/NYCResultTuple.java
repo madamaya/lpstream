@@ -6,6 +6,16 @@ public class NYCResultTuple {
     private long count;
     private double avgDistance;
     private long ts;
+    private long stimulus;
+
+    public NYCResultTuple(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts, long stimulus) {
+        this.vendorId = vendorId;
+        this.dropoffLocationId = dropoffLocationId;
+        this.count = count;
+        this.avgDistance = avgDistance;
+        this.ts = ts;
+        this.stimulus = stimulus;
+    }
 
     public NYCResultTuple(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts) {
         this.vendorId = vendorId;
@@ -53,6 +63,14 @@ public class NYCResultTuple {
 
     public void setTs(long ts) {
         this.ts = ts;
+    }
+
+    public long getStimulus() {
+        return stimulus;
+    }
+
+    public void setStimulus(long stimulus) {
+        this.stimulus = stimulus;
     }
 
     @Override

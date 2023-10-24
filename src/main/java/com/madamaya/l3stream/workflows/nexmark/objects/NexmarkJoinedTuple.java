@@ -17,7 +17,27 @@ public class NexmarkJoinedTuple {
     private int seller;
     private int category;
     private String auction_extra;
+    private long stimulus;
 
+    public NexmarkJoinedTuple(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long stimulus) {
+        this.auctionId = auctionId;
+        this.bidder = bidder;
+        this.price = price;
+        this.channel = channel;
+        this.url = url;
+        this.bid_dateTime = bid_dateTime;
+        this.bid_extra = bid_extra;
+        this.itemName = itemName;
+        this.desc = desc;
+        this.initBid = initBid;
+        this.reserve = reserve;
+        this.auction_dateTime = auction_dateTime;
+        this.expires = expires;
+        this.seller = seller;
+        this.category = category;
+        this.auction_extra = auction_extra;
+        this.stimulus = stimulus;
+    }
 
     public NexmarkJoinedTuple(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra) {
         this.auctionId = auctionId;
@@ -164,6 +184,14 @@ public class NexmarkJoinedTuple {
 
     public void setAuction_extra(String auction_extra) {
         this.auction_extra = auction_extra;
+    }
+
+    public long getStimulus() {
+        return stimulus;
+    }
+
+    public void setStimulus(long stimulus) {
+        this.stimulus = stimulus;
     }
 
     @Override

@@ -3,10 +3,7 @@ package com.madamaya.l3stream.workflows.ysb;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
-import com.madamaya.l3stream.workflows.ysb.ops.CountYSB;
-import com.madamaya.l3stream.workflows.ysb.ops.DataParserYSB;
-import com.madamaya.l3stream.workflows.ysb.ops.ProjectAttributeYSB;
-import com.madamaya.l3stream.workflows.ysb.ops.WatermarkStrategyYSB;
+import com.madamaya.l3stream.workflows.ysb.ops.*;
 import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
@@ -57,14 +54,14 @@ public class L3YSB {
         /* Query */
         DataStream<L3StreamTupleContainer<YSBResultTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
                 .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("2")
-                .map(L3.map(new DataParserYSB())).uid("3")
+                .map(L3.map(new DataParserYSBL3())).uid("3")
                 .map(L3.updateTsWM(new WatermarkStrategyYSB(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyYSB(), settings.numOfInstanceWM())).uid("5")
                 .filter(L3.filter(t -> t.getEventType().equals("view"))).uid("6")
-                .map(L3.map(new ProjectAttributeYSB())).uid("7")
+                .map(L3.map(new ProjectAttributeYSBL3())).uid("7")
                 .keyBy(L3.keyBy(t -> t.getCampaignId(), String.class))
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
-                .aggregate(L3.aggregate(new CountYSB())).uid("8");
+                .aggregate(L3.aggregate(new CountYSBL3())).uid("8");
 
         // L5
         if (settings.getLineageMode() == "NonLineageMode") {

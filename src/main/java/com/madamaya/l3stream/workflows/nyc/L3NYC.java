@@ -3,9 +3,7 @@ package com.madamaya.l3stream.workflows.nyc;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTuple;
-import com.madamaya.l3stream.workflows.nyc.ops.CountAndAvgDistance;
-import com.madamaya.l3stream.workflows.nyc.ops.DataParserNYC;
-import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
+import com.madamaya.l3stream.workflows.nyc.ops.*;
 import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
@@ -59,7 +57,7 @@ public class L3NYC {
         /* Query */
         DataStream<L3StreamTupleContainer<NYCResultTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
                 .map(L3.initMap(t->System.nanoTime(), t->System.nanoTime(), settings)).uid("2")
-                .map(L3.map(new DataParserNYC())).uid("3")
+                .map(L3.map(new DataParserNYCL3())).uid("3")
                 .map(L3.updateTsWM(new WatermarkStrategyNYC(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyNYC(), settings.numOfInstanceWM())).uid("5")
                 .filter(L3.filter(t -> t.getTripDistance() > 5)).uid("6")
@@ -70,7 +68,7 @@ public class L3NYC {
                     }
                 }), TupleTypeInfo.getBasicAndBasicValueTupleTypeInfo(Integer.class, Long.class))
                 .window(TumblingEventTimeWindows.of(Time.minutes(30)))
-                .aggregate(L3.aggregate(new CountAndAvgDistance())).uid("7");
+                .aggregate(L3.aggregate(new CountAndAvgDistanceL3())).uid("7");
 
         // L5
         if (settings.getLineageMode() == "NonLineageMode") {

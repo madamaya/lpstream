@@ -2,6 +2,7 @@ package com.madamaya.l3stream.workflows.lr;
 
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.lr.ops.DataParserLR;
+import com.madamaya.l3stream.workflows.lr.ops.DataParserLRL3;
 import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLR;
 import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
 import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
@@ -11,7 +12,9 @@ import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
 import io.palyvos.provenance.l3stream.wrappers.operators.L3OpWrapperStrategy;
 import io.palyvos.provenance.usecases.CountTuple;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadAccidentAggregate;
+import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadAccidentAggregateL3;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadVehicleAggregate;
+import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadVehicleAggregateL3;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
@@ -57,19 +60,19 @@ public class L3LR {
         /* Query */
         DataStream<L3StreamTupleContainer<CountTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
                 .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("2")
-                .map(L3.map(new DataParserLR())).uid("3")
+                .map(L3.map(new DataParserLRL3())).uid("3")
                 .map(L3.updateTsWM(new WatermarkStrategyLR(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(), settings.numOfInstanceWM())).uid("5")
                 .filter(L3.filter(t -> t.getType() == 0 && t.getSpeed() == 0)).uid("6")
                 .keyBy(L3.keyBy(t -> t.getKey(), String.class))
                 .window(SlidingEventTimeWindows.of(STOPPED_VEHICLE_WINDOW_SIZE,
                         STOPPED_VEHICLE_WINDOW_SLIDE))
-                .aggregate(L3.aggregate(new LinearRoadVehicleAggregate())).uid("7")
+                .aggregate(L3.aggregate(new LinearRoadVehicleAggregateL3())).uid("7")
                 .filter(L3.filter(t -> t.getReports() == 4 && t.isUniquePosition())).uid("8")
                 .keyBy(L3.keyBy(t -> t.getLatestPos(), Integer.class))
                 .window(SlidingEventTimeWindows.of(ACCIDENT_WINDOW_SIZE,
                         ACCIDENT_WINDOW_SLIDE))
-                .aggregate(L3.aggregate(new LinearRoadAccidentAggregate())).uid("9")
+                .aggregate(L3.aggregate(new LinearRoadAccidentAggregateL3())).uid("9")
                 .filter(L3.filter(t -> t.getCount() > 1)).uid("10");
 
         // L5

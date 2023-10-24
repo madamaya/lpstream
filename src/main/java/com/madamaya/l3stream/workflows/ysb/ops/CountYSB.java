@@ -5,28 +5,30 @@ import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple4;
 
-public class CountYSB implements AggregateFunction<YSBInternalTuple, Tuple3<String, Long, Long>, YSBResultTuple> {
+public class CountYSB implements AggregateFunction<YSBInternalTuple, Tuple4<String, Long, Long, Long>, YSBResultTuple> {
     @Override
-    public Tuple3<String, Long, Long> createAccumulator() {
-        return Tuple3.of("", 0L, 0L);
+    public Tuple4<String, Long, Long, Long> createAccumulator() {
+        return Tuple4.of("", 0L, 0L, -1L);
     }
 
     @Override
-    public Tuple3<String, Long, Long> add(YSBInternalTuple tuple, Tuple3<String, Long, Long> acc) {
+    public Tuple4<String, Long, Long, Long> add(YSBInternalTuple tuple, Tuple4<String, Long, Long, Long> acc) {
         acc.f0 = tuple.getCampaignId();
         acc.f1++;
         acc.f2 = Math.max(acc.f2, tuple.getEventtime());
+        acc.f3 = Math.max(acc.f3, tuple.getStimulus());
         return acc;
     }
 
     @Override
-    public YSBResultTuple getResult(Tuple3<String, Long, Long> acc) {
-        return new YSBResultTuple(acc.f0, acc.f1, acc.f2);
+    public YSBResultTuple getResult(Tuple4<String, Long, Long, Long> acc) {
+        return new YSBResultTuple(acc.f0, acc.f1, acc.f2, acc.f3);
     }
 
     @Override
-    public Tuple3<String, Long, Long> merge(Tuple3<String, Long, Long> acc1, Tuple3<String, Long, Long> acc2) {
+    public Tuple4<String, Long, Long, Long> merge(Tuple4<String, Long, Long, Long> acc1, Tuple4<String, Long, Long, Long> acc2) {
         throw new UnsupportedOperationException("CountYSB: merge()");
     }
 }

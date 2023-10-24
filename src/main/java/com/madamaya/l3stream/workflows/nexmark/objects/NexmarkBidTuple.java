@@ -14,9 +14,22 @@ public class NexmarkBidTuple extends NexmarkInputTuple {
     private String url;
     private long dateTime;
     private String extra;
+    private long stimulus;
 
     public NexmarkBidTuple(int eventType) {
         super(eventType);
+    }
+
+    public NexmarkBidTuple(int eventType, int auctionId, int bidder, long price, String channel, String url, long dateTime, String extra, long stimulus) {
+        super(eventType);
+        this.auctionId = auctionId;
+        this.bidder = bidder;
+        this.price = price;
+        this.channel = channel;
+        this.url = url;
+        this.dateTime = dateTime;
+        this.extra = extra;
+        this.stimulus = stimulus;
     }
 
     public NexmarkBidTuple(int eventType, int auctionId, int bidder, long price, String channel, String url, long dateTime, String extra) {
@@ -84,6 +97,14 @@ public class NexmarkBidTuple extends NexmarkInputTuple {
 
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+
+    public long getStimulus() {
+        return stimulus;
+    }
+
+    public void setStimulus(long stimulus) {
+        this.stimulus = stimulus;
     }
 
     @Override

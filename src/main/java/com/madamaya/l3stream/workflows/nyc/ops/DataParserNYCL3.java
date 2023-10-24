@@ -4,7 +4,7 @@ import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class DataParserNYC implements MapFunction<ObjectNode, NYCInputTuple> {
+public class DataParserNYCL3 implements MapFunction<ObjectNode, NYCInputTuple> {
 
     @Override
     public NYCInputTuple map(ObjectNode jNode) throws Exception {
@@ -15,9 +15,8 @@ public class DataParserNYC implements MapFunction<ObjectNode, NYCInputTuple> {
        'payment_type', 'fare_amount', 'extra', 'mta_tax', 'tip_amount',
        'tolls_amount', 'improvement_surcharge', 'total_amount',
        'congestion_surcharge', 'airport_fee'] */
-        long stimulus = System.nanoTime();
 
         String line = jNode.get("value").textValue();
-        return new NYCInputTuple(line, stimulus);
+        return new NYCInputTuple(line);
     }
 }

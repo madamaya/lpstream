@@ -16,9 +16,25 @@ public class NexmarkAuctionTuple extends NexmarkInputTuple {
     private int seller;
     private int category;
     private String extra;
+    private long stimulus;
 
     public NexmarkAuctionTuple(int eventType) {
         super(eventType);
+    }
+
+    public NexmarkAuctionTuple(int eventType, int auctionId, String itemName, String desc, int initBid, int reserve, long dateTime, long expires, int seller, int category, String extra, long stimulus) {
+        super(eventType);
+        this.auctionId = auctionId;
+        this.itemName = itemName;
+        this.desc = desc;
+        this.initBid = initBid;
+        this.reserve = reserve;
+        this.dateTime = dateTime;
+        this.expires = expires;
+        this.seller = seller;
+        this.category = category;
+        this.extra = extra;
+        this.stimulus = stimulus;
     }
 
     public NexmarkAuctionTuple(int eventType, int auctionId, String itemName, String desc, int initBid, int reserve, long dateTime, long expires, int seller, int category, String extra) {
@@ -113,6 +129,14 @@ public class NexmarkAuctionTuple extends NexmarkInputTuple {
 
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+
+    public long getStimulus() {
+        return stimulus;
+    }
+
+    public void setStimulus(long stimulus) {
+        this.stimulus = stimulus;
     }
 
     @Override

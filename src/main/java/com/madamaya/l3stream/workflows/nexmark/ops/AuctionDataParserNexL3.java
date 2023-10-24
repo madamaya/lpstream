@@ -6,7 +6,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class AuctionDataParserNex implements MapFunction<ObjectNode, NexmarkAuctionTuple> {
+public class AuctionDataParserNexL3 implements MapFunction<ObjectNode, NexmarkAuctionTuple> {
     /*
      Sample Input:
     {"event_type":1,"person":null,"auction":{"id":1001,"itemName":"pc","description":"gbyf","initialBid":2940,"reserve":4519,"dateTime":"2023-10-03 05:31:34.28","expires":"2023-10-03 05:31:34.292","seller":1010,"category":13,"extra":""},"bid":null}
@@ -31,7 +31,7 @@ public class AuctionDataParserNex implements MapFunction<ObjectNode, NexmarkAuct
             int category = jnode.get("category").asInt();
             String extra = jnode.get("extra").asText();
 
-            return new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, System.nanoTime());
+            return new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra);
         } else {
             return new NexmarkAuctionTuple(eventType);
         }

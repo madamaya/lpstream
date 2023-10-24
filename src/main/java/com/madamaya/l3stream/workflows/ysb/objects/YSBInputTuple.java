@@ -5,9 +5,18 @@ public class YSBInputTuple {
     private String adId;
     private String eventType;
     private String campaignId;
-    private Long eventtime;
+    private long eventtime;
+    private long stimulus;
 
-    public YSBInputTuple(String adId, String eventType, String campaignId, Long eventtime) {
+    public YSBInputTuple(String adId, String eventType, String campaignId, long eventtime, long stimulus) {
+        this.adId = adId;
+        this.eventType = eventType;
+        this.campaignId = campaignId;
+        this.eventtime = eventtime;
+        this.stimulus = stimulus;
+    }
+
+    public YSBInputTuple(String adId, String eventType, String campaignId, long eventtime) {
         this.adId = adId;
         this.eventType = eventType;
         this.campaignId = campaignId;
@@ -44,6 +53,14 @@ public class YSBInputTuple {
 
     public void setEventtime(Long eventtime) {
         this.eventtime = eventtime;
+    }
+
+    public long getStimulus() {
+        return stimulus;
+    }
+
+    public void setStimulus(long stimulus) {
+        this.stimulus = stimulus;
     }
 
     @Override

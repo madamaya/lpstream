@@ -18,6 +18,15 @@ public class NYCInputTuple {
     private long dropoffTime;
     private double tripDistance;
     private long dropoffLocationId;
+    private long stimulus;
+
+    public NYCInputTuple(int vendorId, long dropoffTime, double tripDistance, long dropoffLocationId, long stimulus) {
+        this.vendorId = vendorId;
+        this.dropoffTime = dropoffTime;
+        this.tripDistance = tripDistance;
+        this.dropoffLocationId = dropoffLocationId;
+        this.stimulus = stimulus;
+    }
 
     public NYCInputTuple(int vendorId, long dropoffTime, double tripDistance, long dropoffLocationId) {
         this.vendorId = vendorId;
@@ -26,18 +35,20 @@ public class NYCInputTuple {
         this.dropoffLocationId = dropoffLocationId;
     }
 
-    public NYCInputTuple(String line) {
+
+    public NYCInputTuple(String line, long stimulus) {
         String[] elements = line.split(",");
         this.vendorId = Integer.parseInt(elements[0]);
         this.dropoffTime = convertDateFormat(elements[2]);
         this.tripDistance = Double.parseDouble(elements[4]);
         this.dropoffLocationId = Long.parseLong(elements[8]);
+        this.stimulus = stimulus;
     }
 
-    public NYCInputTuple(String line, Long ts) {
+    public NYCInputTuple(String line) {
         String[] elements = line.split(",");
         this.vendorId = Integer.parseInt(elements[0]);
-        this.dropoffTime = ts;
+        this.dropoffTime = convertDateFormat(elements[2]);
         this.tripDistance = Double.parseDouble(elements[4]);
         this.dropoffLocationId = Long.parseLong(elements[8]);
     }
@@ -72,6 +83,14 @@ public class NYCInputTuple {
 
     public void setDropoffLocationId(long dropoffLocationId) {
         this.dropoffLocationId = dropoffLocationId;
+    }
+
+    public long getStimulus() {
+        return stimulus;
+    }
+
+    public void setStimulus(long stimulus) {
+        this.stimulus = stimulus;
     }
 
     @Override

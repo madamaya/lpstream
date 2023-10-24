@@ -1,13 +1,12 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
-import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkInputTuple;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class BidderDataParserNex implements MapFunction<ObjectNode, NexmarkBidTuple> {
+public class BidderDataParserNexL3 implements MapFunction<ObjectNode, NexmarkBidTuple> {
     /*
      Sample Input:
    {"event_type":2,"person":null,"auction":null,"bid":{"auction":1000,"bidder":2001,"price":1809,"channel":"channel-5901","url":"https://www.nexmark.com/wjeq/xkl/llzy/item.htm?query=1&channel_id=1326972928","dateTime":"2023-10-03 05:31:34.28","extra":"[MNM`IxtngkjlwyyghNZI^O[bhpwaiKOK\\JXszmhft]_]UHIKMZIVH^WH\\U`"}}
@@ -28,7 +27,7 @@ public class BidderDataParserNex implements MapFunction<ObjectNode, NexmarkBidTu
             long dateTime = NexmarkInputTuple.convertDateStrToLong(jnode.get("dateTime").asText());
             String extra = jnode.get("extra").asText();
 
-            return new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra, System.nanoTime());
+            return new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra);
         } else {
             return new NexmarkBidTuple(eventType);
         }
