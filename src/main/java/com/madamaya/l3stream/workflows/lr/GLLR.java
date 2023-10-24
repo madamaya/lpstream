@@ -1,9 +1,8 @@
 package com.madamaya.l3stream.workflows.lr;
 
-import com.madamaya.l3stream.workflows.lr.ops.DataParserLR;
-import com.madamaya.l3stream.workflows.lr.ops.DataParserLRGL;
-import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLR;
-import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLRGL;
+import com.madamaya.l3stream.glCommons.InitGdataGL;
+import com.madamaya.l3stream.workflows.lr.ops.*;
+import com.madamaya.l3stream.workflows.nexmark.ops.LineageKafkaSinkNexmarkGL;
 import io.palyvos.provenance.usecases.CountTuple;
 import io.palyvos.provenance.usecases.CountTupleGL;
 import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadAccidentAggregate;
@@ -48,6 +47,7 @@ public class GLLR {
 
         /* Query */
         DataStream<CountTupleGL> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
+                .map(new InitGdataGL(settings))
                 .map(new DataParserLRGL())
                 .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL())
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
@@ -63,12 +63,20 @@ public class GLLR {
                 //.slotSharingGroup(settings.secondSlotSharingGroup())
                 .filter(t -> t.getCount() > 1);
 
+        if (settings.getLatencyFlag() == 1) {
+            ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new LineageKafkaSinkLRGL(outputTopicName, settings), kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+        } else {
+            ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new LatencyKafkaSinkLRGL(outputTopicName, settings), kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+        }
+
+        /*
         ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<CountTupleGL>() {
             @Override
             public ProducerRecord<byte[], byte[]> serialize(CountTupleGL tuple, @Nullable Long aLong) {
                 return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
             }
         }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+         */
 
         env.execute("Query: " + queryFlag);
     }

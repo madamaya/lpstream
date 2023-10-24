@@ -5,6 +5,7 @@ import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLR;
 import io.palyvos.provenance.usecases.CountTuple;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadAccidentAggregate;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadVehicleAggregate;
+import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
@@ -24,6 +25,7 @@ public class LR {
     public static void main(String[] args) throws Exception {
 
         /* Define variables & Create environment */
+        ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
 
@@ -58,12 +60,23 @@ public class LR {
                 //.slotSharingGroup(settings.secondSlotSharingGroup())
                 .filter(t -> t.getCount() > 1);
 
-        ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<CountTuple>() {
-            @Override
-            public ProducerRecord<byte[], byte[]> serialize(CountTuple tuple, @Nullable Long aLong) {
-                return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
-            }
-        }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+        if (settings.getLatencyFlag() == 1) {
+            ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<CountTuple>() {
+                @Override
+                public ProducerRecord<byte[], byte[]> serialize(CountTuple tuple, @Nullable Long aLong) {
+                    return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
+                    // return new ProducerRecord<>(outputTopicName, String.valueOf(System.nanoTime() - tuple.getStimulus()).getBytes(StandardCharsets.UTF_8));
+                }
+            }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+        } else {
+            ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<CountTuple>() {
+                @Override
+                public ProducerRecord<byte[], byte[]> serialize(CountTuple tuple, @Nullable Long aLong) {
+                    // return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
+                    return new ProducerRecord<>(outputTopicName, String.valueOf(System.nanoTime() - tuple.getStimulus()).getBytes(StandardCharsets.UTF_8));
+                }
+            }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+        }
 
         env.execute("Query: " + queryFlag);
     }

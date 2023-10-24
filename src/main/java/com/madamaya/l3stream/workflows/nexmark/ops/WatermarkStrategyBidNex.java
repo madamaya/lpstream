@@ -22,7 +22,6 @@ public class WatermarkStrategyBidNex implements WatermarkStrategy<NexmarkBidTupl
 
             @Override
             public void onEvent(NexmarkBidTuple tuple, long l, WatermarkOutput watermarkOutput) {
-                // CNFM: ほんとにこれでいい？
                 watermarkOutput.emitWatermark(new Watermark(tuple.getDateTime() - 1));
             }
 

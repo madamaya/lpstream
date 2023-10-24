@@ -69,7 +69,7 @@ public class L3Nexmark {
         DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("6")
                 .map(L3.initMap(settings)).uid("7")
                 .map(L3.map(new BidderDataParserNexL3())).uid("8")
-                .filter(L3.filter(t -> t.getEventType() == 1))
+                .filter(L3.filter(t -> t.getEventType() == 2))
                 .map(L3.updateTsWM(new WatermarkStrategyBidNex(), 1)).uid("9")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.numOfInstanceWM())).uid("10");
 

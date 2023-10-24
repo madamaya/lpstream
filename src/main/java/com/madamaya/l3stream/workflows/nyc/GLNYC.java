@@ -1,12 +1,11 @@
 package com.madamaya.l3stream.workflows.nyc;
 
-import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
-import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTuple;
-import com.madamaya.l3stream.workflows.nyc.ops.CountAndAvgDistance;
-import com.madamaya.l3stream.workflows.nyc.ops.DataParserNYC;
-import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
+import com.madamaya.l3stream.glCommons.InitGdataGL;
+import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTupleGL;
+import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTupleGL;
+import com.madamaya.l3stream.workflows.nyc.ops.*;
+import com.madamaya.l3stream.workflows.ysb.ops.LineageKafkaSinkYSBGL;
 import io.palyvos.provenance.util.ExperimentSettings;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -23,14 +22,14 @@ import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
-public class NYC {
+public class GLNYC {
     public static void main(String[] args) throws Exception {
 
         /* Define variables & Create environment */
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
-
+        env.setParallelism(4);
         final String queryFlag = "NYC";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
@@ -46,36 +45,34 @@ public class NYC {
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */
-        DataStream<NYCResultTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-                .map(new DataParserNYC())
-                .assignTimestampsAndWatermarks(new WatermarkStrategyNYC())
+        DataStream<NYCResultTupleGL> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
+                .map(new InitGdataGL(settings))
+                .map(new DataParserNYCGL())
+                .assignTimestampsAndWatermarks(new WatermarkStrategyNYCGL())
                 .filter(t -> t.getTripDistance() > 5)
-                .keyBy(new KeySelector<NYCInputTuple, Tuple2<Integer, Long>>() {
+                .keyBy(new KeySelector<NYCInputTupleGL, Tuple2<Integer, Long>>() {
                     @Override
-                    public Tuple2<Integer, Long> getKey(NYCInputTuple tuple) throws Exception {
+                    public Tuple2<Integer, Long> getKey(NYCInputTupleGL tuple) throws Exception {
                         return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
                     }
                 })
                 .window(TumblingEventTimeWindows.of(Time.minutes(30)))
-                .aggregate(new CountAndAvgDistance());
+                .aggregate(new CountAndAvgDistanceGL(settings.aggregateStrategySupplier()));
 
         if (settings.getLatencyFlag() == 1) {
-            ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<NYCResultTuple>() {
-                @Override
-                public ProducerRecord<byte[], byte[]> serialize(NYCResultTuple tuple, @Nullable Long aLong) {
-                    return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
-                    // return new ProducerRecord<>(outputTopicName, String.valueOf(System.nanoTime() - tuple.getStimulus()).getBytes(StandardCharsets.UTF_8));
-                }
-            }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+            ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new LineageKafkaSinkNYCGL(outputTopicName, settings), kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
         } else {
-            ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<NYCResultTuple>() {
-                @Override
-                public ProducerRecord<byte[], byte[]> serialize(NYCResultTuple tuple, @Nullable Long aLong) {
-                    // return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
-                    return new ProducerRecord<>(outputTopicName, String.valueOf(System.nanoTime() - tuple.getStimulus()).getBytes(StandardCharsets.UTF_8));
-                }
-            }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+            ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new LatencyKafkaSinkNYCGL(outputTopicName, settings), kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
         }
+
+        /*
+        ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<NYCResultTupleGL>() {
+            @Override
+            public ProducerRecord<byte[], byte[]> serialize(NYCResultTupleGL tuple, @Nullable Long aLong) {
+                return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
+            }
+        }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+         */
 
         env.execute("Query: " + queryFlag);
     }
