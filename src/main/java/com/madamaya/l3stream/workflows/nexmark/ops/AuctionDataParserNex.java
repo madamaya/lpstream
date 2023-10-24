@@ -31,7 +31,7 @@ public class AuctionDataParserNex extends RichMapFunction<ObjectNode, NexmarkAuc
     @Override
     public NexmarkAuctionTuple map(ObjectNode jsonNodes) throws Exception {
         int eventType = jsonNodes.get("value").get("event_type").asInt();
-
+        count++;
         // eventType is auction
         // id, itemname, description, initialBid, reserve, dateTime, expires, seller, category, extra
         if (eventType == 1) {

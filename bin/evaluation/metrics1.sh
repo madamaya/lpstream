@@ -5,11 +5,13 @@ source ../utils/cpmanager.sh
 source ../utils/flinkJob.sh
 source ../utils/logger.sh
 
-numOfLoop=1
+numOfLoop=3
 sleepTime=30
 queries=(LR Nexmark NYC YSB)
-#approaches=(original genealog l3stream)
-approaches=(baseline)
+#queries=(LR)
+approaches=(baseline genealog l3stream)
+#approaches=(baseline)
+#approaches=(l3stream)
 
 cd ./templates
 
@@ -42,8 +44,8 @@ do
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
         # Start CpMServer
         echo "*** Start CpMServer ***"
-        echo "(../startCpMServer.sh)"
-        ../startCpMServer.sh
+        echo "(../../startCpMServer.sh > /dev/null &)"
+        ../../startCpMServer.sh > /dev/null &
         sleep 10
         # Run
         echo "*** Run ***"

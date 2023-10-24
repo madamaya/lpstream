@@ -31,6 +31,7 @@ public class InitGdataGL extends RichMapFunction<ObjectNode, ObjectNodeGL> {
     public ObjectNodeGL map(ObjectNode jsonNodes) throws Exception {
         ObjectNodeGL out = new ObjectNodeGL(jsonNodes, System.nanoTime());
         out.initGenealog(GenealogTupleType.SOURCE);
+        count++;
         return out;
     }
 

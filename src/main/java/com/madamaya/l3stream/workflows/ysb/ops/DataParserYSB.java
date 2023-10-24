@@ -29,7 +29,7 @@ public class DataParserYSB extends RichMapFunction<ObjectNode, YSBInputTuple> {
         String eventType = jNode.get("value").get("event_type").textValue();
         String campaignId = jNode.get("value").get("campaign_id").textValue();
         long eventtime = Long.parseLong(jNode.get("value").get("event_time").textValue());
-
+        count++;
         return new YSBInputTuple(adId, eventType, campaignId, eventtime, stimulus);
     }
 

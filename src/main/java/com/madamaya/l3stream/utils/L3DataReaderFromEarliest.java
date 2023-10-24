@@ -10,6 +10,9 @@ import org.apache.kafka.common.internals.Topic;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +29,11 @@ public class L3DataReaderFromEarliest {
         String outputFilePath = args[1];
         int parallelism = Integer.parseInt(args[2]);
 
+        Path path = Paths.get(outputFilePath);
+        if (Files.notExists(path.getParent())) {
+            Files.createDirectories(path.getParent());
+        }
+
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, L3Config.BOOTSTRAP_IP_PORT);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, Long.toString(System.currentTimeMillis()));
@@ -40,7 +48,6 @@ public class L3DataReaderFromEarliest {
         }
         consumer.assign(list);
         consumer.seekToBeginning(list);
-
 
         int count = 0;
         BufferedWriter bw;

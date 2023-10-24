@@ -30,14 +30,14 @@ do
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
         # Run
         echo "*** Run ***"
-        echo "(./original.sh ${JAR_PATH} ${mainPath} 0 metrics2/${query}/${approach} ${parallelism})"
-        ./original.sh ${JAR_PATH} ${mainPath} 0 metrics2/${query}/${approach} ${parallelism}
+        echo "(./original.sh ${JAR_PATH} ${mainPath} 0 metrics2/${query}/${approach} 1)"
+        ./original.sh ${JAR_PATH} ${mainPath} 0 metrics2/${query}/${approach} 1
       elif [ ${approach} = "l3stream" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
         # Run
         echo "*** Run ***"
         echo "(./lineage.sh ${JAR_PATH} ${mainPath} 0 ${outputTopicName} metrics2/${query}/${approach} ${parallelism})"
-        ./lineage.sh ${JAR_PATH} ${mainPath} 0 metrics2/${query}/${approach} ${parallelism}
+        ./lineage.sh ${JAR_PATH} ${mainPath} 0 ${outputTopicName} metrics2/${query}/${approach} ${parallelism}
       fi
 
       # Sleep

@@ -32,7 +32,7 @@ public class BidderDataParserNex extends RichMapFunction<ObjectNode, NexmarkBidT
     @Override
     public NexmarkBidTuple map(ObjectNode jsonNodes) throws Exception {
         int eventType = jsonNodes.get("value").get("event_type").asInt();
-
+        count++;
         // eventType is auction
         if (eventType == 2) {
             JsonNode jnode = jsonNodes.get("value").get("bid");

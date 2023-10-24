@@ -33,6 +33,7 @@ public class DataParserNYC extends RichMapFunction<ObjectNode, NYCInputTuple> {
         long stimulus = System.nanoTime();
 
         String line = jNode.get("value").textValue();
+        count++;
         return new NYCInputTuple(line, stimulus);
     }
 

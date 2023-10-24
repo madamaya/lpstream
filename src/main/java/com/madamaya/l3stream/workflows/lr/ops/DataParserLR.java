@@ -42,6 +42,7 @@ public class DataParserLR extends RichMapFunction<ObjectNode, LinearRoadInputTup
                 stimulus
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
+        count++;
         return tuple;
     }
 
