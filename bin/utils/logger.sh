@@ -2,6 +2,19 @@
 
 source $(dirname $0)/../config.sh
 
+function readOutputFromEarliest () {
+  logDir=$1
+  logFile=$2
+  outputTopicName=$3
+
+  if [ ! -d ${logDir} ]; then
+    mkdir ${logDir}
+  fi
+
+  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism})"
+  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism}
+}
+
 function startKafkaLogger () {
   logDir=$1
   logFile=$2

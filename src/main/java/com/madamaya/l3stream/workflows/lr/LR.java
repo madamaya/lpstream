@@ -45,7 +45,7 @@ public class LR {
 
         /* Query */
         DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-                .map(new DataParserLR())
+                .map(new DataParserLR(settings))
                 .assignTimestampsAndWatermarks(new WatermarkStrategyLR())
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
                 .keyBy(t -> t.getKey())

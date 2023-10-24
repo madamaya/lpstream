@@ -47,7 +47,7 @@ public class NYC {
 
         /* Query */
         DataStream<NYCResultTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-                .map(new DataParserNYC())
+                .map(new DataParserNYC(settings))
                 .assignTimestampsAndWatermarks(new WatermarkStrategyNYC())
                 .filter(t -> t.getTripDistance() > 5)
                 .keyBy(new KeySelector<NYCInputTuple, Tuple2<Integer, Long>>() {

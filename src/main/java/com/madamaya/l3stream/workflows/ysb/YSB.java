@@ -44,7 +44,7 @@ public class YSB {
 
         /* Query */
         DataStream<YSBResultTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-                .map(new DataParserYSB())
+                .map(new DataParserYSB(settings))
                 .assignTimestampsAndWatermarks(new WatermarkStrategyYSB())
                 .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSB())
