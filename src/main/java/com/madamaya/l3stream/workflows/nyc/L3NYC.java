@@ -56,7 +56,7 @@ public class L3NYC {
 
         /* Query */
         DataStream<L3StreamTupleContainer<NYCResultTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
-                .map(L3.initMap(t->System.nanoTime(), t->System.nanoTime(), settings)).uid("2")
+                .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserNYCL3())).uid("3")
                 .map(L3.updateTsWM(new WatermarkStrategyNYC(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyNYC(), settings.numOfInstanceWM())).uid("5")

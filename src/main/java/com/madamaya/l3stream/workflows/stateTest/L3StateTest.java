@@ -46,7 +46,8 @@ public class L3StateTest {
 
         /* Query */
         DataStream<L3StreamTupleContainer<Tuple2<Integer, Integer>>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromLatest())
-                .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings))
+                //.map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings))
+                .map(L3.initMap(settings))
                 .map(L3.map(new MapFunction<ObjectNode, Integer>() {
                     @Override
                     public Integer map(ObjectNode s) throws Exception {

@@ -14,7 +14,7 @@ public class NexmarkBidTuple extends NexmarkInputTuple {
     private String url;
     private long dateTime;
     private String extra;
-    private long stimulus;
+    private long stimulus = Long.MAX_VALUE;
 
     public NexmarkBidTuple(int eventType) {
         super(eventType);

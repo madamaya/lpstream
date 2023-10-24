@@ -18,7 +18,7 @@ public class NYCInputTuple {
     private long dropoffTime;
     private double tripDistance;
     private long dropoffLocationId;
-    private long stimulus;
+    private long stimulus = Long.MAX_VALUE;
 
     public NYCInputTuple(int vendorId, long dropoffTime, double tripDistance, long dropoffLocationId, long stimulus) {
         this.vendorId = vendorId;

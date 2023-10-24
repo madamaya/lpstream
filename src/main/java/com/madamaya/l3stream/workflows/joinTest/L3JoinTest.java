@@ -50,7 +50,8 @@ public class L3JoinTest {
 
         /* Query */
         DataStream<L3StreamTupleContainer<Tuple3<Integer, String, Long>>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromLatest())
-                .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings))
+                //.map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings))
+            .map(L3.initMap(settings))
             .map(L3.map(new MapFunction<ObjectNode, Tuple3<Integer, String, Long>>() {
                 @Override
                 public Tuple3<Integer, String, Long> map(ObjectNode jsonNodes) throws Exception {
@@ -62,7 +63,8 @@ public class L3JoinTest {
 
         /* Query */
         DataStream<L3StreamTupleContainer<Tuple3<Integer, Integer, Long>>> ds2 = env.addSource(new FlinkKafkaConsumer<>(inputTopicName2, new JSONKeyValueDeserializationSchema(true), kafkaProperties2).setStartFromLatest())
-                .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings))
+                //.map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings))
+                .map(L3.initMap(settings))
                 .map(L3.map(new MapFunction<ObjectNode, Tuple3<Integer, Integer, Long>>() {
                     @Override
                     public Tuple3<Integer, Integer, Long> map(ObjectNode jsonNodes) throws Exception {

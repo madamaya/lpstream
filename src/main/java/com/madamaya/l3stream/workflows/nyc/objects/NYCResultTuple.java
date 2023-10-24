@@ -6,7 +6,7 @@ public class NYCResultTuple {
     private long count;
     private double avgDistance;
     private long ts;
-    private long stimulus;
+    private long stimulus = Long.MAX_VALUE;
 
     public NYCResultTuple(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts, long stimulus) {
         this.vendorId = vendorId;

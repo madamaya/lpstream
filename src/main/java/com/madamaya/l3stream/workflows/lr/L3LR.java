@@ -11,10 +11,7 @@ import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
 import io.palyvos.provenance.l3stream.wrappers.operators.L3OpWrapperStrategy;
 import io.palyvos.provenance.usecases.CountTuple;
-import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadAccidentAggregate;
-import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadAccidentAggregateL3;
-import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadVehicleAggregate;
-import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadVehicleAggregateL3;
+import io.palyvos.provenance.usecases.linearroad.noprovenance.*;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
@@ -28,6 +25,7 @@ import org.apache.flink.streaming.util.serialization.JSONKeyValueDeserialization
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import javax.annotation.Nullable;
+import javax.xml.crypto.Data;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
@@ -59,7 +57,7 @@ public class L3LR {
 
         /* Query */
         DataStream<L3StreamTupleContainer<CountTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
-                .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("2")
+                .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserLRL3())).uid("3")
                 .map(L3.updateTsWM(new WatermarkStrategyLR(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(), settings.numOfInstanceWM())).uid("5")

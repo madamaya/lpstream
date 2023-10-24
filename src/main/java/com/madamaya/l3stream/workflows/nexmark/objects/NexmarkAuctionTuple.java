@@ -16,7 +16,7 @@ public class NexmarkAuctionTuple extends NexmarkInputTuple {
     private int seller;
     private int category;
     private String extra;
-    private long stimulus;
+    private long stimulus = Long.MAX_VALUE;
 
     public NexmarkAuctionTuple(int eventType) {
         super(eventType);

@@ -4,7 +4,7 @@ public class YSBResultTuple {
     private String campaignId;
     private long count;
     private long ts;
-    private long stimulus;
+    private long stimulus = Long.MAX_VALUE;
 
     public YSBResultTuple(String campaignId, long count, long ts, long stimulus) {
         this.campaignId = campaignId;
@@ -41,6 +41,14 @@ public class YSBResultTuple {
 
     public void setTs(long ts) {
         this.ts = ts;
+    }
+
+    public long getStimulus() {
+        return stimulus;
+    }
+
+    public void setStimulus(long stimulus) {
+        this.stimulus = stimulus;
     }
 
     @Override

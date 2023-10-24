@@ -58,9 +58,10 @@ public class LinearRoadAccidentShort {
 
     // env.addSource(new LinearRoadSource(settings))
     DataStream<L3StreamTupleContainer<VehicleTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
-        .map(L3.initMap(t->System.nanoTime(), t->System.nanoTime(), settings, "Accident")).uid("2")
+        // .map(L3.initMap(t->System.nanoTime(), t->System.nanoTime(), settings, "Accident")).uid("2")
+            .map(L3.initMap(settings)).uid("2")
         .map(L3.map(new ObjectNodeConverter())).uid("3")
-        .map(L3.updateTs(t->t.tuple().getTimestamp())).uid("3.5")
+        //.map(L3.updateTs(t->t.tuple().getTimestamp())).uid("3.5")
         .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new LrWatermark(), 1)).uid("4")
         .filter(L3.filter(t -> t.getType() == 0 && t.getSpeed() == 0)).uid("5")
         .keyBy(L3.keyBy(t -> t.getKey()), TypeInformation.of(String.class))

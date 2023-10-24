@@ -62,7 +62,7 @@ public class LinearRoadAccident {
     kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
     DataStream<L3StreamTupleContainer<CountTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
-        .map(L3.initMap(t->System.nanoTime(), t->System.nanoTime(), settings, "Accident")).uid("2")
+        .map(L3.initMap(settings)).uid("2")
         .map(L3.map(new ObjectNodeConverter())).uid("3")
 
         // previous version

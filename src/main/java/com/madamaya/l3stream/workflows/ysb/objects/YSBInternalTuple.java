@@ -4,7 +4,7 @@ public class YSBInternalTuple {
     private String adId;
     private String campaignId;
     private long eventtime;
-    private long stimulus;
+    private long stimulus = Long.MAX_VALUE;
 
     public YSBInternalTuple(String adId, String campaignId, long eventtime, long stimulus) {
         this.adId = adId;

@@ -6,7 +6,7 @@ public class YSBInputTuple {
     private String eventType;
     private String campaignId;
     private long eventtime;
-    private long stimulus;
+    private long stimulus = Long.MAX_VALUE;
 
     public YSBInputTuple(String adId, String eventType, String campaignId, long eventtime, long stimulus) {
         this.adId = adId;

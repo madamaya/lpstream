@@ -2,6 +2,7 @@ package com.madamaya.l3stream.workflows.ysb;
 
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
+import com.madamaya.l3stream.workflows.ysb.objects.YSBInputTuple;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
 import com.madamaya.l3stream.workflows.ysb.ops.*;
 import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
@@ -53,7 +54,7 @@ public class L3YSB {
 
         /* Query */
         DataStream<L3StreamTupleContainer<YSBResultTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
-                .map(L3.initMap(t -> System.nanoTime(), t -> System.nanoTime(), settings)).uid("2")
+                .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserYSBL3())).uid("3")
                 .map(L3.updateTsWM(new WatermarkStrategyYSB(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyYSB(), settings.numOfInstanceWM())).uid("5")
