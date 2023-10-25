@@ -8,7 +8,8 @@ bin/**/*.csv
 bin/**/*.log
 bin/**/*.txt
 data/checkpoints
-data/output
+data/output/**/*.log
+data/temp2/**/*.log
 data/input/YSB/streaming-benchmarks/
 data/datagen
 data/test0918
