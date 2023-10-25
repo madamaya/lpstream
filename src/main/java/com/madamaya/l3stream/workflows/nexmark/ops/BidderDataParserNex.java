@@ -66,7 +66,7 @@ public class BidderDataParserNex extends RichMapFunction<ObjectNode, NexmarkBidT
             Files.createDirectories(Paths.get(dataPath));
         }
 
-        PrintWriter pw = new PrintWriter(dataPath + "/bid_" + settings.getStartTime() + "_" + getRuntimeContext().getIndexOfThisSubtask() + ".log");
+        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + 1 + "_" + getRuntimeContext().getIndexOfThisSubtask() + ".log");
         pw.println(start + "," + end + "," + (end - start) + "," + count);
         pw.flush();
         pw.close();

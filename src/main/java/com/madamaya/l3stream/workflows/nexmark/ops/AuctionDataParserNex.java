@@ -69,7 +69,7 @@ public class AuctionDataParserNex extends RichMapFunction<ObjectNode, NexmarkAuc
             Files.createDirectories(Paths.get(dataPath));
         }
 
-        PrintWriter pw = new PrintWriter(dataPath + "/auction_" + settings.getStartTime() + "_" + getRuntimeContext().getIndexOfThisSubtask() + ".log");
+        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + 0 + "_" + getRuntimeContext().getIndexOfThisSubtask() + ".log");
         pw.println(start + "," + end + "," + (end - start) + "," + count);
         pw.flush();
         pw.close();

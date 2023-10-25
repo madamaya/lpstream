@@ -5,11 +5,11 @@ source ../utils/cpmanager.sh
 source ../utils/flinkJob.sh
 source ../utils/logger.sh
 
-numOfLoop=1
+numOfLoop=3
 sleepTime=30
 queries=(LR Nexmark NYC YSB)
-#approaches=(original l3stream)
-approaches=(original)
+approaches=(baseline l3stream)
+#approaches=(baseline)
 
 cd ./templates
 
@@ -26,7 +26,7 @@ do
       outputTopicName="${query}-o"
 
       # Start query
-      if [ ${approach} = "original" ]; then
+      if [ ${approach} = "baseline" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
         # Run
         echo "*** Run ***"
@@ -78,3 +78,8 @@ do
     done
   done
 done
+
+cd ${L3_HOME}/data/output/latency/metrics2
+python metrics2.py
+cd ${L3_HOME}/data/output/throughput/metrics2
+python metrics2.py

@@ -60,14 +60,14 @@ public class L3Nexmark {
 
         /* Query */
         DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
-                .map(L3.initMap(settings)).uid("2")
+                .map(L3.initMap(settings, 0)).uid("2")
                 .map(L3.map(new AuctionDataParserNexL3())).uid("3")
                 .filter(L3.filter(t -> t.getEventType() == 1))
                 .map(L3.updateTsWM(new WatermarkStrategyAuctionNex(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.numOfInstanceWM())).uid("5");
 
         DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("6")
-                .map(L3.initMap(settings)).uid("7")
+                .map(L3.initMap(settings, 1)).uid("7")
                 .map(L3.map(new BidderDataParserNexL3())).uid("8")
                 .filter(L3.filter(t -> t.getEventType() == 2))
                 .map(L3.updateTsWM(new WatermarkStrategyBidNex(), 1)).uid("9")

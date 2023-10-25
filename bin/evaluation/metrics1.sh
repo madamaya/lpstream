@@ -91,3 +91,8 @@ do
     done
   done
 done
+
+cd ${L3_HOME}/data/output/latency/metrics1
+python metrics1.py
+cd ${L3_HOME}/data/output/throughput/metrics1
+python metrics1.py
