@@ -29,6 +29,7 @@ logDir="${L3_HOME}/data/log/${(L)testName}"
 echo "logFile=\"${logDir}/${testName}.log\""
 logFile="${logDir}/${testName}.log"
 
+<<OUT
 ## Initialize redis
 echo "*** Initialize redis ***"
 echo "(redis-cli FLUSHDB)"
@@ -83,11 +84,12 @@ stopLogger
 echo "*** Decide target output for lineage randomly ***"
 echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.Sampling ${logFile} ${numOfSamples})"
 java -cp ${JAR_PATH} com.madamaya.l3stream.utils.Sampling ${logFile} ${numOfSamples}
-
+OUT
 ## Obtain jobid from file.
-#jobid=`cat latestJobID.log`
+jobid=`cat latestJobID.log`
 
 ## Read target outputs
+idx=1
 FILE="${logFile}.target.txt"
 while read LINE
 do
@@ -95,5 +97,7 @@ do
   outputTs=`echo ${LINE} | jq '.TS' | sed -e 's/"//g'`
 
   ## Start Lineage Manager with normal mode
-  ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName}
+  ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${experimentName}-${idx}
+
+  idx=`expr ${idx} + 1`
 done < ${FILE}

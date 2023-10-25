@@ -19,4 +19,4 @@ bootstrapServers="localhost:9092"
 
 # execution
 parallelism=4
-numOfSamples=1
+numOfSamples=3

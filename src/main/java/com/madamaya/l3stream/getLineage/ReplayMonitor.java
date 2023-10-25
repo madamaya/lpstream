@@ -1,6 +1,7 @@
 package com.madamaya.l3stream.getLineage;
 
 import com.madamaya.l3stream.conf.L3Config;
+import io.palyvos.provenance.l3stream.conf.L3conf;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
@@ -17,6 +18,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,18 +30,23 @@ public class ReplayMonitor {
     public static boolean parseFlag = false;
 
     public static void main(String[] args) throws Exception {
+        long startTime = System.currentTimeMillis();
+
         long outputTs;
         String lineageTopic;
+        String experimentName; // Example: LR-baseline-1
         String outputValue = "";
 
-        if (args.length == 2) {
+        if (args.length == 3) {
             outputTs = Long.parseLong(args[0]);
             lineageTopic = args[1];
-        } else if (args.length == 3) {
+            experimentName = args[2];
+        } else if (args.length == 4) {
             outputTs = Long.parseLong(args[0]);
             lineageTopic = args[1];
             // remove "\"" from beginnig and end of the input
             outputValue = args[2].substring(0, args[2].length()-1).substring(1);
+            experimentName = args[3];
         } else {
             throw new IllegalArgumentException();
         }
@@ -55,6 +63,7 @@ public class ReplayMonitor {
 
         int count = 0;
         boolean run = true;
+        long endTime = -1;
         while (run) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
             for (ConsumerRecord record : records) {
@@ -64,12 +73,29 @@ public class ReplayMonitor {
                     System.out.print("\rcount = " + count);
                 }
                 if (checkSame(recordValue, outputValue, outputTs)) {
+                    endTime = System.currentTimeMillis();
                     writeLineage((String) record.value());
                     cancelJob();
                     run = false;
                     break;
                 }
             }
+        }
+        BufferedWriter bw;
+        try {
+            String[] elements = experimentName.split("-");
+            String query = elements[0];
+            String id = elements[1];
+            String dataPath = L3conf.L3_HOME + "/data/output/metrics34/" + query;
+            if (Files.notExists(Paths.get(dataPath))) {
+                Files.createDirectories(Paths.get(dataPath));
+            }
+            bw = new BufferedWriter(new FileWriter(dataPath + "/" + id + "-" + "monitor.log"));
+            bw.write(startTime + "," + endTime);
+            bw.flush();
+            bw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
