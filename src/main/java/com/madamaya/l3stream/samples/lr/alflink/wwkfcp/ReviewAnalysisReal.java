@@ -62,7 +62,8 @@ public class ReviewAnalysisReal {
             .addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
             // L4
             //.map(L3S.initMap(t->System.currentTimeMillis(), t->System.nanoTime(), settings, "real_"))
-            .map(L3S.initMap(t->System.nanoTime(), t->System.nanoTime(), settings, "real_"))
+            //.map(L3S.initMap(t->System.nanoTime(), t->System.nanoTime(), settings, "real_"))
+            .map(L3S.initMap(settings))
             // L3
             .map(L3S.map(new ConvertJsonDataReal()))
             .filter(L3S.filter(new FilterFunction<ReviewInputData>() {
