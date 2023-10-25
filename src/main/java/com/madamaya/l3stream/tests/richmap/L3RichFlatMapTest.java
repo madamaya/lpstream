@@ -49,7 +49,8 @@ public class L3RichFlatMapTest {
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
 
         DataStream<L3StreamTupleContainer<String>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromLatest()).uid("source")
-                .map(L3.initMap(t->System.nanoTime(), t->System.nanoTime(), settings, "")).uid("initmap")
+                //.map(L3.initMap(t->System.nanoTime(), t->System.nanoTime(), settings, "")).uid("initmap")
+                .map(L3.initMap(settings)).uid("initmap")
                 .map(L3.map(new DataParser())).uid("parser")
                 .flatMap(L3.flatMap(new MyRichFlatMap())).uid("rfmap");
 
