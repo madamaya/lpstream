@@ -7,7 +7,6 @@ latencyFlag=1
 if [ $# -eq 3 ]; then
   latencyFlag=${3}
 fi
-
 EXE_CMD="${FLINK_HOME}/bin/flink run -d \
 --parallelism ${parallelism} \
 --class ${2} \
