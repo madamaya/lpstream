@@ -1,7 +1,8 @@
 #!/bin/zsh
 
 # path
-L3_HOME="/Users/yamada-aist/workspace/l3stream"
+# Please fill in the path of l3steram
+L3_HOME="~~~/l3stream"
 FLINK_HOME="${L3_HOME}/flink"
 KAFKA_HOME="${L3_HOME}/kafka"
 BIN_DIR="${L3_HOME}/bin"
@@ -19,4 +20,4 @@ bootstrapServers="localhost:9092"
 
 # execution
 parallelism=4
-numOfSamples=3
+numOfSamples=5

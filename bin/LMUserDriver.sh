@@ -29,7 +29,6 @@ logDir="${L3_HOME}/data/log/${(L)testName}"
 echo "logFile=\"${logDir}/${testName}.log\""
 logFile="${logDir}/${testName}.log"
 
-<<OUT
 ## Initialize redis
 echo "*** Initialize redis ***"
 echo "(redis-cli FLUSHDB)"
@@ -84,9 +83,9 @@ stopLogger
 echo "*** Decide target output for lineage randomly ***"
 echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.Sampling ${logFile} ${numOfSamples})"
 java -cp ${JAR_PATH} com.madamaya.l3stream.utils.Sampling ${logFile} ${numOfSamples}
-OUT
+
 ## Obtain jobid from file.
-jobid=`cat latestJobID.log`
+#jobid=`cat latestJobID.log`
 
 ## Read target outputs
 idx=1
@@ -100,4 +99,7 @@ do
   ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${experimentName}-${idx}
 
   idx=`expr ${idx} + 1`
+
+  echo "*** sleep 30 ***"
+  sleep 30
 done < ${FILE}
