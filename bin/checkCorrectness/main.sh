@@ -75,8 +75,8 @@ stopLogger
 
 ## Print max TS
 cd ../checkCorrectness/log
-echo "*** Print ts log (ALL) ***"
-python findMaxWMFromTopic.py ${inputTopicName} all_baseline.log ${inputTopicName}
+#echo "*** Print ts log (ALL) ***"
+#python findMaxWMFromTopic.py ${inputTopicName} all_baseline.log ${inputTopicName}
 
 cd ..
 ./dataLoader.sh 1 ${inputTopicName} ${inputFilePath}
