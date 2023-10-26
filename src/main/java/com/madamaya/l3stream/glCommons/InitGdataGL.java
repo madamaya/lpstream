@@ -1,5 +1,6 @@
 package com.madamaya.l3stream.glCommons;
 
+import com.madamaya.l3stream.conf.L3Config;
 import io.palyvos.provenance.genealog.GenealogTupleType;
 import io.palyvos.provenance.l3stream.conf.L3conf;
 import io.palyvos.provenance.util.ExperimentSettings;
@@ -46,7 +47,7 @@ public class InitGdataGL extends RichMapFunction<ObjectNode, ObjectNodeGL> {
     public void close() throws Exception {
         long end = System.nanoTime();
 
-        String dataPath = L3conf.L3_HOME + "/data/output/throughput/" + settings.getQueryName();
+        String dataPath = L3Config.L3_HOME + "/data/output/throughput/" + settings.getQueryName();
         if (Files.notExists(Paths.get(dataPath))) {
             Files.createDirectories(Paths.get(dataPath));
         }

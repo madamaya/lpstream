@@ -44,7 +44,7 @@ public class TriggerReplay {
             String[] elements = experimentName.split("-");
             String query = elements[0];
             String id = elements[1];
-            String dataPath = L3conf.L3_HOME + "/data/output/metrics34/" + query;
+            String dataPath = L3Config.L3_HOME + "/data/output/metrics34/" + query;
             if (Files.notExists(Paths.get(dataPath))) {
                 Files.createDirectories(Paths.get(dataPath));
             }
