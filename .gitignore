@@ -13,6 +13,7 @@ data/output/**/*.pdf
 data/temp2/**/*.log
 data/input/YSB/streaming-benchmarks/
 data/datagen
+data/log
 data/test0918
 data/**/*.csv
 data/**/*.csv.1
@@ -22,6 +23,10 @@ data/**/*.json
 data/**/*.json.1
 data/**/*.json.2
 data/**/*.txt
+data/**/*.xlsx
+data/**/*.pyc
+**/dump.rdb
+
 script
 
 lib/*jar
@@ -38,3 +43,4 @@ script/autoReplayOutCheck/**/*.log
 /src/main/java/com/madamaya/l3stream/conf/L3Config.java
 /bin/config.sh
 flink-conf.yaml
+dependencies.txt
