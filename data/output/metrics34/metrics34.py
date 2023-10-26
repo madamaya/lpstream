@@ -31,7 +31,7 @@ def calcResults():
             stTr, edTr, ed2Tr = readTrigger("{}/{}-trigger.log".format(query, i))
             stMo, edMo = readMonitor("{}/{}-monitor.log".format(query, i))
 
-            met3 = edTr - stTr
+            met3 = edTr - stMo
             met4 = edMo - edTr
 
             metrics3List.append(met3)

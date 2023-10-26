@@ -11,6 +11,10 @@ elif [ $1 -eq 3 ]; then
 else
   source ./workflowConf/configYSB.sh
 fi
+windowSize=1
+if [ $# -eq 2 ]; then
+  windowSize=$2
+fi
 
 source ./utils/logger.sh
 source ./utils/notifyEnd.sh
@@ -47,8 +51,8 @@ echo "(./startCpMServer.sh > /dev/null &)"
 ## submit Flink job
 cd ${BIN_DIR}/templates
 echo "*** Submit Flink job ***"
-echo "(./nonlineage.sh ${JAR_PATH} ${mainPath})"
-./nonlineage.sh ${JAR_PATH} ${mainPath}
+echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${windowSize})"
+./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${windowSize}
 
 cd ${BIN_DIR}
 echo "*** Get jobid ***"

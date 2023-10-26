@@ -13,7 +13,7 @@ public class TriggerReplay {
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
 
-        if (args.length != 8) {
+        if (args.length != 8 && args.length != 9) {
             throw new IllegalArgumentException();
         }
         String jarPath = args[0];
@@ -24,16 +24,18 @@ public class TriggerReplay {
         long maxWindowSize = Long.parseLong(args[5]);
         int numOfSource = Integer.parseInt(args[6]);
         String experimentName = args[7];
+        String windowSize = (args.length == 9) ? args[8] : "";
+        int latencyFlag = 2;
 
         int replayID = FindReplayCPID.getReplayID(outputTs, maxWindowSize, numOfSource);
 
         long endTime = System.currentTimeMillis();
 
         // Restart
-        String replayCommand = L3Config.BIN_DIR + "/templates/lineage.sh";
+        String replayCommand = L3Config.BIN_DIR + "/templates/lineageReplay.sh";
         System.out.println("Replay from CpID = " + replayID + " of the job (" + jobid + ")");
-        System.out.println("COMMAND --->>> " + replayCommand + " " + jarPath + " " + mainPath + " " + jobid + " " + replayID + " " + lineageTopicName);
-        Runtime.getRuntime().exec(replayCommand + " " + jarPath + " " + mainPath + " " + jobid + " " + replayID + " " + lineageTopicName);
+        System.out.println("COMMAND --->>> " + replayCommand + " " + jarPath + " " + mainPath + " " + L3Config.PARALLELISM + " " + jobid + " " + replayID + " " + lineageTopicName + " " + latencyFlag + " " + windowSize);
+        Runtime.getRuntime().exec(replayCommand + " " + jarPath + " " + mainPath + " " + L3Config.PARALLELISM + " " + jobid + " " + replayID + " " + lineageTopicName + " " + latencyFlag + " " + windowSize);
 
         long endTime2 = System.currentTimeMillis();
 

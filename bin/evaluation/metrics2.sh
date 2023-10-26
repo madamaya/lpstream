@@ -11,7 +11,7 @@ queries=(LR Nexmark NYC YSB)
 approaches=(baseline l3stream)
 #approaches=(baseline)
 
-cd ./templates
+cd ../templates
 
 for loop in `seq 1 ${numOfLoop}`
 do
@@ -30,14 +30,14 @@ do
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
         # Run
         echo "*** Run ***"
-        echo "(./original.sh ${JAR_PATH} ${mainPath} 0 metrics2/${query}/${approach} 1)"
-        ./original.sh ${JAR_PATH} ${mainPath} 0 metrics2/${query}/${approach} 1
+        echo "(./original.sh ${JAR_PATH} ${mainPath} 1 metrics2/${query}/${approach} 0)"
+        ./original.sh ${JAR_PATH} ${mainPath} 1 metrics2/${query}/${approach} 0
       elif [ ${approach} = "l3stream" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
         # Run
         echo "*** Run ***"
-        echo "(./lineage.sh ${JAR_PATH} ${mainPath} 0 ${outputTopicName} metrics2/${query}/${approach} ${parallelism})"
-        ./lineage.sh ${JAR_PATH} ${mainPath} 0 ${outputTopicName} metrics2/${query}/${approach} ${parallelism}
+        echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics2/${query}/${approach} 0 ${outputTopicName})"
+        ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics2/${query}/${approach} 0 ${outputTopicName}
       fi
 
       # Sleep

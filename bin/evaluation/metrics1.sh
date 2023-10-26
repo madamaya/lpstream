@@ -13,7 +13,7 @@ approaches=(baseline genealog l3stream)
 #approaches=(baseline)
 #approaches=(l3stream)
 
-cd ./templates
+cd ../templates
 
 for loop in `seq 1 ${numOfLoop}`
 do
@@ -32,25 +32,25 @@ do
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
         # Run
         echo "*** Run ***"
-        echo "(./original.sh ${JAR_PATH} ${mainPath} 0 metrics1/${query}/${approach} ${parallelism})"
-        ./original.sh ${JAR_PATH} ${mainPath} 0 metrics1/${query}/${approach} ${parallelism}
+        echo "(./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 )"
+        ./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0
       elif [ ${approach} = "genealog" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.GL${query}"
         # Run
         echo "*** Run ***"
-        echo "(./genealog.sh ${JAR_PATH} ${mainPath} 0 metrics1/${query}/${approach} ${parallelism})"
-        ./genealog.sh ${JAR_PATH} ${mainPath} 0 metrics1/${query}/${approach} ${parallelism}
+        echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0)"
+        ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0
       elif [ ${approach} = "l3stream" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
         # Start CpMServer
         echo "*** Start CpMServer ***"
-        echo "(../../startCpMServer.sh > /dev/null &)"
-        ../../startCpMServer.sh > /dev/null &
+        echo "(../startCpMServer.sh > /dev/null &)"
+        ../startCpMServer.sh > /dev/null &
         sleep 10
         # Run
         echo "*** Run ***"
-        echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} 0 metrics1/${query}/${approach} ${parallelism})"
-        ./nonlineage.sh ${JAR_PATH} ${mainPath} 0 metrics1/${query}/${approach} ${parallelism}
+        echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0)"
+        ./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0
       fi
 
       # Sleep

@@ -1,19 +1,35 @@
 #!/bin/bash
 
-source $(dirname $0)/../config.sh
+source $(dirname $0)/../../config.sh
 
-# $1: jar path, $2: main path, $3: latencyFlag
+# type1
+# (-> must) $1: jar path, $2: main path, $3: parallelism
+# type2
+# (-> must) $1: jar path, $2: main path, $3: parallelism, $4: windowSize
+# type3
+# (-> must) $1: jar path, $2: main path, $3: parallelism, $4: queryName (${L3_HOME}/data/output/throughput/~~~, e.g., metrics1/YSB), $5: latencyFlag
+
 latencyFlag=1
-if [ $# -eq 3 ]; then
-  latencyFlag=${3}
+queryNameOption=""
+windowSizeOption=""
+if [ $# -eq 4 ]; then
+  windowSizeOption="--windowSize ${4}"
+elif [ $# -eq 5 ]; then
+  queryNameOption="--queryName ${4}"
+  latencyFlag=${5}
+elif [ $# -ne 3 ]; then
+  echo "Illegal args (evaluation/tamplates/original.sh)"
+  exit 1
 fi
 
 EXE_CMD="${FLINK_HOME}/bin/flink run -d \
---parallelism ${parallelism} \
+--parallelism ${3} \
 --class ${2} \
 ${1} \
 --lineageMode nonLineage \
 --cpmProcessing \
+${windowSizeOption} \
+${queryNameOption} \
 --latencyFlag ${latencyFlag}"
 
 echo "${EXE_CMD}"

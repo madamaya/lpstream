@@ -49,7 +49,7 @@ startKafkaLogger ${logDir} ${logFile} ${testName}-o > /dev/null
 # submit job
 cd ./templates
 echo "sumbit job"
-./nonlineage.sh ${JAR_PATH} ${mainPath}
+./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism}
 
 ## Notify all outputs were provided.
 echo "*** Notify all outputs were provided ***"
@@ -87,8 +87,8 @@ do
 
   # submit job
   echo "*** Submit job ***"
-  echo "(./lineage.sh ${JAR_PATH} ${mainPath} ${mainJobid} ${idx} ${testName}-l)"
-  ./lineage.sh ${JAR_PATH} ${mainPath} ${mainJobid} ${idx} ${testName}-l
+  echo "(./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${mainJobid} ${idx} ${testName}-l)"
+  ./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${mainJobid} ${idx} ${testName}-l
 
   ## Notify all outputs were provided.
   echo "*** Notify all outputs were provided ***"
