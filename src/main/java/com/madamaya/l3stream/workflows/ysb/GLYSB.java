@@ -49,7 +49,7 @@ public class GLYSB {
                 .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSBGL())
                 .keyBy(t -> t.getCampaignId())
-                .window(TumblingEventTimeWindows.of(Time.seconds(10)))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(10))))
                 .aggregate(new CountYSBGL(settings.aggregateStrategySupplier()));
 
         if (settings.getLatencyFlag() == 1) {

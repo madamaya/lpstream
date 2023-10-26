@@ -49,12 +49,12 @@ public class LR {
                 .assignTimestampsAndWatermarks(new WatermarkStrategyLR())
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
                 .keyBy(t -> t.getKey())
-                .window(SlidingEventTimeWindows.of(STOPPED_VEHICLE_WINDOW_SIZE,
+                .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
                         STOPPED_VEHICLE_WINDOW_SLIDE))
                 .aggregate(new LinearRoadVehicleAggregate())
                 .filter(t -> t.getReports() == 4 && t.isUniquePosition())
                 .keyBy(t -> t.getLatestPos())
-                .window(SlidingEventTimeWindows.of(ACCIDENT_WINDOW_SIZE,
+                .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
                         ACCIDENT_WINDOW_SLIDE))
                 .aggregate(new LinearRoadAccidentAggregate())
                 //.slotSharingGroup(settings.secondSlotSharingGroup())

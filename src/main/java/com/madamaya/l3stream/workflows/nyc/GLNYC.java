@@ -56,7 +56,7 @@ public class GLNYC {
                         return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
                     }
                 })
-                .window(TumblingEventTimeWindows.of(Time.minutes(30)))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.minutes(30))))
                 .aggregate(new CountAndAvgDistanceGL(settings.aggregateStrategySupplier()));
 
         if (settings.getLatencyFlag() == 1) {
