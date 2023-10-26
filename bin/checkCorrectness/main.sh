@@ -146,8 +146,33 @@ echo "(stopLogger)"
 stopLogger
 
 cd ../checkCorrectness/log
-echo "*** Print ts log (SPLIT) ***"
-python findMaxWMFromTopic.py ${inputTopicName} split_baseline.log ${inputTopicName}
+#echo "*** Print ts log (SPLIT) ***"
+#python findMaxWMFromTopic.py ${inputTopicName} split_baseline.log ${inputTopicName}
 
-echo "*** Cmp outputs ***"
+############ GeneaLog (SPLIT) ############
+logFile="${logDir}/split_genealog.log"
+
+# start logger
+echo "start logger"
+startKafkaLogger ${logDir} ${logFile} ${testName}-o > /dev/null
+
+# submit job
+cd ./templates
+echo "sumbit job"
+./genealog.sh ${JAR_PATH} ${mainPath}
+
+## Notify all outputs were provided.
+echo "*** Notify all outputs were provided ***"
+echo "(notifyEnd ${logFile})"
+notifyEnd ${logFile}
+
+## Stop kafka logger
+echo "*** Stop kafka logger ***"
+echo "(stopLogger)"
+stopLogger
+
+echo "*** Cmp outputs (all_baseline vs. split_baseline vs. split_from_chk) ***"
 python ${cmpPythonName} ${logDir}/all_baseline.log ${logDir}/split_baseline.log ${logDir}/split_from_chk.log ${startCpID} ${parseFlag}
+
+echo "*** Cmp outputs (split_baseline vs. split_genealog vs. split_from_chk) ***"
+python ${cmpPythonName2} ${logDir}/split_baseline.log ${logDir}/split_genealog.log ${logDir}/split_from_chk.log ${startCpID} ${parseFlag}
