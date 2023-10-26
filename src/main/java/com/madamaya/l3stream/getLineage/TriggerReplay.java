@@ -48,7 +48,7 @@ public class TriggerReplay {
             if (Files.notExists(Paths.get(dataPath))) {
                 Files.createDirectories(Paths.get(dataPath));
             }
-            bw = new BufferedWriter(new FileWriter(dataPath + "/" + id + "-" + "trigger.log"));
+            bw = new BufferedWriter(new FileWriter(dataPath + "/" + id + "-" + windowSize + "-" + "trigger.log"));
             bw.write(startTime + "," + endTime + "," + endTime2);
             bw.flush();
             bw.close();

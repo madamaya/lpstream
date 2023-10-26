@@ -35,18 +35,26 @@ public class ReplayMonitor {
         long outputTs;
         String lineageTopic;
         String experimentName; // Example: LR-baseline-1
+        String windowSize;
         String outputValue = "";
 
-        if (args.length == 3) {
+        /*
+        if (args.length == 4) {
             outputTs = Long.parseLong(args[0]);
             lineageTopic = args[1];
             experimentName = args[2];
-        } else if (args.length == 4) {
+            windowSize = args[3];
+        } else
+         */
+
+        if (args.length == 5) {
+
             outputTs = Long.parseLong(args[0]);
             lineageTopic = args[1];
             // remove "\"" from beginnig and end of the input
             outputValue = args[2].substring(0, args[2].length()-1).substring(1);
             experimentName = args[3];
+            windowSize = args[4];
         } else {
             throw new IllegalArgumentException();
         }

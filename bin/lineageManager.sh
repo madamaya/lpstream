@@ -79,8 +79,8 @@ echo "*** Start lineage derivation ***"
 
 # CNFM: merics3,4がちゃんとなってるか確認
 echo "*** Start program to monitor specified output's lineage derivation ***"
-echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${experimentName} &)"
-java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${experimentName} &
+echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${experimentName} ${windowSize} &)"
+java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${experimentName} ${windowSize} &
 
 echo "*** Identify checkpointID from which replay will be started ***"
 echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.TriggerReplay ${jarPath} ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${numOfSourceOp} ${experimentName} ${windowSize})"
