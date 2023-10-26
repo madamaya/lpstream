@@ -69,7 +69,7 @@ public class Nexmark {
                         return tuple.getAuctionId();
                     }
                 }))
-                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(20)))
+                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(10)))
                 .process(new JoinNex())
                 .filter(t -> t.getCategory() == 10);
 

@@ -85,7 +85,7 @@ public class L3Nexmark {
                         return tuple.getAuctionId();
                     }
                 }, Integer.class)))
-                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(20)))
+                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(10)))
                 .process(L3.processJoin(new JoinNexL3())).uid("11")
                 .filter(L3.filter(t -> t.getCategory() == 10)).uid("12");
 
