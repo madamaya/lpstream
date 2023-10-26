@@ -52,7 +52,7 @@ public class LR {
                 .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
                         STOPPED_VEHICLE_WINDOW_SLIDE))
                 .aggregate(new LinearRoadVehicleAggregate())
-                .filter(t -> t.getReports() == 4 && t.isUniquePosition())
+                .filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())
                 .keyBy(t -> t.getLatestPos())
                 .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
                         ACCIDENT_WINDOW_SLIDE))
