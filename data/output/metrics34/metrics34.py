@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 filterRate = 0.1
 plotLatency = True
-#queries = ["LR", "Nexmark", "NYC", "YSB"]
-queries = ["LR"]
+queries = ["LR", "Nexmark", "NYC", "YSB"]
+#queries = ["LR"]
 startTime = time.time()
 
 def readMonitor(filePath):
