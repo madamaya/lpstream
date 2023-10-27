@@ -42,19 +42,35 @@ elif [ $1 = "mainData" ]; then
 
   ## Generate data for Linear Road
   cd ./LinearRoad
+  echo "START: ./lrGen.sh ${LRScaleFactor}" >> ../dataGen.log
+  date >> ../dataGen.log
   ./lrGen.sh ${LRScaleFactor}
+  echo "END: ./lrGen.sh ${LRScaleFactor}" >> ../dataGen.log
+  date >> ../dataGen.log
 
   ## Generate data for Nexmark
   cd ../Nexmark
+  echo "START: ./nexmarkGen.sh ${NexmarkTupleNum}" >> ../dataGen.log
+  date >> ../dataGen.log
   ./nexmarkGen.sh ${NexmarkTupleNum}
+  echo "END: ./nexmarkGen.sh ${NexmarkTupleNum}" >> ../dataGen.log
+  date >> ../dataGen.log
 
   ## Generate data for NYC
   cd ../NYC
+  echo "START: ./nycGen.sh ${NYCstartYear} ${NYCendYear}" >> ../dataGen.log
+  date >> ../dataGen.log
   ./nycGen.sh ${NYCstartYear} ${NYCendYear}
+  echo "END: ./nycGen.sh ${NYCstartYear} ${NYCendYear}" >> ../dataGen.log
+  date >> ../dataGen.log
 
   ## Generate data for YSB
   cd ../YSB
+  echo "START: ./ysbGen.sh ${YSBTupleNum}" >> ../dataGen.log
+  date >> ../dataGen.log
   ./ysbGen.sh ${YSBTupleNum}
+  echo "END: ./ysbGen.sh ${YSBTupleNum}" >> ../dataGen.log
+  date >> ../dataGen.log
 
   echo "*** END ***"
 elif [ $1 = "testData" ]; then
