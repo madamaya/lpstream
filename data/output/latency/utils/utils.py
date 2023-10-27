@@ -30,7 +30,11 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
 
                 # extract valid data
                 print("*** Extract valid data ***")
-                validarray = nparray[filteredTuple:(nparray.size - filteredTuple)]
+                print(nparray, type(nparray), l)
+                if nparray.size != 1:
+                    validarray = nparray[filteredTuple:(nparray.size - filteredTuple)]
+                else:
+                    validarray = nparray
 
                 # calc mean and std
                 print("*** Calc mean ***")
@@ -73,7 +77,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
             print("*** Save fig for comparison ***")
             for i in range(len(allValidList[approaches[0]])):
                 for approach in approaches:
-                    plt.plot(range(len(allValidList[approach][i])), allValidList[approach][i], linewidth=0.1)
+                    plt.plot(range(allValidList[approach][i].size), allValidList[approach][i], linewidth=0.1)
                 plt.title("{}-{}-comparison".format(query, i))
                 plt.ylabel("Latency")
                 plt.legend(approaches)
