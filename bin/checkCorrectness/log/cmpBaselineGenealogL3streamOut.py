@@ -15,8 +15,8 @@ def parseNYCOutputAndRoundAvg(line):
 if __name__ == "__main__":
     baselineALLpath = sys.argv[1]
     genealogAllpath = sys.argv[2]
-    #l3streampath = sys.argv[3]
-    parseFlag = int(sys.argv[3])
+    l3streampath = sys.argv[3]
+    parseFlag = int(sys.argv[4])
 
     # Create baseline output set
     baselineALLset = set()
@@ -33,8 +33,10 @@ if __name__ == "__main__":
     # Create genealog output set
     genealogALLset = set()
     genealogALLlist = getOutputList(genealogAllpath)
+    genealogLineageSet = set()
     print("*** CREATE BASELINE OUTPUT SET ***")
     for line in tqdm(genealogALLlist):
+        genealogLineageSet.add(line)
         if parseFlag == 1:
             genealogALLset.add(parseNYCOutputAndRoundAvg(json.loads(line)["OUT"]))
         elif parseFlag == 2:
@@ -43,41 +45,39 @@ if __name__ == "__main__":
             genealogALLset.add(json.loads(line)["OUT"])
 
     # Create l3stream output set
-    """
-    l3streamALLset = set()
     l3streamALLlist = getOutputList(l3streampath)
+    l3streamLineageSet = set()
     print("*** CREATE BASELINE OUTPUT SET ***")
     for line in tqdm(l3streamALLlist):
-        if parseFlag == 1:
-            l3streamALLset.add(parseNYCOutputAndRoundAvg(json.loads(line)["OUT"]))
-        elif parseFlag == 2:
-            l3streamALLset.add(json.loads(line.replace("\\", ""))["OUT"])
-        else:
-            l3streamALLset.add(json.loads(line)["OUT"])
-    """
+        l3streamLineageSet.add(line)
 
     baseline2genealog = baselineALLset & genealogALLset
     #genealog2l3stream = genealogALLset & l3streamALLset
     #baseline2l3stream = baselineALLset & l3streamALLset
+    genealog2l3stream = genealogLineageSet & l3streamLineageSet
 
     print("RESULT:::")
     print("  [ baselineALLset & genealogALLset ] len(baseline2genealog) = {},".format(len(baseline2genealog)))
     #print("  [ genealogALLset & l3streamALLset ] len(genealog2l3stream) = {},".format(len(genealog2l3stream)))
     #print("  [ baselineALLset & l3streamALLset ] len(baseline2l3stream) = {},".format(len(baseline2l3stream)))
+    print("  [ genealogLineageSet & l3streamLineageset ] len(genealog2l3stream) = {},".format(len(genealog2l3stream)))
     print()
     print("VALIABLES:::")
     print("  len(baselineALLlist) = {},".format(len(baselineALLlist)))
     print("  len(baselineALLset) = {},".format(len(baselineALLset)))
     print("  len(genealogALLlist) = {},".format(len(genealogALLlist)))
     print("  len(genealogALLset) = {},".format(len(genealogALLset)))
+    print("  len(genealogLineageSet) = {},".format(len(genealogLineageSet)))
     #print("  len(l3streamALLlist) = {},".format(len(l3streamALLlist)))
     #print("  len(l3streamALLset) = {},".format(len(l3streamALLset)))
+    print("  len(l3streamLineageSet) = {},".format(len(l3streamLineageSet)))
 
     rule1 = len(baselineALLset) == len(genealogALLset)
     #rule2 = len(genealogALLset) == len(l3streamALLset)
     #rule3 = len(baselineALLset) == len(l3streamALLset)
+    rule4 = len(genealogLineageSet) == len(l3streamLineageSet)
     #if (rule1 and rule2 and rule3 and len(baseline2genealog) == len(baselineALLset) and len(genealog2l3stream) == len(baselineALLset)  and len(baseline2l3stream) == len(baselineALLset)):
-    if (rule1 and len(baseline2genealog) == len(baselineALLset)):
+    if (rule1 and len(baseline2genealog) == len(baselineALLset) and rule4 and len(genealog2l3stream) == len(genealogLineageSet)):
         print("✅")
     else:
         print("❌")
