@@ -31,7 +31,7 @@ elif [ $1 = "m34" ]; then
   ./LMUserDriver.sh 3
   ./LMUserDriver.sh 4
 
-  cd ${FLINK_HOME}/data/output/metrics34
+  cd ${L3_HOME}/data/output/metrics34
   python metrics34.py
 
   ${FLINK_HOME}/bin/stop-cluster.sh
