@@ -1,7 +1,7 @@
 .idea
 .DS_Store
-flink
-kafka
+flink*
+kafka*
 l3stream-genealog
 bin/**/*.json
 bin/**/*.csv
