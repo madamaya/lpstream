@@ -4,7 +4,7 @@ source $(dirname $0)/../config.sh
 
 # Stop Flink Server
 echo "*** Stop flink cluster ***"
-${FLINK_HOME}/bin/start-cluster.sh
+${FLINK_HOME}/bin/stop-cluster.sh
 
 # Delete topics
 for i in LR NYC YSB Nexmark
