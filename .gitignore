@@ -10,6 +10,7 @@ bin/**/*.txt
 data/checkpoints
 data/output/**/*.log
 data/output/**/*.pdf
+data/output/*-bak*
 data/temp2/**/*.log
 data/input/YSB/streaming-benchmarks/
 data/datagen
