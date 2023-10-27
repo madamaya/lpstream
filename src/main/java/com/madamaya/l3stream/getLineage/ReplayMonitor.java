@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class ReplayMonitor {
-    public static boolean parseFlag = false;
+    // public static boolean parseFlag = false;
 
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
@@ -58,7 +58,7 @@ public class ReplayMonitor {
         } else {
             throw new IllegalArgumentException();
         }
-        parseFlag = lineageTopic.contains("Nexmark");
+        // parseFlag = lineageTopic.contains("Nexmark");
 
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, L3Config.BOOTSTRAP_IP_PORT);
@@ -122,11 +122,11 @@ public class ReplayMonitor {
     public static Tuple3<String, Long, Boolean> extractOutTsFlag(String recordValue) throws JsonProcessingException {
         // CNFM
         JsonNode jsonNode;
-        if (parseFlag) {
-            jsonNode = new ObjectMapper().readTree(recordValue.replace("\\", ""));
-        } else {
+        //if (parseFlag) {
+            //jsonNode = new ObjectMapper().readTree(recordValue.replace("\\", ""));
+        //} else {
             jsonNode = new ObjectMapper().readTree(recordValue);
-        }
+        //}
         return Tuple3.of(jsonNode.get("OUT").asText(), jsonNode.get("TS").asLong(), jsonNode.get("FLAG").asBoolean());
     }
 

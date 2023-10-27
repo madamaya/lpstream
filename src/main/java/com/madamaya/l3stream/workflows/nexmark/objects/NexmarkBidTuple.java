@@ -28,7 +28,7 @@ public class NexmarkBidTuple extends NexmarkInputTuple {
         this.channel = channel;
         this.url = url;
         this.dateTime = dateTime;
-        this.extra = extra;
+        this.extra = extra.replace("\\", "");
         this.stimulus = stimulus;
     }
 
@@ -40,7 +40,7 @@ public class NexmarkBidTuple extends NexmarkInputTuple {
         this.channel = channel;
         this.url = url;
         this.dateTime = dateTime;
-        this.extra = extra;
+        this.extra = extra.replace("\\", "");
     }
 
     public int getAuctionId() {

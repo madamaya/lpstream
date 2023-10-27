@@ -96,9 +96,9 @@ idx=1
 FILE="${logFile}.target.txt"
 while read LINE
 do
-  LINE2=`echo ${LINE} | sed -e 's/\\\//g'`
-  outputValue=`echo ${LINE2} | jq '.OUT'`
-  outputTs=`echo ${LINE2} | jq '.TS' | sed -e 's/"//g'`
+  #LINE2=`echo ${LINE} | sed -e 's/\\\//g'`
+  outputValue=`echo ${LINE} | jq '.OUT'`
+  outputTs=`echo ${LINE} | jq '.TS' | sed -e 's/"//g'`
 
   ## Start Lineage Manager with normal mode
   ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${experimentName}-${idx} ${windowSize}

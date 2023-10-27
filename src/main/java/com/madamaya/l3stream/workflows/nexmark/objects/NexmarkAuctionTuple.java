@@ -33,7 +33,7 @@ public class NexmarkAuctionTuple extends NexmarkInputTuple {
         this.expires = expires;
         this.seller = seller;
         this.category = category;
-        this.extra = extra;
+        this.extra = extra.replace("\\", "");
         this.stimulus = stimulus;
     }
 
@@ -48,7 +48,7 @@ public class NexmarkAuctionTuple extends NexmarkInputTuple {
         this.expires = expires;
         this.seller = seller;
         this.category = category;
-        this.extra = extra;
+        this.extra = extra.replace("\\", "");
     }
 
     public int getAuctionId() {
