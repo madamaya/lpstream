@@ -23,3 +23,10 @@ function getRunningJobID() {
     echo "-1"
   fi
 }
+
+function restartFlinkCluster() {
+  ${FLINK_HOME}/bin/stop-cluster.sh
+  sleep 15
+  ${FLINK_HOME}/bin/start-cluster.sh
+  sleep 15
+}

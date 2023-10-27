@@ -7,7 +7,7 @@ source ../utils/flinkJob.sh
 source ../utils/notifyEnd.sh
 
 startChkID=1
-finalChkID=5
+finalChkID=3
 
 if [ $# -ne 1 ]; then
   echo "Illegal Args"
@@ -87,8 +87,8 @@ do
 
   # submit job
   echo "*** Submit job ***"
-  echo "(./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${mainJobid} ${idx} ${testName}-l)"
-  ./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${mainJobid} ${idx} ${testName}-l
+  echo "(./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${mainJobid} ${idx} ${testName}-l 2)"
+  ./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${mainJobid} ${idx} ${testName}-l 2
 
   ## Notify all outputs were provided.
   echo "*** Notify all outputs were provided ***"

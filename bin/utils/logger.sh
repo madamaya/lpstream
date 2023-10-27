@@ -7,10 +7,6 @@ function readOutputFromEarliest () {
   logFile=$2
   outputTopicName=$3
 
-  if [ ! -d ${logDir} ]; then
-    mkdir ${logDir}
-  fi
-
   echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism})"
   java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism}
 }

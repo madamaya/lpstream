@@ -18,7 +18,7 @@ if [ $# -eq 7 ]; then
   latencyFlag=${7}
 elif [ $# -eq 8 ]; then
   latencyFlag=${7}
-  windowSizeOption=${8}
+  windowSizeOption="--windowSize ${8}"
 else
   echo "Illegal args (lineageReplay.sh)"
   exit 1

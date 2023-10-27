@@ -98,7 +98,7 @@ public class ReplayMonitor {
             if (Files.notExists(Paths.get(dataPath))) {
                 Files.createDirectories(Paths.get(dataPath));
             }
-            bw = new BufferedWriter(new FileWriter(dataPath + "/" + id + "-" + "monitor.log"));
+            bw = new BufferedWriter(new FileWriter(dataPath + "/" + id + "-" + windowSize + "-" + "monitor.log"));
             bw.write(startTime + "," + endTime);
             bw.flush();
             bw.close();
@@ -138,17 +138,19 @@ public class ReplayMonitor {
         } else {
             // check timestamp, value, and flag
             // CNFM
-            if (parseFlag) {
-                return t3.f0.equals(outputValue.replace("\\", "")) && t3.f1 == outputTs && t3.f2;
-            } else {
+            //if (parseFlag) {
+                // return t3.f0.equals(outputValue.replace("\\", "")) && t3.f1 == outputTs && t3.f2;
+                //return t3.f0.equals(outputValue) && t3.f1 == outputTs && t3.f2;
+            //} else {
                 return t3.f0.equals(outputValue) && t3.f1 == outputTs && t3.f2;
-            }
+            //}
         }
     }
 
     public static void writeLineage(String recordValue) {
         // CNFM
-        System.out.println("!!! This is a tentative implementation of writeLineage (ReplayMonitor.java). !!!");
+        // System.out.println("!!! This is a tentative implementation of writeLineage (ReplayMonitor.java). !!!");
+        System.out.println();
         String filePath = L3Config.L3_HOME + "/data/lineage/" + System.currentTimeMillis() + ".txt";
         try {
             BufferedWriter bf = new BufferedWriter(new FileWriter(filePath));

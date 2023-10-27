@@ -48,7 +48,7 @@ startKafkaLogger ${logDir} ${logFile} ${testName}-o > /dev/null
 # submit job
 cd ./templates
 echo "sumbit job"
-./nonlineage.sh ${JAR_PATH} ${mainPath}
+./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism}
 
 ## Notify all outputs were provided.
 echo "*** Notify all outputs were provided ***"
@@ -96,7 +96,7 @@ startKafkaLogger ${logDir} ${logFile} ${testName}-o > /dev/null
 # submit job
 cd ./templates
 echo "sumbit job"
-./nonlineage.sh ${JAR_PATH} ${mainPath}
+./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism}
 
 ## Notify all outputs were provided.
 echo "*** Notify all outputs were provided ***"
@@ -114,7 +114,7 @@ startKafkaLogger ${logDir} ${logFile} ${testName}-l > /dev/null
 
 # submit job
 echo "sumbit job"
-./lineage.sh ${JAR_PATH} ${mainPath} ${jobid} ${startCpID} ${testName}-l
+./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${jobid} ${startCpID} ${testName}-l 2
 
 cd ../checkCorrectness
 ./dataLoader.sh 2 ${inputTopicName} ${inputFilePath} > /dev/null &
@@ -145,7 +145,7 @@ echo "*** Stop kafka logger ***"
 echo "(stopLogger)"
 stopLogger
 
-cd ../checkCorrectness/log
+#cd ../checkCorrectness/log
 #echo "*** Print ts log (SPLIT) ***"
 #python findMaxWMFromTopic.py ${inputTopicName} split_baseline.log ${inputTopicName}
 
@@ -157,22 +157,27 @@ echo "start logger"
 startKafkaLogger ${logDir} ${logFile} ${testName}-o > /dev/null
 
 # submit job
-cd ./templates
 echo "sumbit job"
-./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism}
+./genealog.sh ${JAR_PATH} ${mainGLPath} ${parallelism}
 
 ## Notify all outputs were provided.
 echo "*** Notify all outputs were provided ***"
 echo "(notifyEnd ${logFile})"
 notifyEnd ${logFile}
 
+## Cancel Flink job
+echo "*** Cancel Flink job ***"
+echo "(cancelFlinkJobs)"
+cancelFlinkJobs
+
 ## Stop kafka logger
 echo "*** Stop kafka logger ***"
 echo "(stopLogger)"
 stopLogger
 
+cd ../checkCorrectness/log
 echo "*** Cmp outputs (all_baseline vs. split_baseline vs. split_from_chk) ***"
 python ${cmpPythonName} ${logDir}/all_baseline.log ${logDir}/split_baseline.log ${logDir}/split_from_chk.log ${startCpID} ${parseFlag}
 
-echo "*** Cmp outputs (split_baseline vs. split_genealog vs. split_from_chk) ***"
-python ${cmpPythonName2} ${logDir}/split_baseline.log ${logDir}/split_genealog.log ${logDir}/split_from_chk.log ${startCpID} ${parseFlag}
+echo "*** Cmp outputs (split_baseline vs. split_genealog) ***"
+python cmpBaselineGenealogL3streamOut.py ${logDir}/split_baseline.log ${logDir}/split_genealog.log ${parseFlag}

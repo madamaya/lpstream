@@ -32,7 +32,7 @@ do
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
         # Run
         echo "*** Run ***"
-        echo "(./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 )"
+        echo "(./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0)"
         ./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0
       elif [ ${approach} = "genealog" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.GL${query}"

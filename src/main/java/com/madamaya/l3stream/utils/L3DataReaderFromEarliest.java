@@ -69,6 +69,7 @@ public class L3DataReaderFromEarliest {
                     }
                 }
             }
+            System.out.println("\r" + count + " tuple(s) have been read.");
             bw.flush();
             bw.close();
         } catch (Exception e) {

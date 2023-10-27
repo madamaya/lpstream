@@ -1,6 +1,7 @@
 #!/bin/zsh
 
-sleepTimeNotifyEnd=120
+sleepTimeNotifyEnd=90
+sleepTimeNotifyMonitorEnd=30
 # $1: logFile
 function notifyEnd() {
   logFile=$1
@@ -17,5 +18,17 @@ function notifyEnd() {
     echo "prev=${prev}, current=${current}"
     prev=${current}
     sleep ${sleepTimeNotifyEnd}
+  done
+}
+
+function notifyReplayMonitorEnd() {
+  isRun=`ps aux | grep ReplayMonitor | grep -v grep | wc -l | awk '{print $1}'`
+  while :
+  do
+    if [ ${isRun} -eq 0 ]; then
+      break
+    fi
+    sleep ${sleepTimeNotifyMonitorEnd}
+    isRun=`ps aux | grep ReplayMonitor | grep -v grep | wc -l | awk '{print $1}'`
   done
 }
