@@ -5,5 +5,10 @@
 2. Run redis `redis-server`
 3. Execute the following commands
 ```
-./setup.sh downloads && ./setup.sh compile && ./setup.sh mainData && ./setup.sh testData && ./setup.sh setup && ./setup.sh test
+./setup.sh compile && ./setup.sh downloads && ./setup.sh mainData && ./setup.sh testData && ./setup.sh setup && ./setup.sh test
 ```
+
+```
+./setup.sh compile && ./setup.sh downloads && ./setup.sh mainData && ./setup.sh testData && ./setup.sh setup && ./setup.sh test && evaluate.sh m1 && evaluate.sh m2 && evaluate.sh m34
+```
+
