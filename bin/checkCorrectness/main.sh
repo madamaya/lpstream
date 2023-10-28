@@ -180,4 +180,4 @@ echo "*** Cmp outputs (all_baseline vs. split_baseline vs. split_from_chk) ***"
 python ${cmpPythonName} ${logDir}/all_baseline.log ${logDir}/split_baseline.log ${logDir}/split_from_chk.log ${startCpID} ${parseFlag}
 
 echo "*** Cmp outputs (split_baseline vs. split_genealog) ***"
-python cmpBaselineGenealogL3streamOut.py ${logDir}/split_baseline.log ${logDir}/split_genealog.log ${parseFlag}
+python cmpBaselineGenealogL3streamOut.py ${logDir}/split_baseline.log ${logDir}/split_genealog.log ${logDir}/split_from_chk.log ${parseFlag}
