@@ -41,8 +41,15 @@ lein run -n --configPath ../conf/benchmarkConf.yaml
 echo "(lein run -r -t 1000 --configPath ../conf/benchmarkConf.yaml > /dev/null &)"
 lein run -r -t 1000 --configPath ../conf/benchmarkConf.yaml > /dev/null &
 
-echo "*** Start logger ***"
+sleep 5
+
 cd ${YSB_HOME}
+
+echo "*** Get redis pair ***"
+echo "(python getRedisPair.py)"
+python getRedisPair.py
+
+echo "*** Start logger ***"
 python kafkaLogger.py ${numTuples}
 
 echo "*** Stop data generation"
@@ -58,12 +65,8 @@ sleep 30
 echo "*** Stop zookeeper ***"
 ${KAFKA_HOME}/bin/zookeeper-server-stop.sh
 
-echo "*** Get redis pair ***"
-echo "(python getRedisPair.py)"
-python getRedisPair.py
-
-echo "*** Join data ***"
-echo "(python joinData.py)"
-python joinData.py
+#echo "*** Join data ***"
+#echo "(python joinData.py)"
+#python joinData.py
 
 echo "=*=*=*=*= End YSB data generation =*=*=*=*="
