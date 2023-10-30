@@ -49,7 +49,7 @@ public class L3DataReaderFromEarliest {
         consumer.assign(list);
         consumer.seekToBeginning(list);
 
-        int count = 0;
+        long count = 0;
         BufferedWriter bw;
         try {
             bw = new BufferedWriter(new FileWriter(outputFilePath));

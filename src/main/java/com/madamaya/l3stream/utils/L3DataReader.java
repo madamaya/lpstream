@@ -28,7 +28,6 @@ public class L3DataReader {
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
         consumer.subscribe(Arrays.asList(topicName));
 
-        int count = 0;
         BufferedWriter bw;
         try {
             bw = new BufferedWriter(new FileWriter(outputFilePath));
@@ -36,7 +35,6 @@ public class L3DataReader {
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord record : records) {
-                    count++;
                     String recordValue = (String) record.value();
                     bw.write(recordValue + "\n");
                     bw.flush();

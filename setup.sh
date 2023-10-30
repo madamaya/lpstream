@@ -119,6 +119,15 @@ elif [ $1 = "test" ]; then
   echo "*** Start checkCorrectness ***"
   echo "(./auto.sh)"
   ./auto.sh
+elif [ $1 = "dataSizeTest" ]; then
+  if [ $# -ne 3 ]; then
+    echo "Illegal Arguments (dataSizeTest)"
+    exit 1
+  fi
+  cd ./bin/dataSizeTest
+  echo "*** dataSizeTest ***"
+  echo "(./dataSizeTest.sh $2 $3)"
+  ./dataSizeTest.sh $2 $3
 else
   echo "Illegal Arguments"
   exit 1
