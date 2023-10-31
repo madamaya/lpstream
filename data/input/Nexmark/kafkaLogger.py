@@ -13,7 +13,7 @@ consumer = KafkaConsumer('nexmark',
                          bootstrap_servers=['localhost:9092'])
 
 count = 0
-with open("nexmark.json", "w") as w:
+with open("../data/nexmark.json", "w") as w:
     for message in consumer:
         # print("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition, message.offset, message.key, message.value.decode('utf-8')))
         count = count + 1

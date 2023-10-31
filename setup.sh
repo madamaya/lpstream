@@ -79,19 +79,19 @@ elif [ $1 = "testData" ]; then
 
   ### For LinearRoad
   echo "*** Generate test data for LR ***"
-  python split.py ./LinearRoad/lr.csv
+  python split.py ./data/lr.csv
 
   ### For Nexmark
   echo "*** Generate test data for Nexmark ***"
-  python split.py ./Nexmark/nexmark.json
+  python split.py ./data/nexmark.json
 
   ### For NYC
   echo "*** Generate test data for NYC ***"
-  python split.py ./NYC/nyc.csv
+  python split.py ./data/nyc.csv
 
   ### For YSB
   echo "*** Generate test data for YSB ***"
-  python split.py ./YSB/ysb.json
+  python split.py ./data/ysb.json
 
   echo "*** END ***"
 elif [ $1 = "setup" ]; then

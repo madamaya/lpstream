@@ -9,7 +9,7 @@ def list2str(e, delemeter=","):
     return delemeter.join(e)
 
 if __name__ == "__main__":
-    targetDir = "./csv/yellow"
+    targetDir = "../data/csv"
     tmpList = list()
 
     print("*** Get files ***")
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     start_time = time.time()
     prev_time = time.time()
     current_time = time.time()
-    with open("nyc.csv", "w") as w:
+    with open("../data/nyc.csv", "w") as w:
         for line in mainList:
             cnt = cnt + 1
             w.write('"' + line  + '"' + "\n")
