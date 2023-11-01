@@ -35,7 +35,7 @@ public class IdentifyEnd {
         }
         consumer.assign(list);
         consumer.seekToBeginning(list);
-
+        Thread.sleep(30000);
         long count = 0;
         long startTime = System.currentTimeMillis();
         long endTime = 0;
