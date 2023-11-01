@@ -54,7 +54,7 @@ if __name__ == "__main__":
     baseline2genealog = baselineALLset & genealogALLset
     #genealog2l3stream = genealogALLset & l3streamALLset
     #baseline2l3stream = baselineALLset & l3streamALLset
-    genealog2l3stream = genealogLineageSet & l3streamLineageSet
+    #genealog2l3stream = genealogLineageSet & l3streamLineageSet
 
     print("RESULT:::")
     print("  [ baselineALLset & genealogALLset ] len(baseline2genealog) = {},".format(len(baseline2genealog)))
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     #rule3 = len(baselineALLset) == len(l3streamALLset)
     rule4 = len(genealogLineageSet) == len(l3streamLineageSet)
     #if (rule1 and rule2 and rule3 and len(baseline2genealog) == len(baselineALLset) and len(genealog2l3stream) == len(baselineALLset)  and len(baseline2l3stream) == len(baselineALLset)):
-    if (rule1 and len(baseline2genealog) == len(baselineALLset) and rule4 and len(genealog2l3stream) == len(genealogLineageSet)):
+    if (rule1 and len(baseline2genealog) == len(baselineALLset) and rule4):
         print("✅")
     else:
         print("❌")

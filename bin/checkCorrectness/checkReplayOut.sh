@@ -32,15 +32,15 @@ logDir="${BIN_DIR}/checkCorrectness/log/${testName}"
 logFile="${logDir}/groundTruth.log"
 
 ./dataLoader.sh 3 ${testName}-o
-./dataLoader.sh 4 ${testName}-l
+./dataLoader.sh 3 ${testName}-l
 ./dataLoader.sh 0 ${inputTopicName} ${inputFilePath}
 
 cd ..
 
 ############ Create Baseline Out ############
 # start CpMServer
-echo "start CpMServer"
-./startCpMServer.sh > /dev/null &
+#echo "start CpMServer"
+#./startCpMServer.sh > /dev/null &
 
 # start logger
 echo "start logger"
@@ -67,9 +67,9 @@ echo "(cancelFlinkJobs)"
 cancelFlinkJobs
 
 ## Stop CpMServerManager
-echo "*** Stop CpMServerManager ***"
-echo "(stopCpMServer)"
-stopCpMServer
+#echo "*** Stop CpMServerManager ***"
+#echo "(stopCpMServer)"
+#stopCpMServer
 
 ## Stop kafka logger
 echo "*** Stop kafka logger ***"

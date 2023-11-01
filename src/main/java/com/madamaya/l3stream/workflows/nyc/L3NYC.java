@@ -74,10 +74,12 @@ public class L3NYC {
             ds.map(new CpAssigner<>()).uid("10").addSink(LineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("11");
         }
 
+        /*
         if (settings.cpmProcessing()) {
             DataStream<ObjectNode> ds2 = env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).uid("100").setParallelism(1)
                     .map(new CpManagerClient()).uid("101").setParallelism(1);
         }
+         */
 
         env.execute(settings.getLineageMode() + "," + queryFlag);
     }

@@ -66,7 +66,7 @@ public class GLNexmark {
                         return tuple.getAuctionId();
                     }
                 }))
-                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(10)))
+                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(20)))
                 .process(new JoinNexGL())
                 .filter(t -> t.getCategory() == 10);
 

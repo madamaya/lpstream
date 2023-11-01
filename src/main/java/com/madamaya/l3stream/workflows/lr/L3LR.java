@@ -77,10 +77,12 @@ public class L3LR {
             ds.map(new CpAssigner<>()).uid("13").addSink(LineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("14");
         }
 
+        /*
         if (settings.cpmProcessing()) {
             DataStream<ObjectNode> ds2 = env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).uid("100").setParallelism(1)
                     .map(new CpManagerClient()).uid("101").setParallelism(1);
         }
+         */
 
         env.execute(settings.getLineageMode() + "," + queryFlag);
     }

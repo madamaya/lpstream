@@ -10,7 +10,7 @@ source $(dirname $0)/../config.sh
 if [ ${5} -eq 0 ]; then
 CHK_ARG=""
 else
-CHK_ARG="-s ${L3_HOME}/data/checkpoints/_checkpoints/${4}/chk-${5}"
+CHK_ARG="-s ${L3_HOME}/data/checkpoints/${4}/chk-${5}"
 fi
 windowSizeOption=""
 latencyFlag=2

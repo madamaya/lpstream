@@ -80,7 +80,7 @@ public class L3Nexmark {
                         return tuple.getAuctionId();
                     }
                 }, Integer.class)))
-                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(10)))
+                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(20)))
                 .process(L3.processJoin(new JoinNexL3())).uid("11")
                 .filter(L3.filter(t -> t.getCategory() == 10)).uid("12");
 
@@ -92,10 +92,12 @@ public class L3Nexmark {
             joined.map(new CpAssigner<>()).uid("15").addSink(LineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("16");
         }
 
+        /*
         if (settings.cpmProcessing()) {
             DataStream<ObjectNode> ds2 = env.addSource(new FlinkKafkaConsumer<>("temp", new JSONKeyValueDeserializationSchema(false), kafkaProperties).setStartFromEarliest()).uid("100").setParallelism(1)
                     .map(new CpManagerClient()).uid("101").setParallelism(1);
         }
+         */
 
         env.execute(settings.getLineageMode() + "," + queryFlag);
     }
