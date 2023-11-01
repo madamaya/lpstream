@@ -1,5 +1,6 @@
 package com.madamaya.l3stream.workflows.nexmark;
 
+import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.glCommons.InitGdataGL;
 import com.madamaya.l3stream.workflows.nexmark.objects.*;
 import com.madamaya.l3stream.workflows.nexmark.ops.*;
@@ -31,18 +32,12 @@ public class GLNexmark {
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
 
-        boolean local = true;
         Properties kafkaProperties = new Properties();
         Properties kafkaProperties2 = new Properties();
-        if (local) {
-            kafkaProperties.setProperty("bootstrap.servers", "localhost:9092");
-            kafkaProperties2.setProperty("bootstrap.servers", "localhost:9092");
-        } else {
-            kafkaProperties.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
-            kafkaProperties2.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
-        }
-        kafkaProperties.setProperty("group.id", "myGROUP");
-        kafkaProperties2.setProperty("group.id", "myGROUP2");
+        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
+        kafkaProperties2.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
+        kafkaProperties.setProperty("group.id", "1" + String.valueOf(System.currentTimeMillis()));
+        kafkaProperties2.setProperty("group.id", "2" + String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
         kafkaProperties2.setProperty("transaction.timeout.ms", "540000");
 

@@ -1,5 +1,6 @@
 package com.madamaya.l3stream.workflows.nyc;
 
+import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.glCommons.InitGdataGL;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTupleGL;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTupleGL;
@@ -34,14 +35,9 @@ public class GLNYC {
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
 
-        boolean local = true;
         Properties kafkaProperties = new Properties();
-        if (local) {
-            kafkaProperties.setProperty("bootstrap.servers", "localhost:9092");
-        } else {
-            kafkaProperties.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
-        }
-        kafkaProperties.setProperty("group.id", "myGROUP");
+        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
+        kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         /* Query */

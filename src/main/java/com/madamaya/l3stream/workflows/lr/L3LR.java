@@ -1,5 +1,6 @@
 package com.madamaya.l3stream.workflows.lr;
 
+import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.lr.ops.DataParserLR;
 import com.madamaya.l3stream.workflows.lr.ops.DataParserLRL3;
@@ -45,13 +46,8 @@ public class L3LR {
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
 
-        boolean local = true;
         Properties kafkaProperties = new Properties();
-        if (local) {
-            kafkaProperties.setProperty("bootstrap.servers", "localhost:9092");
-        } else {
-            kafkaProperties.setProperty("bootstrap.servers", "172.16.0.209:9092,172.16.0.220:9092");
-        }
+        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
         kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 

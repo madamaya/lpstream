@@ -20,24 +20,28 @@ if __name__ == "__main__":
             lines = f.readlines()
             tmpList = tmpList + lines
 
-    print("*** Remove newline from each data ***")
-    mainList = [line.rstrip("\n") for line in tqdm(tmpList)]
+    #print("*** Remove newline from each data ***")
+    #mainList = [line.rstrip("\n") for line in tqdm(tmpList)]
 
     print("*** Sort data ***")
-    mainList.sort(key=lambda x: x.split(',')[2])
+    #mainList.sort(key=lambda x: x.split(',')[2])
+    tmpList.sort(key=lambda x: x.split(',')[2])
 
     print("*** Write ***")
     cnt = 0
-    lgth = len(mainList)
+    #lgth = len(mainList)
+    lgth = len(tmpList)
     numofonepercent = lgth // 100
 
     start_time = time.time()
     prev_time = time.time()
     current_time = time.time()
     with open("../data/nyc.csv", "w") as w:
-        for line in mainList:
+        #for line in mainList:
+        for line in tmpList:
             cnt = cnt + 1
-            w.write('"' + line  + '"' + "\n")
+            #w.write('"' + line  + '"' + "\n")
+            w.write('"' + line.rstrip("\n")  + '"' + "\n")
 
             if cnt % numofonepercent == 0:
                 current_time = time.time()
