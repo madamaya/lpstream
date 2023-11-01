@@ -14,8 +14,8 @@ query=$3
 mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
 # Run
 echo "*** Run ***"
-echo "(./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/baseline 0)"
-./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/baseline 0
+echo "(../templates/original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/baseline 0)"
+../templates/original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/baseline 0
 
 echo "*** Data size test (topic=${topic}, parallelism=${parallelism}, checkInterval=${checkInterval}) ***"
 echo "java -cp ${JAR_PATH} com.madamaya.l3stream.utils.IdentifyEnd ${topic} ${parallelism} ${checkInterval}"
