@@ -3,6 +3,7 @@ package com.madamaya.l3stream.workflows.nexmark.ops;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkInputTuple;
 import io.palyvos.provenance.l3stream.conf.L3conf;
+import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -14,7 +15,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class AuctionDataParserNex extends RichMapFunction<ObjectNode, NexmarkAuctionTuple> {
+public class AuctionDataParserNex extends RichMapFunction<L3StreamInput<JsonNode>, NexmarkAuctionTuple> {
     /*
      Sample Input:
     {"event_type":1,"person":null,"auction":{"id":1001,"itemName":"pc","description":"gbyf","initialBid":2940,"reserve":4519,"dateTime":"2023-10-03 05:31:34.28","expires":"2023-10-03 05:31:34.292","seller":1010,"category":13,"extra":""},"bid":null}
@@ -29,7 +30,8 @@ public class AuctionDataParserNex extends RichMapFunction<ObjectNode, NexmarkAuc
     }
 
     @Override
-    public NexmarkAuctionTuple map(ObjectNode jsonNodes) throws Exception {
+    public NexmarkAuctionTuple map(L3StreamInput<JsonNode> input) throws Exception {
+        JsonNode jsonNodes = input.getValue();
         int eventType = jsonNodes.get("value").get("event_type").asInt();
         count++;
         // eventType is auction
@@ -47,7 +49,7 @@ public class AuctionDataParserNex extends RichMapFunction<ObjectNode, NexmarkAuc
             int category = jnode.get("category").asInt();
             String extra = jnode.get("extra").asText();
 
-            return new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, System.nanoTime());
+            return new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getStimulus());
         } else {
             return new NexmarkAuctionTuple(eventType);
         }

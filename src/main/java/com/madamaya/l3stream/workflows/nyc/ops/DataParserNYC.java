@@ -2,6 +2,7 @@ package com.madamaya.l3stream.workflows.nyc.ops;
 
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import io.palyvos.provenance.l3stream.conf.L3conf;
+import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -12,7 +13,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class DataParserNYC extends RichMapFunction<ObjectNode, NYCInputTuple> {
+public class DataParserNYC extends RichMapFunction<L3StreamInput<String>, NYCInputTuple> {
     long start;
     long count;
     ExperimentSettings settings;
@@ -22,7 +23,7 @@ public class DataParserNYC extends RichMapFunction<ObjectNode, NYCInputTuple> {
     }
 
     @Override
-    public NYCInputTuple map(ObjectNode jNode) throws Exception {
+    public NYCInputTuple map(L3StreamInput<String> input) throws Exception {
         /* Column list
         ['VendorID', 'tpep_pickup_datetime', 'tpep_dropoff_datetime',
        'passenger_count', 'trip_distance', 'RatecodeID',
@@ -30,11 +31,9 @@ public class DataParserNYC extends RichMapFunction<ObjectNode, NYCInputTuple> {
        'payment_type', 'fare_amount', 'extra', 'mta_tax', 'tip_amount',
        'tolls_amount', 'improvement_surcharge', 'total_amount',
        'congestion_surcharge', 'airport_fee'] */
-        long stimulus = System.nanoTime();
-
-        String line = jNode.get("value").textValue();
+        // String line = jNode.get("value").textValue();
         count++;
-        return new NYCInputTuple(line, stimulus);
+        return new NYCInputTuple(input.getValue(), input.getStimulus());
     }
 
     @Override

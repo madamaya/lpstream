@@ -1,6 +1,7 @@
 package com.madamaya.l3stream.workflows.lr.ops;
 
 import io.palyvos.provenance.l3stream.conf.L3conf;
+import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -13,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
-public class DataParserLR extends RichMapFunction<ObjectNode, LinearRoadInputTuple> {
+public class DataParserLR extends RichMapFunction<L3StreamInput<String>, LinearRoadInputTuple> {
     private static final Pattern delimiter = Pattern.compile(",");
     long start;
     long count;
@@ -24,10 +25,8 @@ public class DataParserLR extends RichMapFunction<ObjectNode, LinearRoadInputTup
     }
 
     @Override
-    public LinearRoadInputTuple map(ObjectNode jNode) throws Exception {
-        long stimulus = System.nanoTime();
-
-        String line = jNode.get("value").textValue();
+    public LinearRoadInputTuple map(L3StreamInput<String> input) throws Exception {
+        String line = input.getValue();
         String[] elements = delimiter.split(line.trim());
         LinearRoadInputTuple tuple = new LinearRoadInputTuple(
                 Integer.valueOf(elements[0]),
@@ -39,7 +38,7 @@ public class DataParserLR extends RichMapFunction<ObjectNode, LinearRoadInputTup
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
                 Integer.valueOf(elements[8]),
-                stimulus
+                input.getStimulus()
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
         count++;
