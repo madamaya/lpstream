@@ -42,9 +42,7 @@ if __name__ == "__main__":
         convertElement2Line("FLINK_IP", confMap["flinkIP"], "String") + "\n",
         convertElement2Line("FLINK_PORT", confMap["flinkPort"], "int") + "\n",
         convertElement2Line("BOOTSTRAP_IP_PORT", confMap["bootstrapServers"], "String") + "\n",
-        convertElement2Line("PARALLELISM", confMap["parallelism"], "int") + "\n",
-        convertElement2Line("CPMSERVER_IP", confMap["cpmIP"], "String") + "\n",
-        convertElement2Line("CPMSERVER_PORT", confMap["cpmPort"], "int") + "\n"
+        convertElement2Line("PARALLELISM", confMap["parallelism"], "int") + "\n"
     ]
 
     writeConf(javaConfStr)
