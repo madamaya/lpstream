@@ -43,10 +43,10 @@ do
       elif [ ${approach} = "l3stream" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
         # Start CpMServer
-        echo "*** Start CpMServer ***"
-        echo "(../startCpMServer.sh > /dev/null &)"
-        ../startCpMServer.sh > /dev/null &
-        sleep 10
+        #echo "*** Start CpMServer ***"
+        #echo "(../startCpMServer.sh > /dev/null &)"
+        #../startCpMServer.sh > /dev/null &
+        #sleep 10
         # Run
         echo "*** Run ***"
         echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0)"
@@ -63,12 +63,12 @@ do
       echo "(cancelFlinkJobs)"
       cancelFlinkJobs
 
-      if [ ${approach} = "l3stream" ]; then
+      #if [ ${approach} = "l3stream" ]; then
         # Stop CpMServer
-        echo "*** Stop CpMServer ***"
-        echo "(stopCpMServer)"
-        stopCpMServer
-      fi
+        #echo "*** Stop CpMServer ***"
+        #echo "(stopCpMServer)"
+        #stopCpMServer
+      #fi
 
       # Read output
       echo "*** Read all outputs ***"

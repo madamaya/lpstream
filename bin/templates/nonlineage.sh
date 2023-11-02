@@ -27,7 +27,6 @@ EXE_CMD="${FLINK_HOME}/bin/flink run -d \
 --class ${2} \
 ${1} \
 --lineageMode nonLineage \
---cpmProcessing \
 ${windowSizeOption} \
 ${queryNameOption} \
 --latencyFlag ${latencyFlag}"

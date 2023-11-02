@@ -50,26 +50,36 @@ public class L3DataReaderFromEarliest {
         consumer.seekToBeginning(list);
 
         long count = 0;
+        long prevCount = 0;
+        long startTime = System.currentTimeMillis();
+        long prevTime = startTime;
+        final long checkInterval = 30000;
         BufferedWriter bw;
         try {
             bw = new BufferedWriter(new FileWriter(outputFilePath));
 
             while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(30000));
-                if (records.count() == 0) {
-                    System.out.println(" [end (All outputs have been read.)]");
-                    break;
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(checkInterval));
+                if (System.currentTimeMillis() - prevTime > checkInterval) {
+                    if (prevCount == count) {
+                        // System.out.println(" [end (All outputs have been read.)]");
+                        break;
+                    } else if (prevCount < count) {
+                        prevTime = System.currentTimeMillis();
+                        prevCount = count;
+                        System.out.print("\r" + count + " tuple(s) have been read. (" + (System.currentTimeMillis() - startTime) + " [ms])");
+                    }
                 }
+
                 for (ConsumerRecord record : records) {
-                    count++;
                     String recordValue = (String) record.value();
                     bw.write(recordValue + "\n");
-                    if (count % 100 == 0) {
+                    if (++count % 100 == 0) {
                         System.out.print("\r" + count + " tuple(s) have been read.");
                     }
                 }
             }
-            System.out.println("\r" + count + " tuple(s) have been read.");
+            System.out.println("\r" + count + " tuple(s) have been read. [end]");
             bw.flush();
             bw.close();
         } catch (Exception e) {

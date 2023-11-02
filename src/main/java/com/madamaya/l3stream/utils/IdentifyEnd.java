@@ -35,17 +35,27 @@ public class IdentifyEnd {
         }
         consumer.assign(list);
         consumer.seekToBeginning(list);
-        Thread.sleep(30000);
+
         long count = 0;
+        long prevCount = 0;
         long startTime = System.currentTimeMillis();
+        long prevTime = startTime;
         long endTime = 0;
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(checkInterval));
-            if (records.count() == 0) {
-                endTime = System.currentTimeMillis();
-                System.out.println("\r" + count + " tuple(s) have been read. (" + (endTime - startTime) + " [ms]) [end]");
-                break;
+            // if (records.count() == 0) {
+            if (System.currentTimeMillis() - prevTime > checkInterval) {
+                if (prevCount == count) {
+                    endTime = System.currentTimeMillis();
+                    System.out.println("\r" + count + " tuple(s) have been read. (" + (endTime - startTime) + " [ms]) [end]");
+                    break;
+                } else if (prevCount < count) {
+                    prevTime = System.currentTimeMillis();
+                    prevCount = count;
+                    System.out.print("\r" + count + " tuple(s) have been read. (" + (System.currentTimeMillis() - startTime) + " [ms])");
+                }
             }
+
             for (ConsumerRecord record : records) {
                 if (++count % 100 == 0) {
                     System.out.print("\r" + count + " tuple(s) have been read. (" + (System.currentTimeMillis() - startTime) + " [ms])");

@@ -58,8 +58,8 @@ public class L3Nexmark {
         Properties kafkaProperties2 = new Properties();
         kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
         kafkaProperties2.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", "myGROUP");
-        kafkaProperties2.setProperty("group.id", "myGROUP2");
+        kafkaProperties.setProperty("group.id", "1" + String.valueOf(System.currentTimeMillis()));
+        kafkaProperties2.setProperty("group.id", "2" + String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
         kafkaProperties2.setProperty("transaction.timeout.ms", "540000");
 
@@ -100,7 +100,7 @@ public class L3Nexmark {
                         return tuple.getAuctionId();
                     }
                 }, Integer.class)))
-                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(10)))
+                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(20)))
                 .process(L3.processJoin(new JoinNexL3())).uid("11")
                 .filter(L3.filter(t -> t.getCategory() == 10)).uid("12");
 
@@ -114,6 +114,7 @@ public class L3Nexmark {
             joined.map(new CpAssigner<>()).uid("15").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("16");
         }
 
+        /*
         if (settings.cpmProcessing()) {
             KafkaSource<L3StreamInput<String>> tempSource = KafkaSource.<L3StreamInput<String>>builder()
                     .setBootstrapServers(brokers)
@@ -126,6 +127,7 @@ public class L3Nexmark {
             DataStream ds2 = env.fromSource(tempSource, WatermarkStrategy.noWatermarks(), "tempSource").uid("100").setParallelism(1)
                     .map(new CpManagerClient()).uid("101").setParallelism(1);
         }
+         */
 
         env.execute(settings.getLineageMode() + "," + queryFlag);
     }

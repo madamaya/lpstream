@@ -49,8 +49,8 @@ public class Nexmark {
         Properties kafkaProperties2 = new Properties();
         kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
         kafkaProperties2.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", "myGROUP");
-        kafkaProperties2.setProperty("group.id", "myGROUP2");
+        kafkaProperties.setProperty("group.id", "1" + String.valueOf(System.currentTimeMillis()));
+        kafkaProperties2.setProperty("group.id", "2" + String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
         kafkaProperties2.setProperty("transaction.timeout.ms", "540000");
 
@@ -87,7 +87,7 @@ public class Nexmark {
                         return tuple.getAuctionId();
                     }
                 }))
-                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(10)))
+                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(20)))
                 .process(new JoinNex())
                 .filter(t -> t.getCategory() == 10);
 

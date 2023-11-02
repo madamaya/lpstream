@@ -55,7 +55,7 @@ public class L3NYC {
 
         Properties kafkaProperties = new Properties();
         kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", "myGROUP");
+        kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
 
         KafkaSource<L3StreamInput<String>> source = KafkaSource.<L3StreamInput<String>>builder()
@@ -93,6 +93,7 @@ public class L3NYC {
             ds.map(new CpAssigner<>()).uid("10").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("11");
         }
 
+        /*
         if (settings.cpmProcessing()) {
             KafkaSource<L3StreamInput<String>> tempSource = KafkaSource.<L3StreamInput<String>>builder()
                     .setBootstrapServers(brokers)
@@ -105,6 +106,7 @@ public class L3NYC {
             DataStream ds2 = env.fromSource(tempSource, WatermarkStrategy.noWatermarks(), "tempSource").uid("100").setParallelism(1)
                     .map(new CpManagerClient()).uid("101").setParallelism(1);
         }
+         */
 
         env.execute(settings.getLineageMode() + "," + queryFlag);
     }

@@ -35,8 +35,8 @@ logFile="${logDir}/${testName}.log"
 
 ## Initialize redis
 echo "*** Initialize redis ***"
-echo "(redis-cli FLUSHDB)"
-redis-cli FLUSHDB
+echo "(redis-cli -h ${redisIP} FLUSHDB)"
+redis-cli -h ${redisIP} FLUSHDB
 
 ## Start kafka logger
 echo "*** Start Kafka logger ***"
@@ -44,9 +44,9 @@ echo "(startKafkaLogger ${logDir} ${logFile} ${outputTopicName})"
 startKafkaLogger ${logDir} ${logFile} ${outputTopicName} > /dev/null
 
 ## start checkpoint manager server
-echo "*** Start Checkpoint Management Server ***"
-echo "(./startCpMServer.sh > /dev/null &)"
-./startCpMServer.sh > /dev/null &
+#echo "*** Start Checkpoint Management Server ***"
+#echo "(./startCpMServer.sh > /dev/null &)"
+#./startCpMServer.sh > /dev/null &
 
 ## submit Flink job
 cd ${BIN_DIR}/templates
@@ -71,9 +71,9 @@ echo "(cancelFlinkJobs)"
 cancelFlinkJobs
 
 ## Stop CpMServerManager
-echo "*** Stop CpMServerManager ***"
-echo "(stopCpMServer)"
-stopCpMServer
+#echo "*** Stop CpMServerManager ***"
+#echo "(stopCpMServer)"
+#stopCpMServer
 
 ## Stop kafka logger
 echo "*** Stop kafka logger ***"

@@ -8,6 +8,8 @@ source ../utils/notifyEnd.sh
 
 startCpID=1
 
+redis-cli -h ${redisIP} FLUSHDB
+
 if [ $# -ne 1 ]; then
   echo "Illegal Args"
   exit 1
@@ -31,15 +33,15 @@ logDir="${BIN_DIR}/checkCorrectness/log/${testName}"
 logFile="${logDir}/all_baseline.log"
 
 ./dataLoader.sh 3 ${testName}-o
-./dataLoader.sh 4 ${testName}-l
+./dataLoader.sh 3 ${testName}-l
 
 ./dataLoader.sh 0 ${inputTopicName} ${inputFilePath}
 
 cd ..
 ############ Baseline (ALL) ############
 # start CpMServer
-echo "start CpMServer"
-./startCpMServer.sh > /dev/null &
+#echo "start CpMServer"
+#./startCpMServer.sh > /dev/null &
 
 # start logger
 echo "start logger"
@@ -64,9 +66,9 @@ echo "(cancelFlinkJobs)"
 cancelFlinkJobs
 
 ## Stop CpMServerManager
-echo "*** Stop CpMServerManager ***"
-echo "(stopCpMServer)"
-stopCpMServer
+#echo "*** Stop CpMServerManager ***"
+#echo "(stopCpMServer)"
+#stopCpMServer
 
 ## Stop kafka logger
 echo "*** Stop kafka logger ***"
@@ -86,8 +88,8 @@ cd ..
 ############ Baseline (SPLIT) ############
 logFile="${logDir}/split_baseline.log"
 # start CpMServer
-echo "start CpMServer"
-./startCpMServer.sh > /dev/null &
+#echo "start CpMServer"
+#./startCpMServer.sh > /dev/null &
 
 # start logger
 echo "start logger"
@@ -136,9 +138,9 @@ echo "(cancelFlinkJobs)"
 cancelFlinkJobs
 
 ## Stop CpMServerManager
-echo "*** Stop CpMServerManager ***"
-echo "(stopCpMServer)"
-stopCpMServer
+#echo "*** Stop CpMServerManager ***"
+#echo "(stopCpMServer)"
+#stopCpMServer
 
 ## Stop kafka logger
 echo "*** Stop kafka logger ***"
