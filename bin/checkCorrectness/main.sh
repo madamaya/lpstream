@@ -8,6 +8,8 @@ source ../utils/notifyEnd.sh
 
 startCpID=1
 
+redis-cli -h ${redisIP} FLUSHDB
+
 if [ $# -ne 1 ]; then
   echo "Illegal Args"
   exit 1

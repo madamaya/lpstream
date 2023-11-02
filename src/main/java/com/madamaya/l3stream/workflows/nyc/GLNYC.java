@@ -30,7 +30,7 @@ public class GLNYC {
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
-        env.setParallelism(4);
+
         final String queryFlag = "NYC";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
