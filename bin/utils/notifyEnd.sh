@@ -12,10 +12,10 @@ function notifyEnd() {
   do
     current=`wc -l ${logFile} | awk '{print $1}'`
     if [ ${prev} -eq ${current} ]; then
-      echo "prev=${prev}, current=${current} -> break"
+      echo "prev=${prev}, current=${current} -> break" `date`
       break
     fi
-    echo "prev=${prev}, current=${current}"
+    echo "prev=${prev}, current=${current}" `date`
     prev=${current}
     sleep ${sleepTimeNotifyEnd}
   done
