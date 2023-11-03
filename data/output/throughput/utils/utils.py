@@ -23,6 +23,7 @@ def calcResults(queries, approaches):
     for query in queries:
         for approach in approaches:
             thList = []
+            allDuration = 0
             for file in getFileNames("{}/{}".format(query, approach)):
                 startTsMin = -1
                 endTsMax = -1
@@ -37,6 +38,7 @@ def calcResults(queries, approaches):
                     endTsMax = endTs if (endTsMax < 0) else max(endTsMax, endTs)
                     allTupleNum = allTupleNum + tupleNum
                 thList.append(tupleNum / ((endTs - startTs) // 1e9))
+                allDuration = allDuration + (endTs - startTs)
 
                 print("p = {}".format(fileList))
 
@@ -46,7 +48,7 @@ def calcResults(queries, approaches):
 
             if query not in results:
                 results[query] = {}
-            results[query][approach] = [thMean, thSed, thNpList.size]
+            results[query][approach] = [thMean, thSed, thNpList.size, allDuration]
 
     return results
 
@@ -65,11 +67,11 @@ def resultFigsGen(results, queries, approaches, flag):
         plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
         plt.title("*{}* result (Throughput, {})".format(query, flag))
         plt.ylabel("Latency")
-        plt.savefig("./{}.pdf".format(query))
+        plt.savefig("./results/{}.pdf".format(query))
         plt.close()
 
 def writeResults(results, queries, approaches, startTime, flag):
-    with open("throughput.{}.result.{}.txt".format(flag, startTime), "w") as w:
+    with open("./results/throughput.{}.result.{}.txt".format(flag, startTime), "w") as w:
         # Write mean
         w.write("MEAN,{}\n".format(",".join(approaches)))
         for query in queries:
@@ -102,4 +104,16 @@ def writeResults(results, queries, approaches, startTime, flag):
             stds = []
             for approach in approaches:
                 stds.append(str(results[query][approach][2]))
+            w.write("{}\n".format(",".join(stds)))
+
+        w.write("\n")
+
+        # Write duration
+        w.write("DURATION,{}\n".format(",".join(approaches)))
+        for query in queries:
+            w.write("{},".format(query))
+
+            stds = []
+            for approach in approaches:
+                stds.append(str(results[query][approach][3] // 1e9))
             w.write("{}\n".format(",".join(stds)))

@@ -1,3 +1,4 @@
+import os
 import time
 from utils import utils
 
@@ -7,6 +8,9 @@ startTime = time.time()
 flag = "metrics1"
 
 if __name__ == "__main__":
+    if not os.path.exists("./results"):
+        os.makedirs("./results")
+
     print("* calcResults(queries, approaches) *")
     results = utils.calcResults(queries, approaches)
 

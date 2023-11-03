@@ -23,6 +23,10 @@ do
     do
       echo "*** Start evaluation (query = ${query}, approach = ${approach}, loop = ${loop}) ***"
 
+      # restartTMifNeeded
+      echo "*** restartTMifNeeded ***"
+      restartTMifNeeded
+
       echo "*** Read config ***"
       # source ./config/${approach}_${query}.sh
       outputTopicName="${query}-o"

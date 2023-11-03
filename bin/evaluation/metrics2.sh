@@ -21,6 +21,10 @@ do
     do
       echo "*** Start evaluation (query = ${query}, approach = ${approach}, loop = ${loop}) ***"
 
+      # restartTMifNeeded
+      echo "*** restartTMifNeeded ***"
+      restartTMifNeeded
+
       echo "*** Read config ***"
       # source ./config/${approach}_${query}.sh
       outputTopicName="${query}-o"
@@ -50,12 +54,12 @@ do
       echo "(cancelFlinkJobs)"
       cancelFlinkJobs
 
-      if [ ${approach} = "l3stream" ]; then
+      #if [ ${approach} = "l3stream" ]; then
         # Stop CpMServer
-        echo "*** Stop CpMServer ***"
-        echo "(stopCpMServer)"
-        stopCpMServer
-      fi
+        #echo "*** Stop CpMServer ***"
+        #echo "(stopCpMServer)"
+        #stopCpMServer
+      #fi
 
       # Read output
       echo "*** Read all outputs ***"

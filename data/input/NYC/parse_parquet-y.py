@@ -27,12 +27,17 @@ if __name__ == "__main__":
         ed = int(sys.argv[2])
 
     for year in range(st, ed + 1):
+        if year == 2017:
+            mn = 11
+        else:
+            mn = 1
+
         if year == 2023:
             mx = 6
         else:
             mx = 12
 
-        for i in range(1, mx + 1):
+        for i in range(mn, mx + 1):
             file_name = "../data/parquet/yellow_tripdata_{}-{}.parquet".format(year, str(i).zfill(2))
 
             print("***START: {}***".format(file_name))

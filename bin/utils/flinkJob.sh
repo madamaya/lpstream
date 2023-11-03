@@ -30,3 +30,13 @@ function restartFlinkCluster() {
   ${FLINK_HOME}/bin/start-cluster.sh
   sleep 15
 }
+
+function restartTMifNeeded() {
+  num=`curl localhost:8081/taskmanagers | jq '.taskmanagers' | jq 'length' | awk '{print $1}'`
+  if [ ${num} -eq 0 ]; then
+    echo "*** no taskmanagers (runningTMnum) ***"
+    echo "*** restart ***"
+    echo "(restartFlinkCluster)"
+    restartFlinkCluster
+  fi
+}
