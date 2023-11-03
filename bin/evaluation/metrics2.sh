@@ -21,6 +21,10 @@ do
     do
       echo "*** Start evaluation (query = ${query}, approach = ${approach}, loop = ${loop}) ***"
 
+      # restartTMifNeeded
+      echo "*** restartTMifNeeded ***"
+      restartTMifNeeded
+
       echo "*** Read config ***"
       # source ./config/${approach}_${query}.sh
       outputTopicName="${query}-o"
@@ -75,9 +79,6 @@ do
       ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${outputTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
       echo "(sleep 10)"
       sleep 10
-
-      # restartTMifNeeded
-      restartTMifNeeded
     done
   done
 done
