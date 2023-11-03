@@ -26,6 +26,9 @@ if __name__ == "__main__":
         st = int(sys.argv[1])
         ed = int(sys.argv[2])
 
+    if not os.path.exists("../data/parquet"):
+        os.makedirs("../data/parquet")
+
     for year in range(st, ed + 1):
         if year == 2017:
             mn = 11

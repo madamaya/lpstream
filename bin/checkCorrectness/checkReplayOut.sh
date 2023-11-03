@@ -33,6 +33,10 @@ fi
 logDir="${BIN_DIR}/checkCorrectness/log/${testName}"
 logFile="${logDir}/groundTruth.log"
 
+if [ ! -d ${logDir} ]; then
+  mkdir ${logDir}
+fi
+
 ./dataLoader.sh 3 ${testName}-o
 ./dataLoader.sh 3 ${testName}-l
 ./dataLoader.sh 0 ${inputTopicName} ${inputFilePath}
