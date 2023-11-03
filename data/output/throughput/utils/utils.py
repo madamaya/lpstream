@@ -23,6 +23,7 @@ def calcResults(queries, approaches):
     for query in queries:
         for approach in approaches:
             thList = []
+            allDuration = 0
             for file in getFileNames("{}/{}".format(query, approach)):
                 startTsMin = -1
                 endTsMax = -1
@@ -37,6 +38,7 @@ def calcResults(queries, approaches):
                     endTsMax = endTs if (endTsMax < 0) else max(endTsMax, endTs)
                     allTupleNum = allTupleNum + tupleNum
                 thList.append(tupleNum / ((endTs - startTs) // 1e9))
+                allDuration = allDuration + (endTs - startTs)
 
                 print("p = {}".format(fileList))
 
@@ -46,7 +48,7 @@ def calcResults(queries, approaches):
 
             if query not in results:
                 results[query] = {}
-            results[query][approach] = [thMean, thSed, thNpList.size]
+            results[query][approach] = [thMean, thSed, thNpList.size, allDuration]
 
     return results
 
@@ -102,4 +104,14 @@ def writeResults(results, queries, approaches, startTime, flag):
             stds = []
             for approach in approaches:
                 stds.append(str(results[query][approach][2]))
+            w.write("{}\n".format(",".join(stds)))
+
+        # Write duration
+        w.write("DURATION,{}\n".format(",".join(approaches)))
+        for query in queries:
+            w.write("{},".format(query))
+
+            stds = []
+            for approach in approaches:
+                stds.append(str(results[query][approach][3]))
             w.write("{}\n".format(",".join(stds)))
