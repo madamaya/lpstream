@@ -106,6 +106,8 @@ def writeResults(results, queries, approaches, startTime, flag):
                 stds.append(str(results[query][approach][2]))
             w.write("{}\n".format(",".join(stds)))
 
+        w.write("\n")
+
         # Write duration
         w.write("DURATION,{}\n".format(",".join(approaches)))
         for query in queries:
@@ -113,5 +115,5 @@ def writeResults(results, queries, approaches, startTime, flag):
 
             stds = []
             for approach in approaches:
-                stds.append(str(results[query][approach][3]))
+                stds.append(str(results[query][approach][3] // 1e9))
             w.write("{}\n".format(",".join(stds)))

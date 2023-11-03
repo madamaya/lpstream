@@ -88,6 +88,9 @@ do
       ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${outputTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
       echo "(sleep 10)"
       sleep 10
+
+      # restartTMifNeeded
+      restartTMifNeeded
     done
   done
 done
