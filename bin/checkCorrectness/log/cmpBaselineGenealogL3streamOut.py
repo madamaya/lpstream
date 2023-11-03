@@ -63,7 +63,7 @@ if __name__ == "__main__":
         else:
             jdata = json.loads(line)
 
-        if jdata["FLAG"] == "true" and parseLineageData(json.loads(line)) not in genealogLineageSet:
+        if jdata["FLAG"] == "true" and parseLineageData(jdata) not in genealogLineageSet:
             errorList.append(line)
 
     baseline2genealog = baselineALLset & genealogALLset

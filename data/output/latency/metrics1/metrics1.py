@@ -11,8 +11,8 @@ startTime = time.time()
 flag = "metrics1"
 
 if __name__ == "__main__":
-    if not os.path.exists("./figs"):
-        os.makedirs("./figs")
+    if not os.path.exists("./results/figs"):
+        os.makedirs("./results/figs")
 
     print("* calcResults() *")
     results = utils.calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, startTime, flag)

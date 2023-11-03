@@ -65,11 +65,11 @@ def resultFigsGen(results, queries, approaches, flag):
         plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
         plt.title("*{}* result (Throughput, {})".format(query, flag))
         plt.ylabel("Latency")
-        plt.savefig("./{}.pdf".format(query))
+        plt.savefig("./results/{}.pdf".format(query))
         plt.close()
 
 def writeResults(results, queries, approaches, startTime, flag):
-    with open("throughput.{}.result.{}.txt".format(flag, startTime), "w") as w:
+    with open("./results/throughput.{}.result.{}.txt".format(flag, startTime), "w") as w:
         # Write mean
         w.write("MEAN,{}\n".format(",".join(approaches)))
         for query in queries:

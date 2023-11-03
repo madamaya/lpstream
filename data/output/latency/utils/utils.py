@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def logDump(query, approach, meanList, stdList, startTime, flag):
-    with open("latency.{}.info.{}.log".format(flag, round(startTime)), "a") as w:
+    with open("./results/latency.{}.info.{}.log".format(flag, round(startTime)), "a") as w:
         w.write("{}\n".format(query))
         w.write("{}\n".format(approach))
         for i in range(len(meanList)):
@@ -57,7 +57,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 print("*** Save fig ***")
                 plt.title("{}-{}".format(query, approach))
                 plt.ylabel("Latency")
-                plt.savefig("./figs/{}-{}.pdf".format(query, approach))
+                plt.savefig("./results/figs/{}-{}.pdf".format(query, approach))
                 plt.close()
 
             # dump log
@@ -81,7 +81,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 plt.title("{}-{}-comparison".format(query, i))
                 plt.ylabel("Latency")
                 plt.legend(approaches)
-                plt.savefig("./figs/{}-{}-comparison.pdf".format(query, i))
+                plt.savefig("./results/figs/{}-{}-comparison.pdf".format(query, i))
                 plt.close()
 
     return results
@@ -101,11 +101,11 @@ def resultFigsGen(results, queries, approaches, flag):
         plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
         plt.title("*{}* result (Latency, {})".format(query, flag))
         plt.ylabel("Latency")
-        plt.savefig("./{}.pdf".format(query))
+        plt.savefig("./results/{}.pdf".format(query))
         plt.close()
 
 def writeResults(results, queries, approaches, startTime, flag):
-    with open("latency.{}.result.{}.txt".format(flag, startTime), "w") as w:
+    with open("./results/latency.{}.result.{}.txt".format(flag, startTime), "w") as w:
         # Write mean
         w.write("MEAN,{}\n".format(",".join(approaches)))
         for query in queries:
