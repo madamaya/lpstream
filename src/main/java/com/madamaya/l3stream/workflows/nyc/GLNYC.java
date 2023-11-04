@@ -40,6 +40,7 @@ public class GLNYC {
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
+        env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "NYC";
         final String inputTopicName = queryFlag + "-i";
@@ -91,6 +92,6 @@ public class GLNYC {
         }
         ds.sinkTo(sink);
 
-        env.execute("Query: " + queryFlag);
+        env.execute("Query: GL" + queryFlag);
     }
 }

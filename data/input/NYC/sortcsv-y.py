@@ -1,3 +1,4 @@
+import os
 import glob
 import time
 from tqdm import tqdm
@@ -11,6 +12,9 @@ def list2str(e, delemeter=","):
 if __name__ == "__main__":
     targetDir = "../data/csv"
     tmpList = list()
+
+    if not os.path.exists("../data/csv"):
+        os.makedirs("../data/csv")
 
     print("*** Get files ***")
     files = glob.glob(targetDir + "/*")

@@ -33,6 +33,10 @@ logDir="${L3_HOME}/data/log/${(L)testName}"
 echo "logFile=\"${logDir}/${testName}.log\""
 logFile="${logDir}/${testName}.log"
 
+if [ ! -d ${logDir} ]; then
+  mkdir ${logDir}
+fi
+
 ## Initialize redis
 echo "*** Initialize redis ***"
 echo "(redis-cli -h ${redisIP} FLUSHDB)"
