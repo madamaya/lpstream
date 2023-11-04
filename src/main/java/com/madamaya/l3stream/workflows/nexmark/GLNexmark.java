@@ -86,6 +86,6 @@ public class GLNexmark {
         }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
          */
 
-        env.execute("Query: " + queryFlag);
+        env.execute("Query: GL" + queryFlag);
     }
 }
