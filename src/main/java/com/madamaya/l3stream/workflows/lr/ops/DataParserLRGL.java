@@ -31,6 +31,7 @@ public class DataParserLRGL implements MapFunction<ObjectNodeGL, LinearRoadInput
                 jNodeGL.getStimulus()
         );
         out.setKey(String.valueOf(out.getVid()));
+        out.setPartitionID(jNode.get("metadata").get("partition").asInt());
 
         GenealogMapHelper.INSTANCE.annotateResult(jNodeGL, out);
         return out;

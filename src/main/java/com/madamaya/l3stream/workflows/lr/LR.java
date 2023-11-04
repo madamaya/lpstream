@@ -42,7 +42,7 @@ public class LR {
         /* Query */
         DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
                 .map(new DataParserLR(settings))
-                .assignTimestampsAndWatermarks(new WatermarkStrategyLR())
+                .assignTimestampsAndWatermarks(new WatermarkStrategyLR(settings.maxParallelism(), env.getParallelism()))
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
                 .keyBy(t -> t.getKey())
                 .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),

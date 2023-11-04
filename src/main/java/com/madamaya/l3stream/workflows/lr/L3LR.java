@@ -55,8 +55,8 @@ public class L3LR {
         DataStream<L3StreamTupleContainer<CountTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserLRL3())).uid("3")
-                .map(L3.updateTsWM(new WatermarkStrategyLR(), 0)).uid("4")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(), settings.numOfInstanceWM())).uid("5")
+                .map(L3.updateTsWM(new WatermarkStrategyLR(settings.maxParallelism(), env.getParallelism()), 0)).uid("4")
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(settings.maxParallelism(), env.getParallelism()), settings.numOfInstanceWM())).uid("5")
                 .filter(L3.filter(t -> t.getType() == 0 && t.getSpeed() == 0)).uid("6")
                 .keyBy(L3.keyBy(t -> t.getKey(), String.class))
                 .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
