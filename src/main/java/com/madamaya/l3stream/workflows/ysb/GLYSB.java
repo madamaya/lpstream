@@ -27,6 +27,7 @@ public class GLYSB {
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
+        env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "YSB";
         final String inputTopicName = queryFlag + "-i";

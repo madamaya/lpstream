@@ -8,6 +8,15 @@ function cancelFlinkJobs() {
   jobid=(`curl ${flinkIP}:${flinkPort}/jobs | jq '.jobs[] | select( .status == "RESTARTING" or .status == "RUNNING" ) | .id' | xargs echo`)
   for id in ${jobid[@]}
   do
+    state=`curl ${flinkIP}:${flinkPort}/jobs/${id} | jq '.state'`
+    if [ ${state} = "RESTARTING" ]; then
+      echo "${state} is restarting (cancelFlinkJobs)."
+    fi
+    echo "********** job info log **********"
+    curl ${flinkIP}:${flinkPort}/jobs/${id}
+    echo "********** job exception log **********"
+    curl ${flinkIP}:${flinkPort}/jobs/${id}/exceptions
+
     echo "${FLINK_HOME}/bin/flink cancel ${id}"
     ${FLINK_HOME}/bin/flink cancel ${id}
   done

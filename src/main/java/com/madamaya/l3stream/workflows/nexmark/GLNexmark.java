@@ -27,6 +27,7 @@ public class GLNexmark {
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
+        env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "Nexmark";
         final String inputTopicName = queryFlag + "-i";

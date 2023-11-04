@@ -8,17 +8,9 @@ if [ $# -ne 1 ]; then
 fi
 
 if [ $1 = "flesh" ]; then
-  rm ./throughput.metrics1*.txt
-  rm ./LR.pdf
-  rm ./Nexmark.pdf
-  rm ./NYC.pdf
-  rm ./YSB.pdf
+  rm -rf results
 elif [ $1 = "fleshAll" ]; then
-  rm ./throughput.metrics1*.txt
-  rm ./LR.pdf
-  rm ./Nexmark.pdf
-  rm ./NYC.pdf
-  rm ./YSB.pdf
+  rm -rf results
   rm -rf LR
   rm -rf Nexmark
   rm -rf NYC

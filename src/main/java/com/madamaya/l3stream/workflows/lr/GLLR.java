@@ -31,6 +31,7 @@ public class GLLR {
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
+        env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "LR";
         final String inputTopicName = queryFlag + "-i";
