@@ -46,7 +46,7 @@ public class GLLR {
         DataStream<CountTupleGL> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
                 .map(new InitGdataGL(settings))
                 .map(new DataParserLRGL())
-                .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL(settings.maxParallelism(), env.getParallelism()))
+                .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL(settings.maxParallelism()))
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
                 .keyBy(t -> t.getKey())
                 .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),

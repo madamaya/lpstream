@@ -9,11 +9,9 @@ import java.util.*;
 
 public class WatermarkStrategyLRGL implements WatermarkStrategy<LinearRoadInputTupleGL> {
     private int partitionNum;
-    private int parallelism;
 
-    public WatermarkStrategyLRGL(int partitionNum, int parallelism) {
+    public WatermarkStrategyLRGL(int partitionNum) {
         this.partitionNum = partitionNum;
-        this.parallelism = parallelism;
     }
 
     @Override
@@ -28,35 +26,21 @@ public class WatermarkStrategyLRGL implements WatermarkStrategy<LinearRoadInputT
 
     @Override
     public WatermarkGenerator<LinearRoadInputTupleGL> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
-        if (parallelism > 1) {
-            return new WatermarkGenerator<LinearRoadInputTupleGL>() {
-                @Override
-                public void onEvent(LinearRoadInputTupleGL linearRoadInputTuple, long l, WatermarkOutput watermarkOutput) {
-                    watermarkOutput.emitWatermark(new Watermark(Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds() - 1));
-                }
+        return new WatermarkGenerator<LinearRoadInputTupleGL>() {
+            HashMap<Integer, Long> hm = new HashMap<>();
 
-                @Override
-                public void onPeriodicEmit(WatermarkOutput watermarkOutput) {
+            @Override
+            public void onEvent(LinearRoadInputTupleGL linearRoadInputTuple, long l, WatermarkOutput watermarkOutput) {
+                hm.put(linearRoadInputTuple.getPartitionID(), Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds() - 1);
+            }
 
+            @Override
+            public void onPeriodicEmit(WatermarkOutput watermarkOutput) {
+                if (hm.size() == partitionNum) {
+                    watermarkOutput.emitWatermark(new Watermark(findMinimumWM(hm)));
                 }
-            };
-        } else {
-            return new WatermarkGenerator<LinearRoadInputTupleGL>() {
-                HashMap<Integer, Long> hm = new HashMap<>();
-
-                @Override
-                public void onEvent(LinearRoadInputTupleGL linearRoadInputTuple, long l, WatermarkOutput watermarkOutput) {
-                    hm.put(linearRoadInputTuple.getPartitionID(), Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds() - 1);
-                }
-
-                @Override
-                public void onPeriodicEmit(WatermarkOutput watermarkOutput) {
-                    if (hm.size() == partitionNum) {
-                        watermarkOutput.emitWatermark(new Watermark(findMinimumWM(hm)));
-                    }
-                }
-            };
-        }
+            }
+        };
     }
 
     private static long findMinimumWM(Map<Integer, Long> m) {

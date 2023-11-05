@@ -19,10 +19,13 @@ public class WatermarkStrategyBidNex implements WatermarkStrategy<NexmarkBidTupl
     @Override
     public WatermarkGenerator<NexmarkBidTuple> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<NexmarkBidTuple>() {
-
+            long latest = Long.MIN_VALUE;
             @Override
             public void onEvent(NexmarkBidTuple tuple, long l, WatermarkOutput watermarkOutput) {
-                watermarkOutput.emitWatermark(new Watermark(tuple.getDateTime() - 1));
+                if (tuple.getDateTime() > latest) {
+                    watermarkOutput.emitWatermark(new Watermark(tuple.getDateTime() - 1));
+                    latest = tuple.getDateTime();
+                }
             }
 
             @Override

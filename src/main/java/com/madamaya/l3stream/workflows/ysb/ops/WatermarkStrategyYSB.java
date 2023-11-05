@@ -18,9 +18,13 @@ public class WatermarkStrategyYSB implements WatermarkStrategy<YSBInputTuple> {
     @Override
     public WatermarkGenerator<YSBInputTuple> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<YSBInputTuple>() {
+            long latest = Long.MIN_VALUE;
             @Override
             public void onEvent(YSBInputTuple tuple, long l, WatermarkOutput watermarkOutput) {
-                watermarkOutput.emitWatermark(new Watermark(tuple.getEventtime() - 1));
+                if (tuple.getEventtime() > latest) {
+                    watermarkOutput.emitWatermark(new Watermark(tuple.getEventtime() - 1));
+                    latest = tuple.getEventtime();
+                }
             }
 
             @Override
