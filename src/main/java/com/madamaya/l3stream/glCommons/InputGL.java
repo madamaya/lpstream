@@ -8,11 +8,19 @@ public class InputGL<T> implements GenealogTuple {
     private GenealogData gdata;
     private T value;
     private long stimulus = Long.MIN_VALUE;
+    private int partitionID;
 
     public InputGL(T value, long stimulus) {
         this.value = value;
         this.stimulus = stimulus;
     }
+
+    public InputGL(T value, long stimulus, int partitionID) {
+        this.value = value;
+        this.stimulus = stimulus;
+        this.partitionID = partitionID;
+    }
+
     @Override
     public void initGenealog(GenealogTupleType genealogTupleType) {
         this.gdata = new GenealogData();
@@ -25,6 +33,14 @@ public class InputGL<T> implements GenealogTuple {
 
     public void setValue(T value) {
         this.value = value;
+    }
+
+    public int getPartitionID() {
+        return partitionID;
+    }
+
+    public void setPartitionID(int partitionID) {
+        this.partitionID = partitionID;
     }
 
     @Override
