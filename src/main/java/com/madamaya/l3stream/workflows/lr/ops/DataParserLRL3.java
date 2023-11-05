@@ -26,7 +26,7 @@ public class DataParserLRL3 implements MapFunction<L3StreamInput<String>, Linear
                 Integer.valueOf(elements[8])
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
-        tuple.setPartitionID(jNode.get("metadata").get("partition").asInt());
+        tuple.setPartitionID(input.getPartitionID());
 
         return tuple;
     }

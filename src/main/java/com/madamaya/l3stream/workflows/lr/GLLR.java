@@ -2,6 +2,7 @@ package com.madamaya.l3stream.workflows.lr;
 
 import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.glCommons.InitGLdata;
+import com.madamaya.l3stream.glCommons.InitGLdataLR;
 import com.madamaya.l3stream.glCommons.InitGdataJsonNodeGL;
 import com.madamaya.l3stream.glCommons.InitGdataStringGL;
 import com.madamaya.l3stream.workflows.lr.ops.*;
@@ -60,7 +61,7 @@ public class GLLR {
         /* Query */
         //DataStream<CountTupleGL> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<CountTupleGL> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR")
-                .map(new InitGLdata<>(settings))
+                .map(new InitGLdataLR<>(settings))
                 .map(new DataParserLRGL())
                 .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL(settings.maxParallelism()))
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)

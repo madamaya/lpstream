@@ -41,7 +41,7 @@ public class DataParserLR extends RichMapFunction<L3StreamInput<String>, LinearR
                 input.getStimulus()
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
-        tuple.setPartitionID(jNode.get("metadata").get("partition").asInt());
+        tuple.setPartitionID(input.getPartitionID());
         count++;
         return tuple;
     }
