@@ -165,6 +165,7 @@ execution.checkpointing.unaligned: false
 #
 # state.checkpoints.dir: hdfs://namenode-host:port/flink-checkpoints
 state.checkpoints.dir: file://[PLEASE_FILL_IN_MANUALLY]/l3stream/data/checkpoints
+state.checkpoints.num-retained: 200
 # example: file:///home/l3stream/data/checkpoints
 
 # Default target directory for savepoints, optional.
