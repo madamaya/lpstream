@@ -5,7 +5,14 @@ import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadInputTuple
 import org.apache.flink.api.common.eventtime.*;
 import org.apache.flink.api.common.time.Time;
 
+import java.util.*;
+
 public class WatermarkStrategyLRGL implements WatermarkStrategy<LinearRoadInputTupleGL> {
+    private int partitionNum;
+
+    public WatermarkStrategyLRGL(int partitionNum) {
+        this.partitionNum = partitionNum;
+    }
 
     @Override
     public TimestampAssigner<LinearRoadInputTupleGL> createTimestampAssigner(TimestampAssignerSupplier.Context context) {
@@ -20,15 +27,25 @@ public class WatermarkStrategyLRGL implements WatermarkStrategy<LinearRoadInputT
     @Override
     public WatermarkGenerator<LinearRoadInputTupleGL> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<LinearRoadInputTupleGL>() {
+            HashMap<Integer, Long> hm = new HashMap<>();
+
             @Override
             public void onEvent(LinearRoadInputTupleGL linearRoadInputTuple, long l, WatermarkOutput watermarkOutput) {
-                watermarkOutput.emitWatermark(new Watermark(Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds() - 1));
+                hm.put(linearRoadInputTuple.getPartitionID(), Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds() - 1);
             }
 
             @Override
             public void onPeriodicEmit(WatermarkOutput watermarkOutput) {
-
+                if (hm.size() == partitionNum) {
+                    watermarkOutput.emitWatermark(new Watermark(findMinimumWM(hm)));
+                }
             }
         };
+    }
+
+    private static long findMinimumWM(Map<Integer, Long> m) {
+        List<Long> vList = new ArrayList<>(m.values());
+        Collections.sort(vList);
+        return vList.get(0);
     }
 }

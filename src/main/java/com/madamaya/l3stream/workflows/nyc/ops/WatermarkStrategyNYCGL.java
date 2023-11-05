@@ -19,9 +19,13 @@ public class WatermarkStrategyNYCGL implements WatermarkStrategy<NYCInputTupleGL
     @Override
     public WatermarkGenerator<NYCInputTupleGL> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<NYCInputTupleGL>() {
+            long latest = Long.MIN_VALUE;
             @Override
             public void onEvent(NYCInputTupleGL tuple, long l, WatermarkOutput watermarkOutput) {
-                watermarkOutput.emitWatermark(new Watermark(tuple.getDropoffTime() - 1));
+                if (tuple.getDropoffTime() > latest) {
+                    watermarkOutput.emitWatermark(new Watermark(tuple.getDropoffTime() - 1));
+                    latest = tuple.getDropoffTime();
+                }
             }
 
             @Override

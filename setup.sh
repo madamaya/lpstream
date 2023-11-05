@@ -101,19 +101,19 @@ elif [ $1 = "test" ]; then
   # LR
   echo "*** TEST: LR ***"
   echo "(./LMUserDriver.sh 1)"
-  ./LMUserDriver.sh 1
+  ./LMUserDriver.sh 1 2>& 1 | tee LMUserDriver1.log
   # Nexmark
   echo "*** TEST: Nexmark ***"
   echo "(./LMUserDriver.sh 2)"
-  ./LMUserDriver.sh 2
+  ./LMUserDriver.sh 2 2>& 1 | tee LMUserDriver2.log
   # NYC
   echo "*** TEST: NYC ***"
   echo "(./LMUserDriver.sh 3)"
-  ./LMUserDriver.sh 3
+  ./LMUserDriver.sh 3 2>& 1 | tee LMUserDriver3.log
   # YSB
   echo "*** TEST: YSB ***"
   echo "(./LMUserDriver.sh 4)"
-  ./LMUserDriver.sh 4
+  ./LMUserDriver.sh 4 2>& 1 | tee LMUserDriver4.log
 
   cd ./checkCorrectness
   echo "*** Start checkCorrectness ***"

@@ -20,9 +20,13 @@ public class WatermarkStrategyBidNexGL implements WatermarkStrategy<NexmarkBidTu
     public WatermarkGenerator<NexmarkBidTupleGL> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<NexmarkBidTupleGL>() {
 
+            long latest = Long.MIN_VALUE;
             @Override
             public void onEvent(NexmarkBidTupleGL tuple, long l, WatermarkOutput watermarkOutput) {
-                watermarkOutput.emitWatermark(new Watermark(tuple.getDateTime() - 1));
+                if (tuple.getDateTime() > latest) {
+                    watermarkOutput.emitWatermark(new Watermark(tuple.getDateTime() - 1));
+                    latest = tuple.getDateTime();
+                }
             }
 
             @Override
