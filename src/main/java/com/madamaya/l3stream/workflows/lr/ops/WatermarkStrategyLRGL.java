@@ -24,9 +24,10 @@ public class WatermarkStrategyLRGL implements WatermarkStrategy<LinearRoadInputT
             long latest = Long.MIN_VALUE;
             @Override
             public void onEvent(LinearRoadInputTupleGL linearRoadInputTuple, long l, WatermarkOutput watermarkOutput) {
-                if (linearRoadInputTuple.getTimestamp() > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(linearRoadInputTuple.getTimestamp() - 1));
-                    latest = linearRoadInputTuple.getTimestamp();
+                long ts = Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds();
+                if (ts > latest) {
+                    watermarkOutput.emitWatermark(new Watermark(ts - 1));
+                    latest = ts;
                 }
             }
 
