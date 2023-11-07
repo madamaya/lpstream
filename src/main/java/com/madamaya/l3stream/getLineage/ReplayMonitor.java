@@ -28,6 +28,7 @@ import java.util.Properties;
 
 public class ReplayMonitor {
     // public static boolean parseFlag = false;
+    static ObjectMapper om = new ObjectMapper();
 
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
@@ -125,7 +126,7 @@ public class ReplayMonitor {
         //if (parseFlag) {
             //jsonNode = new ObjectMapper().readTree(recordValue.replace("\\", ""));
         //} else {
-            jsonNode = new ObjectMapper().readTree(recordValue);
+            jsonNode = om.readTree(recordValue);
         //}
         return Tuple3.of(jsonNode.get("OUT").asText(), jsonNode.get("TS").asLong(), jsonNode.get("FLAG").asBoolean());
     }
@@ -171,7 +172,7 @@ public class ReplayMonitor {
                 .uri(URI.create("http://" + L3Config.FLINK_IP + ":" + L3Config.FLINK_PORT + "/jobs/overview"))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JsonNode jsonNode = new ObjectMapper().readTree(response.body());
+        JsonNode jsonNode = om.readTree(response.body());
         List<String> endIDs = new ArrayList<>();
         for (int idx = 0; idx < jsonNode.get("jobs").size(); idx++) {
             JsonNode current = jsonNode.get("jobs").get(idx);

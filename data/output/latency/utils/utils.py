@@ -47,7 +47,8 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 if plotLatency:
                     # plot all latencies
                     print("*** Plot latencies ***")
-                    plt.plot(range(validarray.size), validarray, linewidth=0.1)
+                    # plt.plot(range(validarray.size), validarray, linewidth=0.1)
+                    plt.plot(range(validarray.size), validarray, linestyle="None", marker=".")
                     if plotLatencyCmp:
                         if approach not in allValidList:
                             allValidList[approach] = []
@@ -56,6 +57,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
             if plotLatency:
                 print("*** Save fig ***")
                 plt.title("{}-{}".format(query, approach))
+                plt.ylim(bottom=0)
                 plt.ylabel("Latency")
                 plt.savefig("./results/figs/{}-{}.pdf".format(query, approach))
                 plt.close()
@@ -77,8 +79,10 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
             print("*** Save fig for comparison ***")
             for i in range(len(allValidList[approaches[0]])):
                 for approach in approaches:
-                    plt.plot(range(allValidList[approach][i].size), allValidList[approach][i], linewidth=0.1)
+                    # plt.plot(range(allValidList[approach][i].size), allValidList[approach][i], linewidth=0.1)
+                    plt.plot(range(allValidList[approach][i].size), allValidList[approach][i], linestyle="None", marker=".")
                 plt.title("{}-{}-comparison".format(query, i))
+                plt.ylim(bottom=0)
                 plt.ylabel("Latency")
                 plt.legend(approaches)
                 plt.savefig("./results/figs/{}-{}-comparison.pdf".format(query, i))

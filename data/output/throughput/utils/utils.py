@@ -3,6 +3,17 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 
+def logDump(query, approach, thList, startTime):
+    with open("./results/throughput.info.{}.log".format(round(startTime)), "a") as w:
+        w.write("{}\n".format(query))
+        w.write("{}\n".format(approach))
+        for i in range(len(thList)):
+            w.write("{},avg=,{}\n".format(i+1, thList[i]))
+        npMeansArray = np.array(thList)
+        w.write("{}\n".format(npMeansArray.mean()))
+        w.write("{}\n".format(npMeansArray.std()))
+        w.write("\n")
+
 def getLine(filePath):
     with open(filePath) as f:
         return f.readline().replace("\n", "")
@@ -18,7 +29,7 @@ def getFileNames(dirPath):
         fileSet.add(os.path.basename(file.split("_")[0]))
     return fileSet
 
-def calcResults(queries, approaches):
+def calcResults(queries, approaches, startTime):
     results = {}
     for query in queries:
         for approach in approaches:
@@ -37,10 +48,14 @@ def calcResults(queries, approaches):
                     startTsMin = startTs if (startTsMin < 0) else min(startTsMin, startTs)
                     endTsMax = endTs if (endTsMax < 0) else max(endTsMax, endTs)
                     allTupleNum = allTupleNum + tupleNum
-                thList.append(tupleNum / ((endTs - startTs) // 1e9))
+                thList.append(allTupleNum / ((endTs - startTs) // 1e9))
                 allDuration = allDuration + (endTs - startTs)
 
                 print("p = {}".format(fileList))
+
+            # dump log
+            print("*** Dump log ***")
+            logDump(query, approach, thList, startTime)
 
             thNpList = np.array(thList)
             thMean = thNpList.mean()

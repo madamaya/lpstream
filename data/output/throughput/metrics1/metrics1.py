@@ -12,7 +12,7 @@ if __name__ == "__main__":
         os.makedirs("./results")
 
     print("* calcResults(queries, approaches) *")
-    results = utils.calcResults(queries, approaches)
+    results = utils.calcResults(queries, approaches, startTime)
 
     print("* resultFigsGen(results, queries, approaches, flag) *")
     utils.resultFigsGen(results, queries, approaches, flag)
