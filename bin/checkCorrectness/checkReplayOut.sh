@@ -55,7 +55,7 @@ startKafkaLogger ${logDir} ${logFile} ${testName}-o > /dev/null
 # submit job
 cd ./templates
 echo "sumbit job"
-./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism}
+./nonlineageCpAssigner.sh ${JAR_PATH} ${mainPath} ${parallelism}
 
 ## Notify all outputs were provided.
 echo "*** Notify all outputs were provided ***"
