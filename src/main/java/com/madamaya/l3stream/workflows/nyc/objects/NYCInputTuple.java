@@ -19,6 +19,8 @@ public class NYCInputTuple {
     private double tripDistance;
     private long dropoffLocationId;
     private long stimulus = Long.MAX_VALUE;
+    // CNFM
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public NYCInputTuple(int vendorId, long dropoffTime, double tripDistance, long dropoffLocationId, long stimulus) {
         this.vendorId = vendorId;
@@ -104,7 +106,6 @@ public class NYCInputTuple {
     }
 
     public static long convertDateFormat(String dateLine) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date date;
         Calendar calendar;
         try {
