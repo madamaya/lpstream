@@ -25,7 +25,7 @@ with open("../data/lr.csv", "w") as w:
             tmpLine = line.split(",")
             tmpLine[1] = str(int(tmpLine[1]) + tsShipt * i)
             line = ",".join(tmpLine)
-            w.write('"' + line + '"' + "\n")
+            w.write(line + "\n")
 
         ctime = time.time()
         print("- Loop {} is finished.".format(i))

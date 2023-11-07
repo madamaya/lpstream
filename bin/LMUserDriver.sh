@@ -55,7 +55,7 @@ startKafkaLogger ${logDir} ${logFile} ${outputTopicName} > /dev/null
 ## submit Flink job
 cd ${BIN_DIR}/templates
 echo "*** Submit Flink job ***"
-echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${windowSize})"
+echo "(./nonlineageCpAssigner.sh ${JAR_PATH} ${mainPath} ${parallelism} ${windowSize})"
 ./nonlineageCpAssigner.sh ${JAR_PATH} ${mainPath} ${parallelism} ${windowSize}
 
 cd ${BIN_DIR}

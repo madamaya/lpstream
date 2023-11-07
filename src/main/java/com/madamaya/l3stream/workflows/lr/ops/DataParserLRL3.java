@@ -12,7 +12,7 @@ public class DataParserLRL3 implements MapFunction<KafkaInputString, LinearRoadI
 
     @Override
     public LinearRoadInputTuple map(KafkaInputString input) throws Exception {
-        String line = input.getStr().replace("\"", "").trim();
+        String line = input.getStr().trim();
         String[] elements = delimiter.split(line);
         LinearRoadInputTuple tuple = new LinearRoadInputTuple(
                 Integer.valueOf(elements[0]),
