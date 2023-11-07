@@ -29,7 +29,7 @@ if [ $1 = "downloads" ]; then
 
   echo "*** END ***"
 elif [ $1 = "compile" ]; then
-  git clone git@github.com:madamaya/l3stream-genealog.git
+  git clone -b kafkaLatest git@github.com:madamaya/l3stream-genealog.git
   python configGenSh2Java.py
   cd l3stream-genealog
   mvn package
