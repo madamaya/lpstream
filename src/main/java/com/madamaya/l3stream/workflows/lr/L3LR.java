@@ -90,14 +90,26 @@ public class L3LR {
                 .filter(L3.filter(t -> t.getCount() > 1)).uid("10");
 
         // L5
-        if (settings.getLineageMode() == "NonLineageMode") {
-            // ds.map(new CpAssigner<>()).uid("11").addSink(NonLineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("12");
-            ds.map(new CpAssigner<>()).uid("11").sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("12");
+        if (settings.isInvokeCpAssigner()) {
+            ds.map(new CpAssigner<>()).uid("11").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         } else {
-            // env.getCheckpointConfig().disableCheckpointing();
-            // ds.map(new CpAssigner<>()).uid("13").addSink(LineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("14");
-            ds.map(new CpAssigner<>()).uid("13").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("14");
+            ds.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         }
+        /*
+        if (settings.getLineageMode() == "NonLineageMode") {
+            if (settings.isInvokeCpAssigner()) {
+                ds.map(new CpAssigner<>()).uid("11").sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("12");
+            } else {
+                ds.sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("13");
+            }
+        } else {
+            if (settings.isInvokeCpAssigner()) {
+                ds.map(new CpAssigner<>()).uid("14").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("15");
+            } else {
+                ds.sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("16");
+            }
+        }
+         */
 
         /*
         if (settings.cpmProcessing()) {

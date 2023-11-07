@@ -109,14 +109,26 @@ public class L3Nexmark {
                 .filter(L3.filter(t -> t.getCategory() == 10)).uid("12");
 
         // L5
-        if (settings.getLineageMode() == "NonLineageMode") {
-            // joined.map(new CpAssigner<>()).uid("13").addSink(NonLineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("14");
-            joined.map(new CpAssigner<>()).uid("13").sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("14");
+        if (settings.isInvokeCpAssigner()) {
+            joined.map(new CpAssigner<>()).uid("13").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         } else {
-            // env.getCheckpointConfig().disableCheckpointing();
-            // joined.map(new CpAssigner<>()).uid("15").addSink(LineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("16");
-            joined.map(new CpAssigner<>()).uid("15").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("16");
+            joined.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         }
+        /*
+            if (settings.getLineageMode() == "NonLineageMode") {
+                if (settings.isInvokeCpAssigner()) {
+                    joined.map(new CpAssigner<>()).uid("13").sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("14");
+                } else {
+                    joined.sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("15");
+                }
+            } else {
+                if (settings.isInvokeCpAssigner()) {
+                    joined.map(new CpAssigner<>()).uid("16").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("17");
+                } else {
+                    joined.sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("18");
+                }
+            }
+          */
 
         /*
         if (settings.cpmProcessing()) {

@@ -84,6 +84,12 @@ public class L3NYC {
                 .aggregate(L3.aggregate(new CountAndAvgDistanceL3())).uid("7");
 
         // L5
+        if (settings.isInvokeCpAssigner()) {
+            ds.map(new CpAssigner<>()).uid("8").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
+        } else {
+            ds.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
+        }
+        /*
         if (settings.getLineageMode() == "NonLineageMode") {
             // ds.map(new CpAssigner<>()).uid("8").addSink(NonLineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("9");
             ds.map(new CpAssigner<>()).uid("8").sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("9");
@@ -92,6 +98,7 @@ public class L3NYC {
             // ds.map(new CpAssigner<>()).uid("10").addSink(LineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("11");
             ds.map(new CpAssigner<>()).uid("10").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("11");
         }
+         */
 
         /*
         if (settings.cpmProcessing()) {
