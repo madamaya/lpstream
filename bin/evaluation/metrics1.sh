@@ -6,7 +6,7 @@ source ../utils/flinkJob.sh
 source ../utils/logger.sh
 
 numOfLoop=3
-sleepTime=30
+sleepTime=300
 queries=(LR Nexmark NYC YSB)
 #queries=(LR)
 approaches=(baseline genealog l3stream)
