@@ -10,10 +10,17 @@ public class JsonNodeGL implements GenealogTuple {
     private GenealogData gdata;
     private JsonNode jsonNode;
     private long stimulus;
+    private int partitionID;
 
     public JsonNodeGL(JsonNode jsonNode, long stimulus) {
         this.jsonNode = jsonNode;
         this.stimulus = stimulus;
+    }
+
+    public JsonNodeGL(JsonNode jsonNode, long stimulus, int partitionID) {
+        this.jsonNode = jsonNode;
+        this.stimulus = stimulus;
+        this.partitionID = partitionID;
     }
 
     public JsonNode getJsonNode() {
@@ -22,6 +29,14 @@ public class JsonNodeGL implements GenealogTuple {
 
     public void setJsonNode(JsonNode jsonNode) {
         this.jsonNode = jsonNode;
+    }
+
+    public int getPartitionID() {
+        return partitionID;
+    }
+
+    public void setPartitionID(int partitionID) {
+        this.partitionID = partitionID;
     }
 
     @Override

@@ -10,8 +10,8 @@ import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSinkV2;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSinkV2;
-import io.palyvos.provenance.l3stream.util.deserializerV2.StringL3DeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
 import io.palyvos.provenance.l3stream.wrappers.operators.L3OpWrapperStrategy;
 import io.palyvos.provenance.util.ExperimentSettings;
@@ -53,17 +53,17 @@ public class L3NYC {
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
+        /*
         Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
+         */
 
-        KafkaSource<L3StreamInput<String>> source = KafkaSource.<L3StreamInput<String>>builder()
+        KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
-                .setGroupId("myGroup")
+                .setGroupId(String.valueOf(System.currentTimeMillis()))
                 .setStartingOffsets(OffsetsInitializer.earliest())
-                .setDeserializer(new StringL3DeserializerV2())
+                .setDeserializer(new StringDeserializerV2())
                 .build();
 
         /* Query */

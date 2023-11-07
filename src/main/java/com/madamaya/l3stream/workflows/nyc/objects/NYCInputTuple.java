@@ -104,7 +104,7 @@ public class NYCInputTuple {
     }
 
     public static long convertDateFormat(String dateLine) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date date;
         Calendar calendar;
         try {

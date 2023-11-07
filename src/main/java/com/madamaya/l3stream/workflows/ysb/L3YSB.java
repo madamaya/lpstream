@@ -11,9 +11,9 @@ import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSinkV2;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSinkV2;
-import io.palyvos.provenance.l3stream.util.deserializerV2.JsonNodeL3DeserializerV2;
-import io.palyvos.provenance.l3stream.util.deserializerV2.StringL3DeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputJsonNode;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
 import io.palyvos.provenance.l3stream.wrappers.operators.L3OpWrapperStrategy;
 import io.palyvos.provenance.util.ExperimentSettings;
@@ -52,17 +52,17 @@ public class L3YSB {
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
+        /*
         Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
+         */
 
-        KafkaSource<L3StreamInput<JsonNode>> source = KafkaSource.<L3StreamInput<JsonNode>>builder()
+        KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
-                .setGroupId("myGroup")
+                .setGroupId(String.valueOf(System.currentTimeMillis()))
                 .setStartingOffsets(OffsetsInitializer.earliest())
-                .setDeserializer(new JsonNodeL3DeserializerV2())
+                .setDeserializer(new StringDeserializerV2())
                 .build();
 
         /* Query */
@@ -83,7 +83,7 @@ public class L3YSB {
             // ds.map(new CpAssigner<>()).uid("9").addSink(NonLineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("10");
             ds.map(new CpAssigner<>()).uid("9").sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("10");
         } else {
-            env.getCheckpointConfig().disableCheckpointing();
+            // env.getCheckpointConfig().disableCheckpointing();
             // ds.map(new CpAssigner<>()).uid("11").addSink(LineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("12");
             ds.map(new CpAssigner<>()).uid("11").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("12");
         }

@@ -1,20 +1,16 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTuple;
-import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTupleGL;
-import io.palyvos.provenance.genealog.GenealogGraphTraverser;
-import io.palyvos.provenance.l3stream.util.FormatLineage;
-import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 
-public class OutputKafkaSinkNexmarkGLV2 implements KafkaRecordSerializationSchema<NexmarkJoinedTuple> {
+public class OutputKafkaSinkNexmarkV2 implements KafkaRecordSerializationSchema<NexmarkJoinedTuple> {
     private String topic;
 
-    public OutputKafkaSinkNexmarkGLV2(String topic) {
+    public OutputKafkaSinkNexmarkV2(String topic) {
         this.topic = topic;
     }
 

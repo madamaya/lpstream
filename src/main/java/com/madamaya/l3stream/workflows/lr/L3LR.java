@@ -11,8 +11,8 @@ import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSinkV2;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSinkV2;
-import io.palyvos.provenance.l3stream.util.deserializerV2.StringL3DeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
 import io.palyvos.provenance.l3stream.wrappers.operators.L3OpWrapperStrategy;
 import io.palyvos.provenance.usecases.CountTuple;
@@ -26,6 +26,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.Obje
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
@@ -54,17 +55,17 @@ public class L3LR {
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
+        /*
         Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
+         */
 
-        KafkaSource<L3StreamInput<String>> source = KafkaSource.<L3StreamInput<String>>builder()
+        KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
-                .setGroupId("myGroup")
+                .setGroupId(String.valueOf(System.currentTimeMillis()))
                 .setStartingOffsets(OffsetsInitializer.earliest())
-                .setDeserializer(new StringL3DeserializerV2())
+                .setDeserializer(new StringDeserializerV2())
                 .build();
 
         /* Query */
@@ -72,17 +73,19 @@ public class L3LR {
         DataStream<L3StreamTupleContainer<CountTuple>> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR").uid("1")
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserLRL3())).uid("3")
-                .map(L3.updateTsWM(new WatermarkStrategyLR(settings.maxParallelism()), 0)).uid("4")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(settings.maxParallelism()), settings.numOfInstanceWM())).uid("5")
+                .map(L3.updateTsWM(new WatermarkStrategyLR(settings.getWMnumLR(env.getParallelism())), 0)).uid("4")
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(settings.getWMnumLR(env.getParallelism())), settings.numOfInstanceWM())).uid("5")
                 .filter(L3.filter(t -> t.getType() == 0 && t.getSpeed() == 0)).uid("6")
                 .keyBy(L3.keyBy(t -> t.getKey(), String.class))
-                .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
-                        STOPPED_VEHICLE_WINDOW_SLIDE))
+                //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
+                //        STOPPED_VEHICLE_WINDOW_SLIDE))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE)))
                 .aggregate(L3.aggregate(new LinearRoadVehicleAggregateL3())).uid("7")
                 .filter(L3.filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())).uid("8")
                 .keyBy(L3.keyBy(t -> t.getLatestPos(), Integer.class))
-                .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
-                        ACCIDENT_WINDOW_SLIDE))
+                //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
+                //        ACCIDENT_WINDOW_SLIDE))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE)))
                 .aggregate(L3.aggregate(new LinearRoadAccidentAggregateL3())).uid("9")
                 .filter(L3.filter(t -> t.getCount() > 1)).uid("10");
 
@@ -91,7 +94,7 @@ public class L3LR {
             // ds.map(new CpAssigner<>()).uid("11").addSink(NonLineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("12");
             ds.map(new CpAssigner<>()).uid("11").sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("12");
         } else {
-            env.getCheckpointConfig().disableCheckpointing();
+            // env.getCheckpointConfig().disableCheckpointing();
             // ds.map(new CpAssigner<>()).uid("13").addSink(LineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("14");
             ds.map(new CpAssigner<>()).uid("13").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("14");
         }

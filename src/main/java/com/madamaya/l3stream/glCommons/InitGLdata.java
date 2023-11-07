@@ -1,3 +1,4 @@
+/*
 package com.madamaya.l3stream.glCommons;
 
 import com.madamaya.l3stream.conf.L3Config;
@@ -58,3 +59,4 @@ public class InitGLdata<T> extends RichMapFunction<L3StreamInput<T>, InputGL<T>>
         super.close();
     }
 }
+ */

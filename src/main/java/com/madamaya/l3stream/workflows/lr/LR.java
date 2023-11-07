@@ -5,8 +5,8 @@ import com.madamaya.l3stream.workflows.lr.ops.DataParserLR;
 import com.madamaya.l3stream.workflows.lr.ops.LatencyKafkaSinkLRV2;
 import com.madamaya.l3stream.workflows.lr.ops.OutputKafkaSinkLRV2;
 import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLR;
-import io.palyvos.provenance.l3stream.util.deserializerV2.StringL3DeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.usecases.CountTuple;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadAccidentAggregate;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadVehicleAggregate;
@@ -22,6 +22,7 @@ import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDe
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
@@ -50,33 +51,35 @@ public class LR {
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
+        /*
         Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
+         */
 
-        KafkaSource<L3StreamInput<String>> source = KafkaSource.<L3StreamInput<String>>builder()
+        KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
-                .setGroupId("myGroup")
+                .setGroupId(String.valueOf(System.currentTimeMillis()))
                 .setStartingOffsets(OffsetsInitializer.earliest())
-                .setDeserializer(new StringL3DeserializerV2())
+                .setDeserializer(new StringDeserializerV2())
                 .build();
 
         /* Query */
         //DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<CountTuple> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR")
                 .map(new DataParserLR(settings))
-                .assignTimestampsAndWatermarks(new WatermarkStrategyLR(settings.maxParallelism()))
+                .assignTimestampsAndWatermarks(new WatermarkStrategyLR(settings.getWMnumLR(env.getParallelism())))
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
                 .keyBy(t -> t.getKey())
-                .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
-                        STOPPED_VEHICLE_WINDOW_SLIDE))
+                //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
+                //        STOPPED_VEHICLE_WINDOW_SLIDE))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE)))
                 .aggregate(new LinearRoadVehicleAggregate())
                 .filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())
                 .keyBy(t -> t.getLatestPos())
-                .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
-                        ACCIDENT_WINDOW_SLIDE))
+                //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
+                //        ACCIDENT_WINDOW_SLIDE))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE)))
                 .aggregate(new LinearRoadAccidentAggregate())
                 //.slotSharingGroup(settings.secondSlotSharingGroup())
                 .filter(t -> t.getCount() > 1);
@@ -86,13 +89,13 @@ public class LR {
             sink = KafkaSink.<CountTuple>builder()
                     .setBootstrapServers(brokers)
                     .setRecordSerializer(new OutputKafkaSinkLRV2(outputTopicName))
-                    .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         } else {
             sink = KafkaSink.<CountTuple>builder()
                     .setBootstrapServers(brokers)
                     .setRecordSerializer(new LatencyKafkaSinkLRV2(outputTopicName))
-                    .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         }
         ds.sinkTo(sink);

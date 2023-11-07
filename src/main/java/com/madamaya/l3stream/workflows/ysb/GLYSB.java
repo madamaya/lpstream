@@ -1,7 +1,7 @@
 package com.madamaya.l3stream.workflows.ysb;
 
 import com.madamaya.l3stream.conf.L3Config;
-import com.madamaya.l3stream.glCommons.InitGLdata;
+import com.madamaya.l3stream.glCommons.InitGLdataStringGL;
 import com.madamaya.l3stream.glCommons.InitGdataJsonNodeGL;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTupleGL;
 import com.madamaya.l3stream.workflows.nyc.ops.LatencyKafkaSinkNYCGLV2;
@@ -10,8 +10,9 @@ import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
 import com.madamaya.l3stream.workflows.ysb.ops.LineageKafkaSinkYSBGL;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTupleGL;
 import com.madamaya.l3stream.workflows.ysb.ops.*;
-import io.palyvos.provenance.l3stream.util.deserializerV2.JsonNodeL3DeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputJsonNode;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.base.DeliveryGuarantee;
@@ -36,30 +37,30 @@ public class GLYSB {
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
-        env.getCheckpointConfig().disableCheckpointing();
+        // env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "YSB";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
+        /*
         Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
+         */
 
-        KafkaSource<L3StreamInput<JsonNode>> source = KafkaSource.<L3StreamInput<JsonNode>>builder()
+        KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
-                .setGroupId("myGroup")
+                .setGroupId(String.valueOf(System.currentTimeMillis()))
                 .setStartingOffsets(OffsetsInitializer.earliest())
-                .setDeserializer(new JsonNodeL3DeserializerV2())
+                .setDeserializer(new StringDeserializerV2())
                 .build();
 
         /* Query */
         //DataStream<YSBResultTupleGL> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<YSBResultTupleGL> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceYSB")
-                .map(new InitGLdata<>(settings))
+                .map(new InitGLdataStringGL(settings))
                 .map(new DataParserYSBGL())
                 .assignTimestampsAndWatermarks(new WatermarkStrategyYSBGL())
                 .filter(t -> t.getEventType().equals("view"))
@@ -73,13 +74,13 @@ public class GLYSB {
             sink = KafkaSink.<YSBResultTupleGL>builder()
                     .setBootstrapServers(brokers)
                     .setRecordSerializer(new LineageKafkaSinkYSBGLV2(outputTopicName, settings))
-                    .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         } else {
             sink = KafkaSink.<YSBResultTupleGL>builder()
                     .setBootstrapServers(brokers)
                     .setRecordSerializer(new LatencyKafkaSinkYSBGLV2(outputTopicName, settings))
-                    .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         }
         ds.sinkTo(sink);

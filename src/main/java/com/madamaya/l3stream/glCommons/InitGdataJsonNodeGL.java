@@ -2,7 +2,7 @@ package com.madamaya.l3stream.glCommons;
 
 import com.madamaya.l3stream.conf.L3Config;
 import io.palyvos.provenance.genealog.GenealogTupleType;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputJsonNode;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
@@ -13,7 +13,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class InitGdataJsonNodeGL extends RichMapFunction<L3StreamInput<JsonNode>, InputGL<JsonNode>> {
+public class InitGdataJsonNodeGL extends RichMapFunction<KafkaInputJsonNode, JsonNodeGL> {
     long start;
     long count;
     private ExperimentSettings settings;
@@ -30,8 +30,8 @@ public class InitGdataJsonNodeGL extends RichMapFunction<L3StreamInput<JsonNode>
     }
 
     @Override
-    public InputGL<JsonNode> map(L3StreamInput<JsonNode> jsonNodes) throws Exception {
-        InputGL<JsonNode> out = new InputGL<>(jsonNodes.getValue(), jsonNodes.getStimulus());
+    public JsonNodeGL map(KafkaInputJsonNode jsonNodes) throws Exception {
+        JsonNodeGL out = new JsonNodeGL(jsonNodes.getJsonNode(), jsonNodes.getStimulus());
         out.initGenealog(GenealogTupleType.SOURCE);
         count++;
         return out;

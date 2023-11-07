@@ -9,10 +9,17 @@ public class StringGL implements GenealogTuple {
     private GenealogData gdata;
     private String string;
     private long stimulus;
+    private int partitionID;
 
     public StringGL(String string, long stimulus) {
         this.string = string;
         this.stimulus = stimulus;
+    }
+
+    public StringGL(String string, long stimulus, int partitionID) {
+        this.string = string;
+        this.stimulus = stimulus;
+        this.partitionID = partitionID;
     }
 
     public String getString() {
@@ -21,6 +28,14 @@ public class StringGL implements GenealogTuple {
 
     public void setString(String string) {
         this.string = string;
+    }
+
+    public int getPartitionID() {
+        return partitionID;
+    }
+
+    public void setPartitionID(int partitionID) {
+        this.partitionID = partitionID;
     }
 
     @Override

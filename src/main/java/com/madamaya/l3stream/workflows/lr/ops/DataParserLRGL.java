@@ -10,15 +10,16 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.Obje
 
 import java.util.regex.Pattern;
 
-public class DataParserLRGL implements MapFunction<InputGL<String>, LinearRoadInputTupleGL> {
+public class DataParserLRGL implements MapFunction<StringGL, LinearRoadInputTupleGL> {
     private static final Pattern delimiter = Pattern.compile(",");
 
     @Override
-    public LinearRoadInputTupleGL map(InputGL<String> input) throws Exception {
+    public LinearRoadInputTupleGL map(StringGL input) throws Exception {
         //ObjectNode jNode = jNodeGL.getObjectNode();
 
         //String line = jNode.get("value").textValue();
-        String[] elements = delimiter.split(input.getValue().trim());
+        String line = input.getString().replace("\"", "").trim();
+        String[] elements = delimiter.split(line);
         LinearRoadInputTupleGL out = new LinearRoadInputTupleGL(
                 Integer.valueOf(elements[0]),
                 Long.valueOf(elements[1]),

@@ -4,19 +4,20 @@ import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkInputTuple;
 import io.palyvos.provenance.l3stream.conf.L3conf;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class BidderDataParserNex extends RichMapFunction<L3StreamInput<JsonNode>, NexmarkBidTuple> {
+public class BidderDataParserNex extends RichMapFunction<KafkaInputString, NexmarkBidTuple> {
     /*
      Sample Input:
    {"event_type":2,"person":null,"auction":null,"bid":{"auction":1000,"bidder":2001,"price":1809,"channel":"channel-5901","url":"https://www.nexmark.com/wjeq/xkl/llzy/item.htm?query=1&channel_id=1326972928","dateTime":"2023-10-03 05:31:34.28","extra":"[MNM`IxtngkjlwyyghNZI^O[bhpwaiKOK\\JXszmhft]_]UHIKMZIVH^WH\\U`"}}
@@ -25,19 +26,21 @@ public class BidderDataParserNex extends RichMapFunction<L3StreamInput<JsonNode>
     long start;
     long count;
     ExperimentSettings settings;
+    ObjectMapper om;
 
     public BidderDataParserNex(ExperimentSettings settings) {
         this.settings = settings;
+        this.om = new ObjectMapper();
     }
 
     @Override
-    public NexmarkBidTuple map(L3StreamInput<JsonNode> input) throws Exception {
-        JsonNode jsonNodes = input.getValue();
-        int eventType = jsonNodes.get("value").get("event_type").asInt();
+    public NexmarkBidTuple map(KafkaInputString input) throws Exception {
+        JsonNode jsonNodes = om.readTree(input.getStr());
+        int eventType = jsonNodes.get("event_type").asInt();
         count++;
         // eventType is auction
         if (eventType == 2) {
-            JsonNode jnode = jsonNodes.get("value").get("bid");
+            JsonNode jnode = jsonNodes.get("bid");
             int auctionId = jnode.get("auction").asInt();
             int bidder = jnode.get("bidder").asInt();
             long price = jnode.get("price").asLong();

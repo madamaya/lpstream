@@ -1,7 +1,7 @@
 package com.madamaya.l3stream.workflows.lr.ops;
 
 import io.palyvos.provenance.l3stream.conf.L3conf;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
-public class DataParserLR extends RichMapFunction<L3StreamInput<String>, LinearRoadInputTuple> {
+public class DataParserLR extends RichMapFunction<KafkaInputString, LinearRoadInputTuple> {
     private static final Pattern delimiter = Pattern.compile(",");
     long start;
     long count;
@@ -25,9 +25,9 @@ public class DataParserLR extends RichMapFunction<L3StreamInput<String>, LinearR
     }
 
     @Override
-    public LinearRoadInputTuple map(L3StreamInput<String> input) throws Exception {
-        String line = input.getValue();
-        String[] elements = delimiter.split(line.trim());
+    public LinearRoadInputTuple map(KafkaInputString input) throws Exception {
+        String line = input.getStr().replace("\"", "").trim();
+        String[] elements = delimiter.split(line);
         LinearRoadInputTuple tuple = new LinearRoadInputTuple(
                 Integer.valueOf(elements[0]),
                 Long.valueOf(elements[1]),

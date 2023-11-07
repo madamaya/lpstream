@@ -1,14 +1,15 @@
 package com.madamaya.l3stream.workflows.nexmark;
 
 import com.madamaya.l3stream.conf.L3Config;
-import com.madamaya.l3stream.glCommons.InitGLdata;
+import com.madamaya.l3stream.glCommons.InitGLdataStringGL;
 import com.madamaya.l3stream.glCommons.InitGdataJsonNodeGL;
 import com.madamaya.l3stream.workflows.lr.ops.LatencyKafkaSinkLRGLV2;
 import com.madamaya.l3stream.workflows.lr.ops.LineageKafkaSinkLRGLV2;
 import com.madamaya.l3stream.workflows.nexmark.objects.*;
 import com.madamaya.l3stream.workflows.nexmark.ops.*;
-import io.palyvos.provenance.l3stream.util.deserializerV2.JsonNodeL3DeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputJsonNode;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.usecases.CountTupleGL;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -34,41 +35,44 @@ public class GLNexmark {
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
-        env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "Nexmark";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
+        /*
         Properties kafkaProperties = new Properties();
-        Properties kafkaProperties2 = new Properties();
-        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties2.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", "1" + String.valueOf(System.currentTimeMillis()));
-        kafkaProperties2.setProperty("group.id", "2" + String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
-        kafkaProperties2.setProperty("transaction.timeout.ms", "540000");
+         */
 
-        KafkaSource<L3StreamInput<JsonNode>> source = KafkaSource.<L3StreamInput<JsonNode>>builder()
+        KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
-                .setGroupId("myGroup")
+                .setGroupId("1" + String.valueOf(System.currentTimeMillis()))
                 .setStartingOffsets(OffsetsInitializer.earliest())
-                .setDeserializer(new JsonNodeL3DeserializerV2())
+                .setDeserializer(new StringDeserializerV2())
+                .build();
+
+        KafkaSource<KafkaInputString> source2 = KafkaSource.<KafkaInputString>builder()
+                .setBootstrapServers(brokers)
+                .setTopics(inputTopicName)
+                .setGroupId("2" + String.valueOf(System.currentTimeMillis()))
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setDeserializer(new StringDeserializerV2())
                 .build();
 
         /* Query */
         // DataStream<NexmarkAuctionTupleGL> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<NexmarkAuctionTupleGL> auction = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark")
-                .map(new InitGLdata<>(settings, 0))
+                .map(new InitGLdataStringGL(settings, 0))
                 .map(new AuctionDataParserNexGL())
                 .filter(t -> t.getEventType() == 1)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNexGL());
 
         // DataStream<NexmarkBidTupleGL> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-        DataStream<NexmarkBidTupleGL> bid = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark")
-                .map(new InitGLdata<>(settings, 1))
+        DataStream<NexmarkBidTupleGL> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark")
+                .map(new InitGLdataStringGL(settings, 1))
                 .map(new BidderDataParserNexGL())
                 .filter(t -> t.getEventType() == 2)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyBidNexGL());
@@ -94,13 +98,13 @@ public class GLNexmark {
             sink = KafkaSink.<NexmarkJoinedTupleGL>builder()
                     .setBootstrapServers(brokers)
                     .setRecordSerializer(new LineageKafkaSinkNexmarkGLV2(outputTopicName, settings))
-                    .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         } else {
             sink = KafkaSink.<NexmarkJoinedTupleGL>builder()
                     .setBootstrapServers(brokers)
                     .setRecordSerializer(new LatencyKafkaSinkNexmarkGLV2(outputTopicName, settings))
-                    .setDeliveryGuarantee(DeliveryGuarantee.EXACTLY_ONCE)
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         }
         joined.sinkTo(sink);

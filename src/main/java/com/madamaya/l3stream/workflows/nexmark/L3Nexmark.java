@@ -13,9 +13,9 @@ import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.LineageKafkaSinkV2;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
 import io.palyvos.provenance.l3stream.util.NonLineageKafkaSinkV2;
-import io.palyvos.provenance.l3stream.util.deserializerV2.JsonNodeL3DeserializerV2;
-import io.palyvos.provenance.l3stream.util.deserializerV2.StringL3DeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputJsonNode;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
 import io.palyvos.provenance.l3stream.wrappers.operators.L3OpWrapperStrategy;
 import io.palyvos.provenance.util.ExperimentSettings;
@@ -54,21 +54,25 @@ public class L3Nexmark {
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
+        /*
         Properties kafkaProperties = new Properties();
-        Properties kafkaProperties2 = new Properties();
-        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties2.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", "1" + String.valueOf(System.currentTimeMillis()));
-        kafkaProperties2.setProperty("group.id", "2" + String.valueOf(System.currentTimeMillis()));
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
-        kafkaProperties2.setProperty("transaction.timeout.ms", "540000");
+         */
 
-        KafkaSource<L3StreamInput<JsonNode>> source = KafkaSource.<L3StreamInput<JsonNode>>builder()
+        KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
-                .setGroupId("myGroup")
+                .setGroupId("1" + String.valueOf(System.currentTimeMillis()))
                 .setStartingOffsets(OffsetsInitializer.earliest())
-                .setDeserializer(new JsonNodeL3DeserializerV2())
+                .setDeserializer(new StringDeserializerV2())
+                .build();
+
+        KafkaSource<KafkaInputString> source2 = KafkaSource.<KafkaInputString>builder()
+                .setBootstrapServers(brokers)
+                .setTopics(inputTopicName)
+                .setGroupId("2" + String.valueOf(System.currentTimeMillis()))
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setDeserializer(new StringDeserializerV2())
                 .build();
 
         /* Query */
@@ -81,7 +85,7 @@ public class L3Nexmark {
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.numOfInstanceWM())).uid("5");
 
         // DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("6")
-        DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("6")
+        DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("6")
                 .map(L3.initMap(settings, 1)).uid("7")
                 .map(L3.map(new BidderDataParserNexL3())).uid("8")
                 .filter(L3.filter(t -> t.getEventType() == 2))
@@ -109,7 +113,7 @@ public class L3Nexmark {
             // joined.map(new CpAssigner<>()).uid("13").addSink(NonLineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("14");
             joined.map(new CpAssigner<>()).uid("13").sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("14");
         } else {
-            env.getCheckpointConfig().disableCheckpointing();
+            // env.getCheckpointConfig().disableCheckpointing();
             // joined.map(new CpAssigner<>()).uid("15").addSink(LineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("16");
             joined.map(new CpAssigner<>()).uid("15").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("16");
         }

@@ -1,9 +1,8 @@
-/*
 package com.madamaya.l3stream.glCommons;
 
 import com.madamaya.l3stream.conf.L3Config;
 import io.palyvos.provenance.genealog.GenealogTupleType;
-import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamInput;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
@@ -12,25 +11,25 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class InitGLdataLR<T> extends RichMapFunction<L3StreamInput<T>, InputGL<T>> {
+public class InitGLdataStringGLLR extends RichMapFunction<KafkaInputString, StringGL> {
     long start;
     long count;
     private ExperimentSettings settings;
     private int sourceID;
 
-    public InitGLdataLR(ExperimentSettings settings, int sourceID) {
+    public InitGLdataStringGLLR(ExperimentSettings settings, int sourceID) {
         this.settings = settings;
         this.sourceID = sourceID;
     }
 
-    public InitGLdataLR(ExperimentSettings settings) {
+    public InitGLdataStringGLLR(ExperimentSettings settings) {
         this.settings = settings;
         this.sourceID = 0;
     }
 
     @Override
-    public InputGL<T> map(L3StreamInput<T> input) throws Exception {
-        InputGL<T> out = new InputGL<>(input.getValue(), input.getStimulus());
+    public StringGL map(KafkaInputString input) throws Exception {
+        StringGL out = new StringGL(input.getStr(), input.getStimulus());
         out.initGenealog(GenealogTupleType.SOURCE);
         out.setPartitionID(input.getPartitionID());
         count++;
@@ -60,4 +59,3 @@ public class InitGLdataLR<T> extends RichMapFunction<L3StreamInput<T>, InputGL<T
         super.close();
     }
 }
- */
