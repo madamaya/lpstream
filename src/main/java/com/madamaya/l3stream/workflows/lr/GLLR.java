@@ -1,6 +1,7 @@
 package com.madamaya.l3stream.workflows.lr;
 
 import com.madamaya.l3stream.conf.L3Config;
+import com.madamaya.l3stream.glCommons.InitGLdataStringGL;
 import com.madamaya.l3stream.glCommons.InitGLdataStringGLLR;
 import com.madamaya.l3stream.workflows.lr.ops.*;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
@@ -52,9 +53,9 @@ public class GLLR {
         /* Query */
         //DataStream<CountTupleGL> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<CountTupleGL> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR")
-                .map(new InitGLdataStringGLLR(settings))
+                .map(new InitGLdataStringGL(settings))
                 .map(new DataParserLRGL())
-                .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL(settings.readPartitionNum(env.getParallelism())))
+                .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL())
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
                 .keyBy(t -> t.getKey())
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
