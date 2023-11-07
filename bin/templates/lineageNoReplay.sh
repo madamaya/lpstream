@@ -11,7 +11,7 @@ if [ $# -ne 6 ]; then
 fi
 
 EXE_CMD="${FLINK_HOME}/bin/flink run -d \
---parallelism 1 \
+--parallelism ${3} \
 --allowNonRestoredState \
 --class ${2} \
 ${1} \

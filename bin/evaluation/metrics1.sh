@@ -46,15 +46,16 @@ do
         ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0
       elif [ ${approach} = "l3stream" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
-        # Start CpMServer
-        #echo "*** Start CpMServer ***"
-        #echo "(../startCpMServer.sh > /dev/null &)"
-        #../startCpMServer.sh > /dev/null &
-        #sleep 10
         # Run
         echo "*** Run ***"
         echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0)"
         ./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0
+      elif [ ${approach} = "l3streamlin" ]; then
+        mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
+        # Run
+        echo "*** Run ***"
+        echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName})"
+        ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName}
       fi
 
       # Sleep
@@ -94,6 +95,7 @@ do
       sleep 10
     done
   done
+  restartFlinkCluster
 done
 
 cd ${L3_HOME}/data/output/latency/metrics1

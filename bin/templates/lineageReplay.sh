@@ -26,7 +26,7 @@ fi
 
 EXE_CMD="${FLINK_HOME}/bin/flink run -d \
 ${CHK_ARG} \
---parallelism 1 \
+--parallelism ${3} \
 --allowNonRestoredState \
 --class ${2} \
 ${1} \
