@@ -71,7 +71,7 @@ public class L3YSB {
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserYSBL3())).uid("3")
                 .map(L3.updateTsWM(new WatermarkStrategyYSB(), 0)).uid("4")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyYSB(), settings.numOfInstanceWM())).uid("5")
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyYSB(), settings.readPartitionNum(env.getParallelism()))).uid("5")
                 .filter(L3.filter(t -> t.getEventType().equals("view"))).uid("6")
                 .map(L3.map(new ProjectAttributeYSBL3())).uid("7")
                 .keyBy(L3.keyBy(t -> t.getCampaignId(), String.class))

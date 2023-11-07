@@ -54,7 +54,7 @@ public class GLLR {
         DataStream<CountTupleGL> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR")
                 .map(new InitGLdataStringGLLR(settings))
                 .map(new DataParserLRGL())
-                .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL(settings.getWMnumLR(env.getParallelism())))
+                .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL(settings.readPartitionNum(env.getParallelism())))
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
                 .keyBy(t -> t.getKey())
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),

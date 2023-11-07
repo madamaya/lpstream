@@ -82,7 +82,7 @@ public class L3Nexmark {
                 .map(L3.map(new AuctionDataParserNexL3())).uid("3")
                 .filter(L3.filter(t -> t.getEventType() == 1))
                 .map(L3.updateTsWM(new WatermarkStrategyAuctionNex(), 0)).uid("4")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.numOfInstanceWM())).uid("5");
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.readPartitionNum(env.getParallelism()))).uid("5");
 
         // DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("6")
         DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("6")
@@ -90,7 +90,7 @@ public class L3Nexmark {
                 .map(L3.map(new BidderDataParserNexL3())).uid("8")
                 .filter(L3.filter(t -> t.getEventType() == 2))
                 .map(L3.updateTsWM(new WatermarkStrategyBidNex(), 1)).uid("9")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.numOfInstanceWM())).uid("10");
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.readPartitionNum(env.getParallelism()))).uid("10");
 
         DataStream<L3StreamTupleContainer<NexmarkJoinedTuple>> joined = auction.keyBy(L3.keyBy(new KeySelector<NexmarkAuctionTuple, Integer>() {
                 @Override

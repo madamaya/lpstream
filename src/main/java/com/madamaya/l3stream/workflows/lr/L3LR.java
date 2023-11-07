@@ -74,7 +74,7 @@ public class L3LR {
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserLRL3())).uid("3")
                 .map(L3.updateTsWM(new WatermarkStrategyLR(settings.getWMnumLR(env.getParallelism())), 0)).uid("4")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(settings.getWMnumLR(env.getParallelism())), settings.numOfInstanceWM())).uid("5")
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(settings.readPartitionNum(env.getParallelism())), settings.readPartitionNum(env.getParallelism()))).uid("5")
                 .filter(L3.filter(t -> t.getType() == 0 && t.getSpeed() == 0)).uid("6")
                 .keyBy(L3.keyBy(t -> t.getKey(), String.class))
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),

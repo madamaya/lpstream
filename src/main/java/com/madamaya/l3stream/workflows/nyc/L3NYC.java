@@ -72,7 +72,7 @@ public class L3NYC {
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserNYCL3())).uid("3")
                 .map(L3.updateTsWM(new WatermarkStrategyNYC(), 0)).uid("4")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyNYC(), settings.numOfInstanceWM())).uid("5")
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyNYC(), settings.readPartitionNum(env.getParallelism()))).uid("5")
                 .filter(L3.filter(t -> t.getTripDistance() > 5)).uid("6")
                 .keyBy(L3.keyBy(new KeySelector<NYCInputTuple, Tuple2<Integer, Long>>() {
                     @Override
