@@ -7,9 +7,9 @@ import java.util.Date;
 
 public class DateParseTest {
     public static void main(String[] args) {
-        String str = "2018-02-01 00:01:58";
+        String str = "2018-02-01 00:01:58.100";
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         try {
             System.out.println(str);
             Date date = sdf.parse(str);

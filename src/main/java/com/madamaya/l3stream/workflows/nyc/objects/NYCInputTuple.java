@@ -20,7 +20,6 @@ public class NYCInputTuple {
     private long dropoffLocationId;
     private long stimulus = Long.MAX_VALUE;
     // CNFM
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public NYCInputTuple(int vendorId, long dropoffTime, double tripDistance, long dropoffLocationId, long stimulus) {
         this.vendorId = vendorId;
@@ -38,21 +37,21 @@ public class NYCInputTuple {
     }
 
 
-    public NYCInputTuple(String line, long stimulus) {
+    public NYCInputTuple(String line, long stimulus, SimpleDateFormat sdf) {
         String[] elements = line.split(",");
         this.vendorId = Integer.parseInt(elements[0]);
-        this.dropoffTime = convertDateFormat(elements[2]);
         this.tripDistance = Double.parseDouble(elements[4]);
         this.dropoffLocationId = Long.parseLong(elements[8]);
         this.stimulus = stimulus;
+        this.dropoffTime = convertDateFormat(elements[2], sdf);
     }
 
-    public NYCInputTuple(String line) {
+    public NYCInputTuple(String line, SimpleDateFormat sdf) {
         String[] elements = line.split(",");
         this.vendorId = Integer.parseInt(elements[0]);
-        this.dropoffTime = convertDateFormat(elements[2]);
         this.tripDistance = Double.parseDouble(elements[4]);
         this.dropoffLocationId = Long.parseLong(elements[8]);
+        this.dropoffTime = convertDateFormat(elements[2], sdf);
     }
 
     public int getVendorId() {
@@ -105,7 +104,7 @@ public class NYCInputTuple {
                 '}';
     }
 
-    public static long convertDateFormat(String dateLine) {
+    public long convertDateFormat(String dateLine, SimpleDateFormat sdf) {
         Date date;
         Calendar calendar;
         try {
@@ -113,6 +112,10 @@ public class NYCInputTuple {
             calendar = Calendar.getInstance();
             calendar.setTime(date);
         } catch (ParseException e) {
+            throw new RuntimeException(e);
+        } catch (NumberFormatException e) {
+            System.out.println(sdf);
+            System.out.println(dateLine);
             throw new RuntimeException(e);
         }
 

@@ -12,11 +12,13 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.Obje
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 
 public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTuple> {
     long start;
     long count;
     ExperimentSettings settings;
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public DataParserNYC(ExperimentSettings settings) {
         this.settings = settings;
@@ -33,7 +35,7 @@ public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTup
        'congestion_surcharge', 'airport_fee'] */
         // String line = jNode.get("value").textValue();
         count++;
-        return new NYCInputTuple(input.getStr(), input.getStimulus());
+        return new NYCInputTuple(input.getStr(), input.getStimulus(), sdf);
     }
 
     @Override

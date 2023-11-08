@@ -10,6 +10,7 @@ import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
@@ -17,6 +18,7 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
@@ -29,15 +31,16 @@ public class NYC {
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
-        env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
 
         final String queryFlag = "NYC";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
+        /*
         Properties kafkaProperties = new Properties();
         kafkaProperties.setProperty("transaction.timeout.ms", "540000");
+         */
 
         KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
@@ -59,8 +62,7 @@ public class NYC {
                         return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
                     }
                 })
-                // .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(3))))
-                .window(TumblingProcessingTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(3))))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(3))))
                 .aggregate(new CountAndAvgDistance());
 
         KafkaSink<NYCResultTuple> sink;
@@ -74,7 +76,6 @@ public class NYC {
             sink = KafkaSink.<NYCResultTuple>builder()
                     .setBootstrapServers(brokers)
                     .setRecordSerializer(new LatencyKafkaSinkNYCV2(outputTopicName))
-                    .setKafkaProducerConfig(kafkaProperties)
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         }
