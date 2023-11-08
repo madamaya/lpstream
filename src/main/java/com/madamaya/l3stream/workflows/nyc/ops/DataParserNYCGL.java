@@ -19,8 +19,9 @@ public class DataParserNYCGL implements MapFunction<StringGL, NYCInputTupleGL> {
         // JsonNode jNode = jNodeGL.getJsonNode();
 
         // String line = jNode.get("value").textValue();
-
-        NYCInputTupleGL out = new NYCInputTupleGL(input.getString(), input.getStimulus(), sdf);
+        String inputStr = input.getString();
+        String line = inputStr.substring(1, inputStr.length() - 1).trim();
+        NYCInputTupleGL out = new NYCInputTupleGL(line, input.getStimulus(), sdf);
         GenealogMapHelper.INSTANCE.annotateResult(input, out);
 
         return out;

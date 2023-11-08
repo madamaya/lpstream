@@ -26,7 +26,8 @@ public class DataParserLR extends RichMapFunction<KafkaInputString, LinearRoadIn
 
     @Override
     public LinearRoadInputTuple map(KafkaInputString input) throws Exception {
-        String line = input.getStr().trim();
+        String inputStr = input.getStr();
+        String line = inputStr.substring(1, inputStr.length() - 1).trim();
         String[] elements = delimiter.split(line);
         LinearRoadInputTuple tuple = new LinearRoadInputTuple(
                 Integer.valueOf(elements[0]),

@@ -35,7 +35,9 @@ public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTup
        'congestion_surcharge', 'airport_fee'] */
         // String line = jNode.get("value").textValue();
         count++;
-        return new NYCInputTuple(input.getStr(), input.getStimulus(), sdf);
+        String inputStr = input.getStr();
+        String line = inputStr.substring(1, inputStr.length() - 1).trim();
+        return new NYCInputTuple(line, input.getStimulus(), sdf);
     }
 
     @Override

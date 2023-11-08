@@ -20,6 +20,8 @@ public class DataParserNYCL3 implements MapFunction<KafkaInputString, NYCInputTu
        'congestion_surcharge', 'airport_fee'] */
 
         // String line = jNode.get("value").textValue();
-        return new NYCInputTuple(input.getStr(), sdf);
+        String inputStr = input.getStr();
+        String line = inputStr.substring(1, inputStr.length() - 1).trim();
+        return new NYCInputTuple(line, sdf);
     }
 }

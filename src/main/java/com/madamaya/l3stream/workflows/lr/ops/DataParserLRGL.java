@@ -18,7 +18,8 @@ public class DataParserLRGL implements MapFunction<StringGL, LinearRoadInputTupl
         //ObjectNode jNode = jNodeGL.getObjectNode();
 
         //String line = jNode.get("value").textValue();
-        String line = input.getString().trim();
+        String inputStr = input.getString();
+        String line = inputStr.substring(1, inputStr.length() - 1).trim();
         String[] elements = delimiter.split(line);
         LinearRoadInputTupleGL out = new LinearRoadInputTupleGL(
                 Integer.valueOf(elements[0]),
