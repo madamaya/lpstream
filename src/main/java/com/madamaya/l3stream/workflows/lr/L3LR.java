@@ -27,6 +27,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
@@ -79,13 +80,15 @@ public class L3LR {
                 .keyBy(L3.keyBy(t -> t.getKey(), String.class))
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
                 //        STOPPED_VEHICLE_WINDOW_SLIDE))
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE)))
+                //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE)))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(10))))
                 .aggregate(L3.aggregate(new LinearRoadVehicleAggregateL3())).uid("7")
                 .filter(L3.filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())).uid("8")
                 .keyBy(L3.keyBy(t -> t.getLatestPos(), Integer.class))
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
                 //        ACCIDENT_WINDOW_SLIDE))
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE)))
+                //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE)))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(3))))
                 .aggregate(L3.aggregate(new LinearRoadAccidentAggregateL3())).uid("9")
                 .filter(L3.filter(t -> t.getCount() > 1)).uid("10");
 

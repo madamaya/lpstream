@@ -23,6 +23,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
@@ -73,13 +74,15 @@ public class LR {
                 .keyBy(t -> t.getKey())
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
                 //        STOPPED_VEHICLE_WINDOW_SLIDE))
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE)))
+                //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE)))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(10))))
                 .aggregate(new LinearRoadVehicleAggregate())
                 .filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())
                 .keyBy(t -> t.getLatestPos())
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
                 //        ACCIDENT_WINDOW_SLIDE))
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE)))
+                //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE)))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(3))))
                 .aggregate(new LinearRoadAccidentAggregate())
                 //.slotSharingGroup(settings.secondSlotSharingGroup())
                 .filter(t -> t.getCount() > 1);
