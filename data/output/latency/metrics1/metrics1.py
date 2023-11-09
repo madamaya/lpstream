@@ -6,7 +6,7 @@ filterRate = 0.1
 plotLatency = True
 plotLatencyCmp = True
 queries = ["LR", "Nexmark", "NYC", "YSB"]
-approaches = ["baseline", "genealog", "l3stream"]
+approaches = ["baseline", "genealog", "l3stream", "l3streamlin"]
 startTime = time.time()
 flag = "metrics1"
 

@@ -61,7 +61,7 @@ public class GLNYC {
                         return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
                     }
                 })
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.minutes(30))))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(3))))
                 .aggregate(new CountAndAvgDistanceGL(settings.aggregateStrategySupplier()));
 
         KafkaSink<NYCResultTupleGL> sink;

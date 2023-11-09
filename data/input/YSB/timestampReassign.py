@@ -23,7 +23,7 @@ if __name__ == "__main__":
                 count += 1
                 #print(",".join(line.split(",")[:2] + [currentTime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]] + line.split(",")[3:]))
                 jdata = json.loads(line)
-                jdata["event_time"] = currentTime // 1000
+                jdata["event_time"] = str(currentTime // 1000)
                 currentTime += incrementSize
                 w.write(json.dumps(jdata) + "\n")
                 if count % 10000 == 0:
