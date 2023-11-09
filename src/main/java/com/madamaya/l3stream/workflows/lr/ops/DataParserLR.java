@@ -42,6 +42,7 @@ public class DataParserLR extends RichMapFunction<KafkaInputString, LinearRoadIn
                 input.getStimulus()
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
+        tuple.setTimestamp(System.currentTimeMillis());
         // tuple.setPartitionID(input.getPartitionID());
         count++;
         return tuple;

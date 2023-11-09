@@ -50,7 +50,7 @@ public class YSB {
                 .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSB())
                 .keyBy(t -> t.getCampaignId())
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(10))))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(1))))
                 // .trigger(new TriggerYSB())
                 .aggregate(new CountYSB());
 

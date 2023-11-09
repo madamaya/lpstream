@@ -66,7 +66,7 @@ public class GLYSB {
                 .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSBGL())
                 .keyBy(t -> t.getCampaignId())
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(10))))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(1))))
                 .aggregate(new CountYSBGL(settings.aggregateStrategySupplier()));
 
         KafkaSink<YSBResultTupleGL> sink;

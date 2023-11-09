@@ -34,6 +34,7 @@ public class DataParserLRGL implements MapFunction<StringGL, LinearRoadInputTupl
                 input.getStimulus()
         );
         out.setKey(String.valueOf(out.getVid()));
+        out.setTimestamp(System.currentTimeMillis());
         //out.setPartitionID(input.getPartitionID());
 
         GenealogMapHelper.INSTANCE.annotateResult(input, out);
