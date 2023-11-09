@@ -49,7 +49,7 @@ public class TriggerReplay {
                 Files.createDirectories(Paths.get(dataPath));
             }
             bw = new BufferedWriter(new FileWriter(dataPath + "/" + id + "-" + windowSize + "-" + "trigger.log"));
-            bw.write(startTime + "," + endTime + "," + endTime2);
+            bw.write(startTime + "," + endTime + "," + endTime2 + "," + replayID);
             bw.flush();
             bw.close();
         } catch (IOException e) {
