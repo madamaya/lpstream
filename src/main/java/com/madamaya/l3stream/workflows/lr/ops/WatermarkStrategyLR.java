@@ -20,12 +20,12 @@ public class WatermarkStrategyLR implements WatermarkStrategy<LinearRoadInputTup
     @Override
     public WatermarkGenerator<LinearRoadInputTuple> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<LinearRoadInputTuple>() {
-            long latest = Long.MIN_VALUE;
+            long latest = 0;
             @Override
             public void onEvent(LinearRoadInputTuple linearRoadInputTuple, long l, WatermarkOutput watermarkOutput) {
                 long ts = Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds();
                 if (ts > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(ts - 1));
+                    watermarkOutput.emitWatermark(new Watermark(latest - 1));
                     latest = ts;
                 }
             }

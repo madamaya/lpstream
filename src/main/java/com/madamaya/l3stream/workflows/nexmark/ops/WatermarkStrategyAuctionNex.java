@@ -19,11 +19,11 @@ public class WatermarkStrategyAuctionNex implements WatermarkStrategy<NexmarkAuc
     @Override
     public WatermarkGenerator<NexmarkAuctionTuple> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<NexmarkAuctionTuple>() {
-            long latest = Long.MIN_VALUE;
+            long latest = 0;
             @Override
             public void onEvent(NexmarkAuctionTuple tuple, long l, WatermarkOutput watermarkOutput) {
                 if (tuple.getDateTime() > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(tuple.getDateTime() - 1));
+                    watermarkOutput.emitWatermark(new Watermark(latest - 1));
                     latest = tuple.getDateTime();
                 }
             }

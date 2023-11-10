@@ -18,11 +18,11 @@ public class WatermarkStrategyNYC implements WatermarkStrategy<NYCInputTuple> {
     @Override
     public WatermarkGenerator<NYCInputTuple> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<NYCInputTuple>() {
-            long latest = Long.MIN_VALUE;
+            long latest = 0;
             @Override
             public void onEvent(NYCInputTuple tuple, long l, WatermarkOutput watermarkOutput) {
                 if (tuple.getDropoffTime() > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(tuple.getDropoffTime() - 1));
+                    watermarkOutput.emitWatermark(new Watermark(latest - 1));
                     latest = tuple.getDropoffTime();
                 }
             }
