@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 
 public class NYCInputTupleGL extends NYCInputTuple implements GenealogTuple {
     private GenealogData gdata;
-    private long timestamp;
 
     public NYCInputTupleGL(String line, long stimulus, SimpleDateFormat sdf) {
         super(line, stimulus, sdf);
@@ -27,11 +26,11 @@ public class NYCInputTupleGL extends NYCInputTuple implements GenealogTuple {
 
     @Override
     public long getTimestamp() {
-        return timestamp;
+        return super.getDropoffTime();
     }
 
     @Override
     public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+        super.setDropoffTime(timestamp);
     }
 }

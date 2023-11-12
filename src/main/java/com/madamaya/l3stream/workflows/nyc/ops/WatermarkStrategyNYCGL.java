@@ -23,7 +23,7 @@ public class WatermarkStrategyNYCGL implements WatermarkStrategy<NYCInputTupleGL
             @Override
             public void onEvent(NYCInputTupleGL tuple, long l, WatermarkOutput watermarkOutput) {
                 if (tuple.getDropoffTime() > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(latest - 1));
+                    watermarkOutput.emitWatermark(new Watermark(latest));
                     latest = tuple.getDropoffTime();
                 }
             }

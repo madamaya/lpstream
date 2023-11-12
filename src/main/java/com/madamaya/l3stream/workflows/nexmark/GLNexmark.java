@@ -12,6 +12,7 @@ import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputJsonNode;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.usecases.CountTupleGL;
 import io.palyvos.provenance.util.ExperimentSettings;
+import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.connector.base.DeliveryGuarantee;
@@ -34,6 +35,7 @@ public class GLNexmark {
         /* Define variables & Create environment */
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
 
         final String queryFlag = "Nexmark";

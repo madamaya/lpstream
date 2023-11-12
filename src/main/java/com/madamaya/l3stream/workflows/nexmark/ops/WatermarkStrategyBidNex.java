@@ -23,7 +23,7 @@ public class WatermarkStrategyBidNex implements WatermarkStrategy<NexmarkBidTupl
             @Override
             public void onEvent(NexmarkBidTuple tuple, long l, WatermarkOutput watermarkOutput) {
                 if (tuple.getDateTime() > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(latest - 1));
+                    watermarkOutput.emitWatermark(new Watermark(latest));
                     latest = tuple.getDateTime();
                 }
             }

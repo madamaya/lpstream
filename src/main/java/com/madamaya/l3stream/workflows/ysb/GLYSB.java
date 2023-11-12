@@ -14,6 +14,7 @@ import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputJsonNode;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
+import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
@@ -36,6 +37,7 @@ public class GLYSB {
         /* Define variables & Create environment */
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
         // env.getCheckpointConfig().disableCheckpointing();
 

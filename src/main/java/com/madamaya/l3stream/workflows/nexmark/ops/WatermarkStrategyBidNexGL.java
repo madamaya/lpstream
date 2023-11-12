@@ -24,7 +24,7 @@ public class WatermarkStrategyBidNexGL implements WatermarkStrategy<NexmarkBidTu
             @Override
             public void onEvent(NexmarkBidTupleGL tuple, long l, WatermarkOutput watermarkOutput) {
                 if (tuple.getDateTime() > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(latest - 1));
+                    watermarkOutput.emitWatermark(new Watermark(latest));
                     latest = tuple.getDateTime();
                 }
             }

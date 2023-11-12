@@ -23,7 +23,7 @@ public class WatermarkStrategyAuctionNex implements WatermarkStrategy<NexmarkAuc
             @Override
             public void onEvent(NexmarkAuctionTuple tuple, long l, WatermarkOutput watermarkOutput) {
                 if (tuple.getDateTime() > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(latest - 1));
+                    watermarkOutput.emitWatermark(new Watermark(latest));
                     latest = tuple.getDateTime();
                 }
             }

@@ -26,7 +26,7 @@ public class WatermarkStrategyLRGL implements WatermarkStrategy<LinearRoadInputT
             public void onEvent(LinearRoadInputTupleGL linearRoadInputTuple, long l, WatermarkOutput watermarkOutput) {
                 long ts = Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds();
                 if (ts > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(latest - 1));
+                    watermarkOutput.emitWatermark(new Watermark(latest));
                     latest = ts;
                 }
             }

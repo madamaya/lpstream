@@ -10,6 +10,7 @@ import io.palyvos.provenance.usecases.CountTupleGL;
 import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadAccidentAggregate;
 import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadVehicleAggregate;
 import io.palyvos.provenance.util.ExperimentSettings;
+import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
@@ -31,6 +32,7 @@ public class GLLR {
         /* Define variables & Create environment */
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
 
         final String queryFlag = "LR";
@@ -59,16 +61,16 @@ public class GLLR {
                 .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL())
                 .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
                 .keyBy(t -> t.getKey())
-                //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
-                //        STOPPED_VEHICLE_WINDOW_SLIDE))
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE)))
+                .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
+                        STOPPED_VEHICLE_WINDOW_SLIDE))
+                //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE)))
                 //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(10))))
                 .aggregate(new LinearRoadVehicleAggregate(settings.aggregateStrategySupplier()))
                 .filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())
                 .keyBy(t -> t.getLatestPos())
-                //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
-                //        ACCIDENT_WINDOW_SLIDE))
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE)))
+                .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
+                        ACCIDENT_WINDOW_SLIDE))
+                //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE)))
                 //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(3))))
                 .aggregate(new LinearRoadAccidentAggregate(settings.aggregateStrategySupplier()))
                 //.slotSharingGroup(settings.secondSlotSharingGroup())

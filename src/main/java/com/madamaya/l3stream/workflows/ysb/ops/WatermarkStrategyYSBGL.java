@@ -23,7 +23,7 @@ public class WatermarkStrategyYSBGL implements WatermarkStrategy<YSBInputTupleGL
             @Override
             public void onEvent(YSBInputTupleGL tuple, long l, WatermarkOutput watermarkOutput) {
                 if (tuple.getEventtime() > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(latest - 1));
+                    watermarkOutput.emitWatermark(new Watermark(latest));
                     latest = tuple.getEventtime();
                 }
             }
