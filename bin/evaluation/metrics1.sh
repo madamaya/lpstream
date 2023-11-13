@@ -9,7 +9,7 @@ numOfLoop=3
 sleepTime=300
 queries=(LR Nexmark NYC YSB)
 #queries=(LR)
-approaches=(baseline genealog l3stream)
+approaches=(baseline genealog l3stream l3streamlin)
 #approaches=(baseline)
 #approaches=(l3stream)
 
@@ -31,6 +31,13 @@ do
       # source ./config/${approach}_${query}.sh
       outputTopicName="${query}-o"
 
+      # Decide strategy
+      if [ "${query}" = "LR" ]; then
+        aggregateStrategy="sortedPtr"
+      else
+        aggregateStrategy="unsortedPtr"
+      fi
+
       # Start query
       if [ ${approach} = "baseline" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
@@ -42,8 +49,8 @@ do
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.GL${query}"
         # Run
         echo "*** Run ***"
-        echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0)"
-        ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0
+        echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${aggregateStrategy})"
+        ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${aggregateStrategy}
       elif [ ${approach} = "l3stream" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
         # Run
@@ -54,8 +61,8 @@ do
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
         # Run
         echo "*** Run ***"
-        echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName})"
-        ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName}
+        echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy})"
+        ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy}
       fi
 
       # Sleep

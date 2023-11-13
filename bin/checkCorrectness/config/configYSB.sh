@@ -9,3 +9,4 @@ inputTopicName="YSB-i"
 inputFilePath="${L3_HOME}/data/input/data/ysb.json"
 cmpPythonName="cmpBaselineAndReplay.py"
 parseFlag=0
+aggregateStrategy="unsortedPtr"

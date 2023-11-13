@@ -3,9 +3,9 @@
 source $(dirname $0)/../config.sh
 
 # type1
-# $1: jar path, $2: main path, $3: parallelism, $4: jobID, $5: chkID, $6: lineageTopicName, $7: latencyFlag
+# $1: jar path, $2: main path, $3: parallelism, $4: jobID, $5: chkID, $6: lineageTopicName, $7: latencyFlag, $8: aggregateStrategy
 # type2
-# $1: jar path, $2: main path, $3: parallelism, $4: jobID, $5: chkID, $6: lineageTopicName, $7: latencyFlag, $8: windowSize
+# $1: jar path, $2: main path, $3: parallelism, $4: jobID, $5: chkID, $6: lineageTopicName, $7: latencyFlag, $8: aggregateStrategy, $9: windowSize
 
 if [ ${5} -eq 0 ]; then
 CHK_ARG=""
@@ -14,11 +14,14 @@ CHK_ARG="-s ${L3_HOME}/data/checkpoints/${4}/chk-${5}"
 fi
 windowSizeOption=""
 latencyFlag=2
-if [ $# -eq 7 ]; then
+aggregateStrategy=""
+if [ $# -eq 8 ]; then
   latencyFlag=${7}
-elif [ $# -eq 8 ]; then
+  aggregateStrategy=${8}
+elif [ $# -eq 9 ]; then
   latencyFlag=${7}
-  windowSizeOption="--windowSize ${8}"
+  aggregateStrategy=${8}
+  windowSizeOption="--windowSize ${9}"
 else
   echo "Illegal args (lineageReplay.sh)"
   exit 1
@@ -34,6 +37,7 @@ ${1} \
 --lineageMode Lineage \
 ${windowSizeOption} \
 --lineageTopic ${6} \
+--aggregateStrategy ${aggregateStrategy} \
 --latencyFlag ${latencyFlag}"
 
 echo "${EXE_CMD}"

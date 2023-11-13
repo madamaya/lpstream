@@ -46,6 +46,9 @@ public class L3YSB {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
+        if (settings.getLineageMode() == "LineageMode") {
+            env.getCheckpointConfig().disableCheckpointing();
+        }
 
         final String queryFlag = "YSB";
         final String inputTopicName = queryFlag + "-i";

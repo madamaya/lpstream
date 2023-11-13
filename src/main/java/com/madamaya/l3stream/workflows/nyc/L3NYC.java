@@ -47,6 +47,9 @@ public class L3NYC {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
+        if (settings.getLineageMode() == "LineageMode") {
+            env.getCheckpointConfig().disableCheckpointing();
+        }
 
         final String queryFlag = "NYC";
         final String inputTopicName = queryFlag + "-i";

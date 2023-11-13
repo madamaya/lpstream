@@ -9,3 +9,4 @@ inputTopicName="NYC-i"
 inputFilePath="${L3_HOME}/data/input/data/nyc.csv"
 cmpPythonName="cmpBaselineAndReplay.py"
 parseFlag=1
+aggregateStrategy="unsortedPtr"

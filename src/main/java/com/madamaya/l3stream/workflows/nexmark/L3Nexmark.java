@@ -48,6 +48,9 @@ public class L3Nexmark {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
+        if (settings.getLineageMode() == "LineageMode") {
+            env.getCheckpointConfig().disableCheckpointing();
+        }
 
         final String queryFlag = "Nexmark";
         final String inputTopicName = queryFlag + "-i";

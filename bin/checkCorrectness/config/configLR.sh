@@ -9,3 +9,4 @@ inputTopicName="LR-i"
 inputFilePath="${L3_HOME}/data/input/data/lr.csv"
 cmpPythonName="cmpBaselineAndReplay.py"
 parseFlag=0
+aggregateStrategy="sortedPtr"

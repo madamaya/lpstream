@@ -93,8 +93,8 @@ do
 
   # submit job
   echo "*** Submit job ***"
-  echo "(./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${mainJobid} ${idx} ${testName}-l 2)"
-  ./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${mainJobid} ${idx} ${testName}-l 2
+  echo "(./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${mainJobid} ${idx} ${testName}-l 2 ${aggregateStrategy})"
+  ./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${mainJobid} ${idx} ${testName}-l 2 ${aggregateStrategy}
 
   ## Notify all outputs were provided.
   echo "*** Notify all outputs were provided ***"

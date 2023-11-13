@@ -105,7 +105,7 @@ do
   outputTs=`echo ${LINE} | jq '.TS' | sed -e 's/"//g'`
 
   ## Start Lineage Manager with normal mode
-  ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${experimentName}-${idx} ${windowSize}
+  ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${experimentName}-${idx} ${windowSize} ${aggregateStrategy}
 
   idx=`expr ${idx} + 1`
 

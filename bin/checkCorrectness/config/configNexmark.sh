@@ -9,3 +9,4 @@ inputTopicName="Nexmark-i"
 inputFilePath="${L3_HOME}/data/input/data/nexmark.json"
 cmpPythonName="cmpBaselineAndReplay.py"
 parseFlag=2
+aggregateStrategy="unsortedPtr"

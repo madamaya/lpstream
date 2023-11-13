@@ -13,7 +13,7 @@ public class TriggerReplay {
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
 
-        if (args.length != 8 && args.length != 9) {
+        if (args.length != 9 && args.length != 10) {
             throw new IllegalArgumentException();
         }
         String jarPath = args[0];
@@ -24,7 +24,8 @@ public class TriggerReplay {
         long maxWindowSize = Long.parseLong(args[5]);
         int numOfSource = Integer.parseInt(args[6]);
         String experimentName = args[7];
-        String windowSize = (args.length == 9) ? args[8] : "";
+        String aggregateStrategy = args[8];
+        String windowSize = (args.length == 10) ? args[9] : "";
         int latencyFlag = 2;
 
         int replayID = FindReplayCPID.getReplayID(outputTs, maxWindowSize, numOfSource);
@@ -34,8 +35,8 @@ public class TriggerReplay {
         // Restart
         String replayCommand = L3Config.BIN_DIR + "/templates/lineageReplay.sh";
         System.out.println("Replay from CpID = " + replayID + " of the job (" + jobid + ")");
-        System.out.println("COMMAND --->>> " + replayCommand + " " + jarPath + " " + mainPath + " " + L3Config.PARALLELISM + " " + jobid + " " + replayID + " " + lineageTopicName + " " + latencyFlag + " " + windowSize);
-        Runtime.getRuntime().exec(replayCommand + " " + jarPath + " " + mainPath + " " + L3Config.PARALLELISM + " " + jobid + " " + replayID + " " + lineageTopicName + " " + latencyFlag + " " + windowSize);
+        System.out.println("COMMAND --->>> " + replayCommand + " " + jarPath + " " + mainPath + " " + L3Config.PARALLELISM + " " + jobid + " " + replayID + " " + lineageTopicName + " " + latencyFlag + " " + aggregateStrategy + " " + windowSize);
+        Runtime.getRuntime().exec(replayCommand + " " + jarPath + " " + mainPath + " " + L3Config.PARALLELISM + " " + jobid + " " + replayID + " " + lineageTopicName + " " + latencyFlag + " " + aggregateStrategy + " " + windowSize);
 
         long endTime2 = System.currentTimeMillis();
 
