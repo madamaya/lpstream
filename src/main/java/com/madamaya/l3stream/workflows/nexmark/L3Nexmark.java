@@ -70,17 +70,11 @@ public class L3Nexmark {
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 
-        KafkaSource<KafkaInputString> source2 = KafkaSource.<KafkaInputString>builder()
-                .setBootstrapServers(brokers)
-                .setTopics(inputTopicName)
-                .setGroupId("2" + String.valueOf(System.currentTimeMillis()))
-                .setStartingOffsets(OffsetsInitializer.earliest())
-                .setDeserializer(new StringDeserializerV2())
-                .build();
-
         /* Query */
+        DataStream<KafkaInputString> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("1");
         // DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
-        DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("1")
+        // DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("1")
+        DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = sourceDs
                 .map(L3.initMap(settings, 0)).uid("2")
                 .map(L3.map(new AuctionDataParserNexL3())).uid("3")
                 .filter(L3.filter(t -> t.getEventType() == 1))
@@ -88,7 +82,8 @@ public class L3Nexmark {
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.readPartitionNum(env.getParallelism()))).uid("5");
 
         // DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("6")
-        DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("6")
+        // DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("6")
+        DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = sourceDs
                 .map(L3.initMap(settings, 1)).uid("7")
                 .map(L3.map(new BidderDataParserNexL3())).uid("8")
                 .filter(L3.filter(t -> t.getEventType() == 2))

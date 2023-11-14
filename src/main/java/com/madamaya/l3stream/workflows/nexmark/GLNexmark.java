@@ -57,24 +57,19 @@ public class GLNexmark {
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 
-        KafkaSource<KafkaInputString> source2 = KafkaSource.<KafkaInputString>builder()
-                .setBootstrapServers(brokers)
-                .setTopics(inputTopicName)
-                .setGroupId("2" + String.valueOf(System.currentTimeMillis()))
-                .setStartingOffsets(OffsetsInitializer.earliest())
-                .setDeserializer(new StringDeserializerV2())
-                .build();
-
         /* Query */
+        DataStream<KafkaInputString> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark");
         // DataStream<NexmarkAuctionTupleGL> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-        DataStream<NexmarkAuctionTupleGL> auction = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark")
+        // DataStream<NexmarkAuctionTupleGL> auction = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark")
+        DataStream<NexmarkAuctionTupleGL> auction = sourceDs
                 .map(new InitGLdataStringGL(settings, 0))
                 .map(new AuctionDataParserNexGL())
                 .filter(t -> t.getEventType() == 1)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNexGL());
 
         // DataStream<NexmarkBidTupleGL> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-        DataStream<NexmarkBidTupleGL> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark")
+        // DataStream<NexmarkBidTupleGL> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark")
+        DataStream<NexmarkBidTupleGL> bid = sourceDs
                 .map(new InitGLdataStringGL(settings, 1))
                 .map(new BidderDataParserNexGL())
                 .filter(t -> t.getEventType() == 2)
