@@ -12,7 +12,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.Obje
 import java.text.SimpleDateFormat;
 
 public class DataParserNYCGL implements MapFunction<StringGL, NYCInputTupleGL> {
-    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     @Override
     public NYCInputTupleGL map(StringGL input) throws Exception {
