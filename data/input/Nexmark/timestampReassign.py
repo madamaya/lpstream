@@ -1,4 +1,5 @@
 import sys
+import json
 from datetime import datetime
 from datetime import timedelta
 
@@ -20,9 +21,20 @@ if __name__ == "__main__":
                 if line == "":
                     break
                 count += 1
-                #print(",".join(line.split(",")[:2] + [currentTime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]] + line.split(",")[3:]))
-                w.write(",".join(line.split(",")[:2] + [currentTime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]] + line.split(",")[3:]))
-                currentTime = currentTime + timedelta(microseconds=incrementSize//1000)
+                jdata = json.loads(line)
+
+                type = ""
+                if jdata["event_type"] == 1:
+                    type = "auction"
+                elif jdata["event_type"] == 2:
+                    type = "bid"
+                else:
+                    type = "person"
+
+                jdata[type]["dateTime"] = currentTime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                currentTime += timedelta(microseconds=incrementSize//1000)
+                elements = line.split(",")
+                w.write(json.dumps(jdata) + "\n")
                 if count % 10000 == 0:
                     print(count)
 
