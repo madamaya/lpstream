@@ -1,7 +1,9 @@
 import time
 import glob
 import numpy as np
+from scipy import stats
 import matplotlib.pyplot as plt
+import itertools
 
 def logDump(query, approach, meanList, stdList, startTime, flag):
     with open("./results/latency.{}.info.{}.log".format(flag, round(startTime)), "a") as w:
@@ -10,8 +12,27 @@ def logDump(query, approach, meanList, stdList, startTime, flag):
         for i in range(len(meanList)):
             w.write("{},avg=,{},std=,{}\n".format(i+1, meanList[i], stdList[i]))
         npMeansArray = np.array(meanList)
-        w.write("{}\n".format(npMeansArray.mean()))
-        w.write("{}\n".format(npMeansArray.std()))
+        w.write("MEAN: {}\n".format(npMeansArray.mean()))
+        w.write("STD: {}\n".format(npMeansArray.std()))
+        w.write("\n")
+
+def logDumpWelch(query, approaches, startTime, flag, allValidList):
+    bonferroniCoef = (len(approaches) * (len(approaches) - 1)) // 2
+    with open("./results/latency.{}.info.{}.log".format(flag, round(startTime)), "a") as w:
+        w.write("===== Welch results ({}) =====\n".format(query))
+        for pair in itertools.combinations(approaches, 2):
+            for i in range(len(allValidList[approaches[0]])):
+                ret = stats.ttest_ind(allValidList[pair[0]][i], allValidList[pair[1]][i], equal_var=False)
+                fixedPvalue = ret.pvalue * bonferroniCoef
+                if fixedPvalue <= 0.01:
+                    resultFlag = "diff (0.01)"
+                elif 0.01 < fixedPvalue and fixedPvalue <= 0.05:
+                    resultFlag = "diff (0.05)"
+                else:
+                    resultFlag = "nodiff"
+
+                w.write("{}-{}:{}:{}: {} ({})\n".format(pair[0], pair[1], i, resultFlag, str(ret), bonferroniCoef))
+        w.write("=================================\n")
         w.write("\n")
 
 def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, startTime, flag):
@@ -58,7 +79,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 print("*** Save fig ***")
                 plt.title("{}-{}".format(query, approach))
                 plt.ylim(bottom=0)
-                plt.ylabel("Latency")
+                plt.ylabel("Latency [ns]")
                 plt.savefig("./results/figs/{}-{}.pdf".format(query, approach))
                 plt.close()
 
@@ -87,6 +108,9 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 plt.legend(approaches)
                 plt.savefig("./results/figs/{}-{}-comparison.pdf".format(query, i))
                 plt.close()
+
+        print("*** Welch test ***")
+        logDumpWelch(query, approaches, startTime, flag, allValidList)
 
     return results
 

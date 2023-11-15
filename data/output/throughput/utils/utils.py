@@ -2,6 +2,8 @@ import os
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import stats
+import itertools
 
 def logDump(query, approach, thList, startTime):
     with open("./results/throughput.info.{}.log".format(round(startTime)), "a") as w:
@@ -12,6 +14,25 @@ def logDump(query, approach, thList, startTime):
         npMeansArray = np.array(thList)
         w.write("{}\n".format(npMeansArray.mean()))
         w.write("{}\n".format(npMeansArray.std()))
+        w.write("\n")
+
+def logDumpWelch(query, approaches, startTime, allList):
+    print(allList)
+    bonferroniCoef = (len(approaches) * (len(approaches) - 1)) // 2
+    with open("./results/throughput.info.{}.log".format(round(startTime)), "a") as w:
+        w.write("===== Welch results ({}) =====\n".format(query))
+        for pair in itertools.combinations(approaches, 2):
+            #for i in range(len(allList[approaches[0]])):
+            ret = stats.ttest_ind(allList[pair[0]], allList[pair[1]], equal_var=False)
+            fixedPvalue = ret.pvalue * bonferroniCoef
+            if fixedPvalue <= 0.01:
+                resultFlag = "diff (0.01)"
+            elif 0.01 < fixedPvalue and fixedPvalue <= 0.05:
+                resultFlag = "diff (0.05)"
+            else:
+                resultFlag = "nodiff"
+            w.write("{}-{}:{}: {} ({})\n".format(pair[0], pair[1], resultFlag, str(ret), bonferroniCoef))
+        w.write("=================================\n")
         w.write("\n")
 
 def getLine(filePath):
@@ -32,6 +53,7 @@ def getFileNames(dirPath):
 def calcResults(queries, approaches, startTime):
     results = {}
     for query in queries:
+        allList = {}
         for approach in approaches:
             thList = []
             allDuration = 0
@@ -56,6 +78,7 @@ def calcResults(queries, approaches, startTime):
             # dump log
             print("*** Dump log ***")
             logDump(query, approach, thList, startTime)
+            allList[approach] = thList
 
             thNpList = np.array(thList)
             thMean = thNpList.mean()
@@ -64,6 +87,9 @@ def calcResults(queries, approaches, startTime):
             if query not in results:
                 results[query] = {}
             results[query][approach] = [thMean, thSed, thNpList.size, allDuration]
+
+        print("*** Welch test ***")
+        logDumpWelch(query, approaches, startTime, allList)
 
     return results
 
@@ -81,7 +107,7 @@ def resultFigsGen(results, queries, approaches, flag):
 
         plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
         plt.title("*{}* result (Throughput, {})".format(query, flag))
-        plt.ylabel("Latency")
+        plt.ylabel("Throughput [tuples/s]")
         plt.savefig("./results/{}.pdf".format(query))
         plt.close()
 
