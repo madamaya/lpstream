@@ -18,7 +18,7 @@ public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTup
     long start;
     long count;
     ExperimentSettings settings;
-    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     public DataParserNYC(ExperimentSettings settings) {
         this.settings = settings;

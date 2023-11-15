@@ -10,8 +10,8 @@ if __name__ == "__main__":
 
     incrementSize = 1000000000 // throughput
     assert incrementSize > 0, str(incrementSize) + " <= 0"
-
     count = 0
+    nanoTime = 0
     currentTime = datetime.strptime("2023-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
     with open(filePath) as f:
         with open(filePath + ".reassign", "w") as w:
@@ -22,7 +22,10 @@ if __name__ == "__main__":
                 count += 1
                 #print(",".join(line.split(",")[:2] + [currentTime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]] + line.split(",")[3:]))
                 w.write(",".join(line.split(",")[:2] + [currentTime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]] + line.split(",")[3:]))
-                currentTime = currentTime + timedelta(microseconds=incrementSize//1000)
+                nanoTime += incrementSize
+                if (nanoTime >= 1000):
+                    currentTime = currentTime + timedelta(microseconds=nanoTime//1000)
+                    nanoTime %= 1000
                 if count % 10000 == 0:
                     print(count)
 
