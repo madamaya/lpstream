@@ -104,7 +104,7 @@ public class NYCInputTuple {
                 '}';
     }
 
-    public long convertDateFormat(String dateLine, SimpleDateFormat sdf) {
+    private long convertDateFormat(String dateLine, SimpleDateFormat sdf) {
         Date date;
         Calendar calendar;
         try {

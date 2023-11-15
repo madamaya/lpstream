@@ -8,8 +8,14 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class BidderDataParserNexL3 implements MapFunction<KafkaInputString, NexmarkBidTuple> {
     ObjectMapper om;
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     public BidderDataParserNexL3() {
         this.om = new ObjectMapper();
@@ -32,12 +38,30 @@ public class BidderDataParserNexL3 implements MapFunction<KafkaInputString, Nexm
             long price = jnode.get("price").asLong();
             String channel = jnode.get("channel").asText();
             String url = jnode.get("url").asText();
-            long dateTime = NexmarkInputTuple.convertDateStrToLong(jnode.get("dateTime").asText());
+            long dateTime = convertDateFormat(jnode.get("dateTime").asText());
             String extra = jnode.get("extra").asText();
 
             return new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra);
         } else {
             return new NexmarkBidTuple(eventType);
         }
+    }
+
+    private long convertDateFormat(String dateLine) {
+        Date date;
+        Calendar calendar;
+        try {
+            date = sdf.parse(dateLine);
+            calendar = Calendar.getInstance();
+            calendar.setTime(date);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        } catch (NumberFormatException e) {
+            System.out.println(sdf);
+            System.out.println(dateLine);
+            throw new RuntimeException(e);
+        }
+
+        return calendar.getTimeInMillis();
     }
 }

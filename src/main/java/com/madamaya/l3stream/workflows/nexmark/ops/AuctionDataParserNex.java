@@ -15,6 +15,10 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.Obje
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, NexmarkAuctionTuple> {
     /*
@@ -26,6 +30,7 @@ public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, Nexm
     long count;
     ExperimentSettings settings;
     ObjectMapper om;
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     public AuctionDataParserNex(ExperimentSettings settings) {
         this.settings = settings;
@@ -46,8 +51,8 @@ public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, Nexm
             String desc = jnode.get("description").asText();
             int initBid = jnode.get("initialBid").asInt();
             int reserve = jnode.get("reserve").asInt();
-            long dateTime = NexmarkInputTuple.convertDateStrToLong(jnode.get("dateTime").asText());
-            long expires = NexmarkInputTuple.convertDateStrToLong(jnode.get("expires").asText());
+            long dateTime = convertDateFormat(jnode.get("dateTime").asText());
+            long expires = convertDateFormat(jnode.get("expires").asText());
             int seller = jnode.get("seller").asInt();
             int category = jnode.get("category").asInt();
             String extra = jnode.get("extra").asText();
@@ -79,5 +84,23 @@ public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, Nexm
         pw.flush();
         pw.close();
         super.close();
+    }
+
+    private long convertDateFormat(String dateLine) {
+        Date date;
+        Calendar calendar;
+        try {
+            date = sdf.parse(dateLine);
+            calendar = Calendar.getInstance();
+            calendar.setTime(date);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        } catch (NumberFormatException e) {
+            System.out.println(sdf);
+            System.out.println(dateLine);
+            throw new RuntimeException(e);
+        }
+
+        return calendar.getTimeInMillis();
     }
 }

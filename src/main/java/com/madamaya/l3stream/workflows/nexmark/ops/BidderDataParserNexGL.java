@@ -11,8 +11,14 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class BidderDataParserNexGL implements MapFunction<StringGL, NexmarkBidTupleGL> {
     ObjectMapper om;
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     public BidderDataParserNexGL() {
         this.om = new ObjectMapper();
@@ -36,7 +42,7 @@ public class BidderDataParserNexGL implements MapFunction<StringGL, NexmarkBidTu
             long price = jnode.get("price").asLong();
             String channel = jnode.get("channel").asText();
             String url = jnode.get("url").asText();
-            long dateTime = NexmarkInputTuple.convertDateStrToLong(jnode.get("dateTime").asText());
+            long dateTime = convertDateFormat(jnode.get("dateTime").asText());
             String extra = jnode.get("extra").asText();
 
             NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getStimulus());
@@ -46,5 +52,23 @@ public class BidderDataParserNexGL implements MapFunction<StringGL, NexmarkBidTu
         } else {
             return new NexmarkBidTupleGL(eventType);
         }
+    }
+
+    private long convertDateFormat(String dateLine) {
+        Date date;
+        Calendar calendar;
+        try {
+            date = sdf.parse(dateLine);
+            calendar = Calendar.getInstance();
+            calendar.setTime(date);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        } catch (NumberFormatException e) {
+            System.out.println(sdf);
+            System.out.println(dateLine);
+            throw new RuntimeException(e);
+        }
+
+        return calendar.getTimeInMillis();
     }
 }
