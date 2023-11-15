@@ -24,6 +24,6 @@ public class DateTest {
         }
 
         System.out.println("NexmarkInputTuple.convertDateStrToLong(str)");
-        System.out.println(NexmarkInputTuple.convertDateStrToLong(str));
+        //System.out.println(NexmarkInputTuple.convertDateStrToLong(str));
     }
 }
