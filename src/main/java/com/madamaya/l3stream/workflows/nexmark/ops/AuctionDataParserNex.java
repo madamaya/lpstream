@@ -30,7 +30,8 @@ public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, Nexm
     long count;
     ExperimentSettings settings;
     ObjectMapper om;
-    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    final SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    final SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public AuctionDataParserNex(ExperimentSettings settings) {
         this.settings = settings;
@@ -51,8 +52,8 @@ public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, Nexm
             String desc = jnode.get("description").asText();
             int initBid = jnode.get("initialBid").asInt();
             int reserve = jnode.get("reserve").asInt();
-            long dateTime = convertDateFormat(jnode.get("dateTime").asText());
-            long expires = convertDateFormat(jnode.get("expires").asText());
+            long dateTime = convertDateFormat(jnode.get("dateTime").asText(), sdf1);
+            long expires = convertDateFormat(jnode.get("expires").asText(), sdf2);
             int seller = jnode.get("seller").asInt();
             int category = jnode.get("category").asInt();
             String extra = jnode.get("extra").asText();
@@ -86,7 +87,7 @@ public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, Nexm
         super.close();
     }
 
-    private long convertDateFormat(String dateLine) {
+    private long convertDateFormat(String dateLine, SimpleDateFormat sdf) {
         Date date;
         Calendar calendar;
         try {
