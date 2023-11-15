@@ -5,6 +5,18 @@ from scipy import stats
 import matplotlib.pyplot as plt
 import itertools
 
+def markerSize(dataNum):
+    if dataNum <= 100:
+        return 10
+    elif dataNum <= 1000:
+        return 5
+    elif dataNum <= 10000:
+        return 1
+    elif dataNum <= 100000:
+        return 0.5
+    else:
+        return 0.1
+
 def logDump(query, approach, meanList, stdList, startTime, flag):
     with open("./results/latency.{}.info.{}.log".format(flag, round(startTime)), "a") as w:
         w.write("{}\n".format(query))
@@ -66,22 +78,27 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 meanList.append(mean)
                 stdList.append(std)
 
-                if plotLatency:
-                    # plot all latencies
-                    print("*** Plot latencies ***")
-                    plt.plot(range(validarray.size), validarray, linewidth=0.1)
-                    #plt.plot(range(validarray.size), validarray, linestyle="None", marker=".")
-                    if plotLatencyCmp:
-                        if approach not in allValidList:
-                            allValidList[approach] = []
-                        allValidList[approach].append(validarray)
+                if approach not in allValidList:
+                    allValidList[approach] = []
+                allValidList[approach].append(validarray)
 
             if plotLatency:
+                for validList in allValidList[approach]:
+                    plt.plot(range(validList.size), validList, linewidth=0.1)
                 print("*** Save fig ***")
                 plt.title("{}-{}".format(query, approach))
                 plt.ylim(bottom=0)
                 plt.ylabel("Latency [ns]")
                 plt.savefig("./results/figs/{}-{}.pdf".format(query, approach))
+                plt.close()
+
+                for validList in allValidList[approach]:
+                    plt.plot(range(validList.size), validList, linestyle="None", marker=".", markersize=markerSize(validList.size))
+                print("*** Save fig ***")
+                plt.title("{}-{}".format(query, approach))
+                plt.ylim(bottom=0)
+                plt.ylabel("Latency [ns]")
+                plt.savefig("./results/figs/{}-{}.png".format(query, approach), dpi=900)
                 plt.close()
 
             # dump log
@@ -102,12 +119,20 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
             for i in range(len(allValidList[approaches[0]])):
                 for approach in approaches:
                     plt.plot(range(allValidList[approach][i].size), allValidList[approach][i], linewidth=0.1)
-                    #plt.plot(range(allValidList[approach][i].size), allValidList[approach][i], linestyle="None", marker=".")
                 plt.title("{}-{}-comparison".format(query, i))
                 plt.ylim(bottom=0)
                 plt.ylabel("Latency")
                 plt.legend(approaches)
                 plt.savefig("./results/figs/{}-{}-comparison.pdf".format(query, i))
+                plt.close()
+
+                for approach in approaches:
+                    plt.plot(range(allValidList[approach][i].size), allValidList[approach][i], linestyle="None", marker=".", markersize=markerSize(allValidList[approach][i].size))
+                plt.title("{}-{}-comparison".format(query, i))
+                plt.ylim(bottom=0)
+                plt.ylabel("Latency")
+                plt.legend(approaches)
+                plt.savefig("./results/figs/{}-{}-comparison.png".format(query, i), dpi=900)
                 plt.close()
 
         print("*** Welch test ***")
