@@ -6,7 +6,7 @@ source ../utils/flinkJob.sh
 source ../utils/logger.sh
 
 numOfLoop=3
-sleepTime=300
+sleepTime=180
 queries=(LR Nexmark NYC YSB)
 #queries=(LR)
 approaches=(baseline genealog l3stream l3streamlin)
@@ -21,6 +21,11 @@ do
   do
     for query in ${queries[@]}
     do
+      if [ ${query} = "Nexmark" ]; then
+        sleepTime=900
+      else
+        sleepTime=180
+      fi
       echo "*** Start evaluation (query = ${query}, approach = ${approach}, loop = ${loop}) ***"
 
       # restartTMifNeeded
@@ -32,11 +37,7 @@ do
       outputTopicName="${query}-o"
 
       # Decide strategy
-      if [ "${query}" = "LR" ]; then
-        aggregateStrategy="sortedPtr"
-      else
-        aggregateStrategy="unsortedPtr"
-      fi
+      aggregateStrategy="unsortedPtr"
 
       # Start query
       if [ ${approach} = "baseline" ]; then
