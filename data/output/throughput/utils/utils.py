@@ -104,6 +104,8 @@ def resultFigsGen(results, queries, approaches, flag):
                 colorList.append("g")
             elif approach == "l3stream":
                 colorList.append("r")
+            else:
+                colorList.append("m")
 
         plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
         plt.title("*{}* result (Throughput, {})".format(query, flag))

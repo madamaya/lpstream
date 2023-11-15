@@ -43,7 +43,8 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
         for approach in approaches:
             meanList = []
             stdList = []
-            for l in glob.glob("{}/{}/*.log".format(query, approach)):
+            for idx in range(len(glob.glob("{}/{}/*.log".format(query, approach)))):
+                l = "{}/{}/{}.log".format(query, approach, str(idx+1))
                 # read log data
                 print("*** Read log data ({}) ***".format(l))
                 nparray = np.loadtxt("{}".format(l), dtype="int64")
@@ -94,7 +95,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
 
             if query not in results:
                 results[query] = {}
-            results[query][approach] = [allMean, allStd, meanNpList.size]
+            results[query][approach] = [allMean, allStd, meanNpList.size, meanNpList]
 
         if plotLatencyCmp:
             print("*** Save fig for comparison ***")
@@ -125,12 +126,24 @@ def resultFigsGen(results, queries, approaches, flag):
                 colorList.append("g")
             elif approach == "l3stream":
                 colorList.append("r")
+            else:
+                colorList.append("m")
 
         plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
         plt.title("*{}* result (Latency, {})".format(query, flag))
-        plt.ylabel("Latency")
+        plt.ylabel("Latency [ns]")
         plt.savefig("./results/{}.pdf".format(query))
         plt.close()
+
+        for idx in range(results[query][approaches[0]][2]):
+            resultsList = [results[query][approach][3][idx] for approach in approaches]
+            for approach in approaches:
+                plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
+                plt.title("*{}* result (Latency, {}, {})".format(query, flag, idx))
+                plt.ylabel("Latency [ns]")
+                plt.savefig("./results/{}-{}.pdf".format(query, idx))
+                plt.close()
+
 
 def writeResults(results, queries, approaches, startTime, flag):
     with open("./results/latency.{}.result.{}.txt".format(flag, startTime), "w") as w:
