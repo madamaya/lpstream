@@ -44,18 +44,24 @@ public class Nexmark {
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 
+        KafkaSource<KafkaInputString> source2 = KafkaSource.<KafkaInputString>builder()
+                .setBootstrapServers(brokers)
+                .setTopics(inputTopicName)
+                .setGroupId("2" + String.valueOf(System.currentTimeMillis()))
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setDeserializer(new StringDeserializerV2())
+                .build();
+
         /* Query */
-        DataStream<KafkaInputString> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark");
+        // DataStream<KafkaInputString> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark");
         // DataStream<NexmarkAuctionTuple> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-        // DataStream<NexmarkAuctionTuple> auction = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark")
-        DataStream<NexmarkAuctionTuple> auction = sourceDs
+        DataStream<NexmarkAuctionTuple> auction = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark1")
                 .map(new AuctionDataParserNex(settings))
                 .filter(t -> t.getEventType() == 1)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex());
 
         // DataStream<NexmarkBidTuple> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-        // DataStream<NexmarkBidTuple> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark")
-        DataStream<NexmarkBidTuple> bid = sourceDs
+        DataStream<NexmarkBidTuple> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark2")
                 .map(new BidderDataParserNex(settings))
                 .filter(t -> t.getEventType() == 2)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyBidNex());

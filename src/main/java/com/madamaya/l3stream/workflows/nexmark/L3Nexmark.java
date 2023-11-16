@@ -70,25 +70,31 @@ public class L3Nexmark {
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 
+        KafkaSource<KafkaInputString> source2 = KafkaSource.<KafkaInputString>builder()
+                .setBootstrapServers(brokers)
+                .setTopics(inputTopicName)
+                .setGroupId("2" + String.valueOf(System.currentTimeMillis()))
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setDeserializer(new StringDeserializerV2())
+                .build();
+
         /* Query */
-        DataStream<KafkaInputString> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("1");
+        // DataStream<KafkaInputString> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("1");
         // DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("1")
-        // DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("1")
-        DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = sourceDs
+        DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark1").uid("1")
                 .map(L3.initMap(settings, 0)).uid("2")
                 .map(L3.map(new AuctionDataParserNexL3())).uid("3")
-                .filter(L3.filter(t -> t.getEventType() == 1))
-                .map(L3.updateTsWM(new WatermarkStrategyAuctionNex(), 0)).uid("4")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.readPartitionNum(env.getParallelism()))).uid("5");
+                .filter(L3.filter(t -> t.getEventType() == 1)).uid("4")
+                .map(L3.updateTsWM(new WatermarkStrategyAuctionNex(), 0)).uid("5")
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.readPartitionNum(env.getParallelism()))).uid("6");
 
         // DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest()).uid("6")
-        // DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("6")
-        DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = sourceDs
-                .map(L3.initMap(settings, 1)).uid("7")
-                .map(L3.map(new BidderDataParserNexL3())).uid("8")
-                .filter(L3.filter(t -> t.getEventType() == 2))
-                .map(L3.updateTsWM(new WatermarkStrategyBidNex(), 1)).uid("9")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.readPartitionNum(env.getParallelism()))).uid("10");
+        DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark2").uid("7")
+                .map(L3.initMap(settings, 1)).uid("8")
+                .map(L3.map(new BidderDataParserNexL3())).uid("9")
+                .filter(L3.filter(t -> t.getEventType() == 2)).uid("10")
+                .map(L3.updateTsWM(new WatermarkStrategyBidNex(), 1)).uid("11")
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.readPartitionNum(env.getParallelism()))).uid("12");
 
         DataStream<L3StreamTupleContainer<NexmarkJoinedTuple>> joined = auction.keyBy(L3.keyBy(new KeySelector<NexmarkAuctionTuple, Integer>() {
                 @Override
@@ -103,12 +109,12 @@ public class L3Nexmark {
                     }
                 }, Integer.class)))
                 .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(20)))
-                .process(L3.processJoin(new JoinNexL3())).uid("11")
-                .filter(L3.filter(t -> t.getCategory() == 10)).uid("12");
+                .process(L3.processJoin(new JoinNexL3())).uid("13")
+                .filter(L3.filter(t -> t.getCategory() == 10)).uid("14");
 
         // L5
         if (settings.isInvokeCpAssigner()) {
-            joined.map(new CpAssigner<>()).uid("13").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
+            joined.map(new CpAssigner<>()).uid("15").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         } else {
             joined.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         }
