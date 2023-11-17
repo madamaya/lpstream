@@ -25,6 +25,7 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -47,7 +48,7 @@ public class L3YSB {
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
         if (settings.getLineageMode() == "LineageMode") {
-            // env.getCheckpointConfig().disableCheckpointing();
+            env.getCheckpointConfig().disableCheckpointing();
         }
 
         final String queryFlag = "YSB";

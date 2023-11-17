@@ -23,6 +23,7 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -39,7 +40,7 @@ public class GLYSB {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
-        // env.getCheckpointConfig().disableCheckpointing();
+        env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "YSB";
         final String inputTopicName = queryFlag + "-i";
