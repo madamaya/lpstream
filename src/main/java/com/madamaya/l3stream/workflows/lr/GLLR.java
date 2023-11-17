@@ -34,7 +34,7 @@ public class GLLR {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
-        env.getCheckpointConfig().disableCheckpointing();
+        // env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "LR";
         final String inputTopicName = queryFlag + "-i";
