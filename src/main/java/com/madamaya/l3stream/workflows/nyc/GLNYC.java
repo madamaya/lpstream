@@ -20,6 +20,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.kafka.clients.producer.ProducerConfig;
 
 import java.util.Properties;
 
@@ -69,8 +70,11 @@ public class GLNYC {
 
         KafkaSink<NYCResultTupleGL> sink;
         if (settings.getLatencyFlag() == 1) {
+            Properties props = new Properties();
+            props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 3200000);
             sink = KafkaSink.<NYCResultTupleGL>builder()
                     .setBootstrapServers(brokers)
+                    .setKafkaProducerConfig(props)
                     .setRecordSerializer(new LineageKafkaSinkNYCGLV2(outputTopicName, settings))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();

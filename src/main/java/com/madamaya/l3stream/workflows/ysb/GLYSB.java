@@ -29,6 +29,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.util.serialization.JSONKeyValueDeserializationSchema;
+import org.apache.kafka.clients.producer.ProducerConfig;
 
 import java.util.Properties;
 
@@ -74,8 +75,11 @@ public class GLYSB {
 
         KafkaSink<YSBResultTupleGL> sink;
         if (settings.getLatencyFlag() == 1) {
+            Properties props = new Properties();
+            props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 3200000);
             sink = KafkaSink.<YSBResultTupleGL>builder()
                     .setBootstrapServers(brokers)
+                    .setKafkaProducerConfig(props)
                     .setRecordSerializer(new LineageKafkaSinkYSBGLV2(outputTopicName, settings))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();

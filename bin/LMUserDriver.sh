@@ -103,9 +103,9 @@ do
   #LINE2=`echo ${LINE} | sed -e 's/\\\//g'`
   outputValue=`echo ${LINE} | jq '.OUT'`
   outputTs=`echo ${LINE} | jq '.TS' | sed -e 's/"//g'`
-
+  CPID=`echo ${LINE} | jq '.CPID' | sed -e 's/"//g'`
   ## Start Lineage Manager with normal mode
-  ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${experimentName}-${idx} ${windowSize} ${aggregateStrategy}
+  ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${experimentName}-${idx} ${windowSize} ${aggregateStrategy} ${CPID}
 
   idx=`expr ${idx} + 1`
 

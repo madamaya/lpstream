@@ -6,9 +6,9 @@ source ./utils/notifyEnd.sh
 
 mode=$1
 
-if [ $# -ne 10 ]; then
+if [ $# -ne 11 ]; then
   echo "Illegal Arguments (lineageManager.sh)"
-  echo $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10}
+  echo $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10} ${11}
   exit 1
 fi
 # $1: jarPath, $2: mainPath, $3: jobid, $4: outputTs, $5: outputValue, $6: maxWsize, $7: lineageTopicName, $8: experimentName $9: windowSize
@@ -22,6 +22,7 @@ lineageTopicName=$7
 experimentName=$8
 windowSize=$9
 aggregateStrategy=${10}
+CPID=${11}
 # define numOfSourceOp
 if [[ ${mainPath} == *Nexmark* ]]; then
   numOfSourceOp=2
@@ -37,7 +38,7 @@ echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${out
 java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${experimentName} ${windowSize} &
 
 echo "*** Identify checkpointID from which replay will be started ***"
-echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.TriggerReplay ${jarPath} ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${numOfSourceOp} ${experimentName} ${aggregateStrategy} ${windowSize})"
-java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.TriggerReplay ${jarPath} ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${numOfSourceOp} ${experimentName} ${aggregateStrategy} ${windowSize}
+echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.TriggerReplay ${jarPath} ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${numOfSourceOp} ${experimentName} ${aggregateStrategy} ${CPID} ${windowSize})"
+java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.TriggerReplay ${jarPath} ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${numOfSourceOp} ${experimentName} ${aggregateStrategy} ${CPID} ${windowSize}
 
 notifyReplayMonitorEnd

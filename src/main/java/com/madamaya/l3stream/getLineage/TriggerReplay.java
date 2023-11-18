@@ -13,7 +13,7 @@ public class TriggerReplay {
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
 
-        if (args.length != 9 && args.length != 10) {
+        if (args.length != 10 && args.length != 11) {
             throw new IllegalArgumentException();
         }
         String jarPath = args[0];
@@ -25,7 +25,8 @@ public class TriggerReplay {
         int numOfSource = Integer.parseInt(args[6]);
         String experimentName = args[7];
         String aggregateStrategy = args[8];
-        String windowSize = (args.length == 10) ? args[9] : "";
+        int CPID = Integer.parseInt(args[9]);
+        String windowSize = (args.length == 11) ? args[10] : "";
         int latencyFlag = 2;
 
         int replayID = FindReplayCPID.getReplayID(outputTs, maxWindowSize, numOfSource);
@@ -50,7 +51,7 @@ public class TriggerReplay {
                 Files.createDirectories(Paths.get(dataPath));
             }
             bw = new BufferedWriter(new FileWriter(dataPath + "/" + id + "-" + windowSize + "-" + "trigger.log"));
-            bw.write(startTime + "," + endTime + "," + endTime2 + "," + replayID);
+            bw.write(startTime + "," + endTime + "," + endTime2 + "," + CPID + "," + replayID);
             bw.flush();
             bw.close();
         } catch (IOException e) {
