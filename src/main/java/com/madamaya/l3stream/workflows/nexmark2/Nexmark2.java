@@ -26,7 +26,7 @@ public class Nexmark2 {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
 
-        final String queryFlag = "Nexmark";
+        final String queryFlag = "Nexmark2";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;

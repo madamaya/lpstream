@@ -33,7 +33,7 @@ public class L3Nexmark2 {
             env.getCheckpointConfig().disableCheckpointing();
         }
 
-        final String queryFlag = "Nexmark";
+        final String queryFlag = "Nexmark2";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
