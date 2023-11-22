@@ -22,7 +22,8 @@ public class MyTestRun implements Runnable {
     Map<Integer, Long> map;
 
     public MyTestRun(String filePath, String qName, String topic, int partition, Map<Integer, Long> map) {
-        this.filePath = filePath;
+        this.filePath = filePath + ".ingest." + partition;
+        // this.filePath = filePath;
         this.qName = qName;
         this.topic = topic;
         this.partition = partition;
