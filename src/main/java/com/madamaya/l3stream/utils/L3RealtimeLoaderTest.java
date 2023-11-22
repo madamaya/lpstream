@@ -18,6 +18,13 @@ public class L3RealtimeLoaderTest {
         String topic = args[2];
         int parallelism = Integer.parseInt(args[3]);
 
+        System.out.println("==== ARGS ====");
+        System.out.println("\tfilePath = " + filePath);
+        System.out.println("\tqName = " + qName);
+        System.out.println("\ttopic = " + topic);
+        System.out.println("\tparallelism = " + parallelism);
+        System.out.println("==============");
+
         Map<Integer, Long> map = new HashMap<>();
         for (int i = 0; i < parallelism; i++) {
             new Thread(new MyTestRun(filePath, qName, topic, i, map)).start();

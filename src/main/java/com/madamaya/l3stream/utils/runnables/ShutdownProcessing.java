@@ -11,6 +11,6 @@ public class ShutdownProcessing implements Runnable {
 
     @Override
     public void run() {
-        System.out.println(map);
+        System.out.println("ShutdownProcessing: " + map);
     }
 }

@@ -16,7 +16,7 @@ elif [ $1 = "fleshAll" ]; then
   ./latency/metrics2/flesh.sh fleshAll
   ./throughput/metrics1/flesh.sh fleshAll
   ./throughput/metrics2/flesh.sh fleshAll
-  rm -rf ./throughput/169*
+  rm -rf ./throughput/170*
   ./metrics34/flesh.sh fleshAll
 else
   echo "Illegal arguments (${1})"

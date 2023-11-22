@@ -19,13 +19,13 @@ elif [ $1 = "m2" ]; then
   restartFlinkCluster
 elif [ $1 = "m34" ]; then
   cd ./bin
-  ./LMUserDriver.sh 1
+  ./LMUserDriver.sh 1 2>&1 | tee LMUserDriver1.log
   restartFlinkCluster
-  ./LMUserDriver.sh 2
+  ./LMUserDriver.sh 2 2>&1 | tee LMUserDriver2.log
   restartFlinkCluster
-  ./LMUserDriver.sh 3
+  ./LMUserDriver.sh 3 2>&1 | tee LMUserDriver3.log
   restartFlinkCluster
-  ./LMUserDriver.sh 4
+  ./LMUserDriver.sh 4 2>&1 | tee LMUserDriver4.log
   restartFlinkCluster
 
   cd ${L3_HOME}/data/output/metrics34

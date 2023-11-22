@@ -17,7 +17,7 @@ source $(dirname $0)/../config.sh
 #sleep 10
 
 # Create topics
-for i in LR NYC YSB Nexmark
+for i in LR NYC YSB Nexmark Nexmark2
 do
   for j in i o l
   do
@@ -25,12 +25,13 @@ do
   done
 done
 
+<<OUT
 cd ${L3_HOME}
 
 # LR
 echo "*** Ingest LR data into Kafka ***"
 echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/input/LinearRoad/lr.csv LR-i)"
-java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/input/data/lr.csv LR-i
+java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/input/data/lr.csv2 LR-i
 
 # NYC
 echo "*** Ingest NYC data into Kafka ***"
@@ -46,3 +47,4 @@ java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/in
 echo "*** Ingest Nexmark data into Kafka ***"
 echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/input/Nexmark/nexmark.json Nexmark-i)"
 java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/input/data/nexmark.json Nexmark-i
+OUT

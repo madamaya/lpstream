@@ -32,10 +32,9 @@ public class MyTestRun implements Runnable {
     @Override
     public void run() {
         InputParser ip;
-        System.out.println("qName = " + qName);
         if (qName.equals("LR")) {
             ip = new ParserLR();
-        } else if (qName.equals("Nexmark")) {
+        } else if (qName.contains("Nexmark")) {
             ip = new ParserNexmark();
         } else if (qName.equals("NYC")) {
             ip = new ParserNYC();

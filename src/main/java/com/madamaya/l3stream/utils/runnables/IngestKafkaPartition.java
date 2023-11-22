@@ -26,8 +26,8 @@ public class IngestKafkaPartition implements Runnable {
     int granularity = 1; // 1 -> 1000ms, 10 -> 100ms, 100 -> 10ms, etc.
 
     public IngestKafkaPartition(String filePath, String qName, String topic, int partition, int throughput, Map<Integer, Double> map) {
-        // this.filePath = filePath + ".ingest." + partition;
-        this.filePath = filePath;
+        this.filePath = filePath + ".ingest." + partition;
+        // this.filePath = filePath;
         this.qName = qName;
         this.topic = topic;
         this.partition = partition;
@@ -37,7 +37,7 @@ public class IngestKafkaPartition implements Runnable {
         // initialize data parser
         if (qName.equals("LR")) {
             this.ip = new ParserLR();
-        } else if (qName.equals("Nexmark")) {
+        } else if (qName.contains("Nexmark")) {
             this.ip = new ParserNexmark();
         } else if (qName.equals("NYC")) {
             this.ip = new ParserNYC();
@@ -80,7 +80,7 @@ public class IngestKafkaPartition implements Runnable {
                 while ((line = br.readLine()) != null) {
                     // Send data
                     String sendLine = ip.attachTimestamp(line, System.currentTimeMillis());
-                    System.out.println(sendLine);
+                    // System.out.println(sendLine);
                     producer.send(new ProducerRecord<String, String>(topic, partition, null, null, sendLine),
                             (recordMetadata, e) -> {
                                 if (e != null) {

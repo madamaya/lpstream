@@ -17,6 +17,7 @@ redisPort=6379
 flinkIP="localhost"
 flinkPort=8081
 bootstrapServers="localhost:9092"
+ingestNode="localhost"
 
 # execution
 parallelism=4
