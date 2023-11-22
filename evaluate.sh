@@ -11,7 +11,11 @@ fi
 
 if [ $1 = "m1" ]; then
   cd ./bin/evaluation
-  ./metrics1.sh
+  thList=(1000)
+  for th in ${thList[@]}
+  do
+    ./metrics1.sh ${th}
+  done
   restartFlinkCluster
 elif [ $1 = "m2" ]; then
   cd ./bin/evaluation

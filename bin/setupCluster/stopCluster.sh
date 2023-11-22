@@ -7,7 +7,7 @@ source $(dirname $0)/../config.sh
 #${FLINK_HOME}/bin/stop-cluster.sh
 
 # Delete topics
-for i in LR NYC YSB Nexmark Nexmark2
+for i in LR NYC YSB Nexmark Nexmark2 Test
 do
   for j in i o l
   do

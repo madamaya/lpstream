@@ -68,9 +68,6 @@ do
         ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy}
       fi
 
-      echo "sleep 10"
-      echo sleep 10
-
       # Start data ingestion
       echo "Start data ingestion"
       if [ ${query} = "LR" ] || [ ${query} = "NYC" ]; then
@@ -149,6 +146,8 @@ cd ${L3_HOME}/data/output/throughput/metrics1
 python metrics1.py
 
 cd ${L3_HOME}/data/output
+./getResult.sh
 cp -r latency latency${throughput}
 cp -r throughput throughput${throughput}
+cp -r result result${throughput}
 ./flesh.sh fleshAll
