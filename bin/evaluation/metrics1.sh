@@ -149,5 +149,5 @@ cd ${L3_HOME}/data/output
 ./getResult.sh
 cp -r latency latency${throughput}
 cp -r throughput throughput${throughput}
-cp -r result result${throughput}
+cp -r results results${throughput}
 ./flesh.sh fleshAll
