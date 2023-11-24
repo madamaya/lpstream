@@ -59,7 +59,15 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 l = "{}/{}/{}.log".format(query, approach, str(idx+1))
                 # read log data
                 print("*** Read log data ({}) ***".format(l))
-                nparray = np.loadtxt("{}".format(l), dtype="int64")
+                tmpLines = []
+                with open(l) as f:
+                    while True:
+                        line = f.readline()
+                        if line == "":
+                            break
+                        tmpLines.append(int(line.split(",")[0]))
+                #nparray = np.loadtxt("{}".format(l), dtype="int64")
+                nparray = np.array(tmpLines)
                 filteredTuple = round(nparray.size * filterRate)
 
                 # extract valid data

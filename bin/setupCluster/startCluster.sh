@@ -25,7 +25,7 @@ do
   done
 done
 
-<<OUT
+#<<OUT
 cd ${L3_HOME}
 
 # LR
@@ -47,4 +47,9 @@ java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/in
 echo "*** Ingest Nexmark data into Kafka ***"
 echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/input/Nexmark/nexmark.json Nexmark-i)"
 java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/input/data/nexmark.json Nexmark-i
-OUT
+
+# Nexmark2
+echo "*** Ingest Nexmark2 data into Kafka ***"
+echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/input/Nexmark/nexmark.json Nexmark2-i)"
+java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${L3_HOME}/data/input/data/nexmark.json Nexmark2-i
+#OUT
