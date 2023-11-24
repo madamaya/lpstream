@@ -69,9 +69,9 @@ public class GLNYC {
                 .aggregate(new CountAndAvgDistanceGL(settings.aggregateStrategySupplier()));
 
         KafkaSink<NYCResultTupleGL> sink;
+        Properties props = new Properties();
+        props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
         if (settings.getLatencyFlag() == 1) {
-            Properties props = new Properties();
-            props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 3200000);
             sink = KafkaSink.<NYCResultTupleGL>builder()
                     .setBootstrapServers(brokers)
                     .setKafkaProducerConfig(props)
@@ -81,6 +81,7 @@ public class GLNYC {
         } else {
             sink = KafkaSink.<NYCResultTupleGL>builder()
                     .setBootstrapServers(brokers)
+                    .setKafkaProducerConfig(props)
                     .setRecordSerializer(new LatencyKafkaSinkNYCGLV2(outputTopicName, settings))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();

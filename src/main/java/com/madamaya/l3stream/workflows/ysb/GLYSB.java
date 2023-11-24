@@ -74,9 +74,9 @@ public class GLYSB {
                 .aggregate(new CountYSBGL(settings.aggregateStrategySupplier()));
 
         KafkaSink<YSBResultTupleGL> sink;
+        Properties props = new Properties();
+        props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
         if (settings.getLatencyFlag() == 1) {
-            Properties props = new Properties();
-            props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 3200000);
             sink = KafkaSink.<YSBResultTupleGL>builder()
                     .setBootstrapServers(brokers)
                     .setKafkaProducerConfig(props)
@@ -86,6 +86,7 @@ public class GLYSB {
         } else {
             sink = KafkaSink.<YSBResultTupleGL>builder()
                     .setBootstrapServers(brokers)
+                    .setKafkaProducerConfig(props)
                     .setRecordSerializer(new LatencyKafkaSinkYSBGLV2(outputTopicName, settings))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();

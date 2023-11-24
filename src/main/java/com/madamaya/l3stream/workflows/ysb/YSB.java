@@ -15,6 +15,9 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.kafka.clients.producer.ProducerConfig;
+
+import java.util.Properties;
 
 public class YSB {
     public static void main(String[] args) throws Exception {
@@ -55,15 +58,19 @@ public class YSB {
                 .aggregate(new CountYSB());
 
         KafkaSink<YSBResultTuple> sink;
+        Properties props = new Properties();
+        props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
         if (settings.getLatencyFlag() == 1) {
             sink = KafkaSink.<YSBResultTuple>builder()
                     .setBootstrapServers(brokers)
+                    .setKafkaProducerConfig(props)
                     .setRecordSerializer(new OutputKafkaSinkYSBV2(outputTopicName))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         } else {
             sink = KafkaSink.<YSBResultTuple>builder()
                     .setBootstrapServers(brokers)
+                    .setKafkaProducerConfig(props)
                     .setRecordSerializer(new LatencyKafkaSinkYSBV2(outputTopicName))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
