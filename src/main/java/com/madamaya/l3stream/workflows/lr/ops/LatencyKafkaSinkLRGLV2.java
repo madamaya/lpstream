@@ -25,6 +25,7 @@ public class LatencyKafkaSinkLRGLV2 implements KafkaRecordSerializationSchema<Co
     public ProducerRecord<byte[], byte[]> serialize(CountTupleGL tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
         String lineage = FormatLineage.formattedLineage(genealogGraphTraverser.getProvenance(tuple));
         String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
-        return new ProducerRecord<>(topic, latency.getBytes(StandardCharsets.UTF_8));
+        //return new ProducerRecord<>(topic, latency.getBytes(StandardCharsets.UTF_8));
+        return new ProducerRecord<>(topic, (latency + "," + tuple + "," + lineage).getBytes(StandardCharsets.UTF_8));
     }
 }
