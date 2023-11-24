@@ -6,7 +6,6 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 
 public class YSBInputTupleGL extends YSBInputTuple implements GenealogTuple {
     private GenealogData gdata;
-    private long timestamp;
 
     public YSBInputTupleGL(String adId, String eventType, String campaignId, long eventtime, long stimulus) {
         super(adId, eventType, campaignId, eventtime, stimulus);
@@ -25,11 +24,11 @@ public class YSBInputTupleGL extends YSBInputTuple implements GenealogTuple {
 
     @Override
     public long getTimestamp() {
-        return timestamp;
+        return super.getEventtime();
     }
 
     @Override
     public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+        super.setEventtime(timestamp);
     }
 }

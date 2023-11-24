@@ -6,7 +6,6 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 
 public class NYCResultTupleGL extends NYCResultTuple implements GenealogTuple {
     private GenealogData gdata;
-    private long timestamp;
 
     public NYCResultTupleGL(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts, long stimulus) {
         super(vendorId, dropoffLocationId, count, avgDistance, ts, stimulus);
@@ -25,11 +24,11 @@ public class NYCResultTupleGL extends NYCResultTuple implements GenealogTuple {
 
     @Override
     public long getTimestamp() {
-        return timestamp;
+        return super.getTs();
     }
 
     @Override
     public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+        super.setTs(timestamp);
     }
 }

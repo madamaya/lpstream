@@ -6,7 +6,6 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 
 public class NexmarkAuctionTupleGL extends NexmarkAuctionTuple implements GenealogTuple {
     private GenealogData gdata;
-    private long timestamp;
 
     public NexmarkAuctionTupleGL(int eventType) {
         super(eventType);
@@ -29,11 +28,11 @@ public class NexmarkAuctionTupleGL extends NexmarkAuctionTuple implements Geneal
 
     @Override
     public long getTimestamp() {
-        return timestamp;
+        return super.getDateTime();
     }
 
     @Override
     public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+        super.setDateTime(timestamp);
     }
 }

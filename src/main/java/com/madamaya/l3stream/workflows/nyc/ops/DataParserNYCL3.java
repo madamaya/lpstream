@@ -22,6 +22,8 @@ public class DataParserNYCL3 implements MapFunction<KafkaInputString, NYCInputTu
         // String line = jNode.get("value").textValue();
         String inputStr = input.getStr();
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
-        return new NYCInputTuple(line, sdf);
+        NYCInputTuple tuple = new NYCInputTuple(line, sdf);
+        tuple.setDropoffTime(System.currentTimeMillis());
+        return tuple;
     }
 }

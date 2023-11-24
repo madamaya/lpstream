@@ -65,7 +65,7 @@ public class GLLR {
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
                         //STOPPED_VEHICLE_WINDOW_SLIDE))
                 // .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE)))
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(28))))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(4))))
                 //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.milliseconds(80))))
                 .aggregate(new LinearRoadVehicleAggregate(settings.aggregateStrategySupplier()))
                 .filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())
@@ -73,7 +73,7 @@ public class GLLR {
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
                         //ACCIDENT_WINDOW_SLIDE))
                 //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE)))
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(7))))
+                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(1))))
                 //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.milliseconds(20))))
                 .aggregate(new LinearRoadAccidentAggregate(settings.aggregateStrategySupplier()))
                 //.slotSharingGroup(settings.secondSlotSharingGroup())

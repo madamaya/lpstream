@@ -41,7 +41,9 @@ public class BidderDataParserNexL3 implements MapFunction<KafkaInputString, Nexm
             long dateTime = convertDateFormat(jnode.get("dateTime").asText());
             String extra = jnode.get("extra").asText();
 
-            return new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra);
+            NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra);
+            tuple.setDateTime(System.currentTimeMillis());
+            return tuple;
         } else {
             return new NexmarkBidTuple(eventType);
         }

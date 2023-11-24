@@ -27,7 +27,7 @@ public class DataParserLRL3 implements MapFunction<KafkaInputString, LinearRoadI
                 Integer.valueOf(elements[8])
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
-        // tuple.setTimestamp(System.currentTimeMillis());
+        tuple.setTimestamp(System.currentTimeMillis());
         //tuple.setPartitionID(input.getPartitionID());
 
         return tuple;
