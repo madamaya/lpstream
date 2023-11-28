@@ -47,11 +47,13 @@ def logDumpWelch(query, approaches, startTime, flag, allValidList):
         w.write("=================================\n")
         w.write("\n")
 
-def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, startTime, flag):
+def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, violinPlot, startTime, flag):
     results = {}
+    allValidList = {}
     for query in queries:
-        if plotLatencyCmp:
+        if violinPlot == False:
             allValidList = {}
+        allValidList[query] = {}
         for approach in approaches:
             meanList = []
             stdList = []
@@ -86,12 +88,12 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 meanList.append(mean)
                 stdList.append(std)
 
-                if approach not in allValidList:
-                    allValidList[approach] = []
-                allValidList[approach].append(validarray)
+                if approach not in allValidList[query]:
+                    allValidList[query][approach] = []
+                allValidList[query][approach].append(validarray)
 
             if plotLatency:
-                for validList in allValidList[approach]:
+                for validList in allValidList[query][approach]:
                     plt.plot(range(validList.size), validList, linewidth=0.1)
                 print("*** Save fig ***")
                 plt.title("{}-{}".format(query, approach))
@@ -100,7 +102,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 plt.savefig("./results/figs/{}-{}.pdf".format(query, approach))
                 plt.close()
 
-                for validList in allValidList[approach]:
+                for validList in allValidList[query][approach]:
                     plt.plot(range(validList.size), validList, linestyle="None", marker=".", markersize=markerSize(validList.size))
                 print("*** Save fig ***")
                 plt.title("{}-{}".format(query, approach))
@@ -124,9 +126,9 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
 
         if plotLatencyCmp:
             print("*** Save fig for comparison ***")
-            for i in range(len(allValidList[approaches[0]])):
+            for i in range(len(allValidList[query][approaches[0]])):
                 for approach in approaches:
-                    plt.plot(range(allValidList[approach][i].size), allValidList[approach][i], linewidth=0.1)
+                    plt.plot(range(allValidList[query][approach][i].size), allValidList[query][approach][i], linewidth=0.1)
                 plt.title("{}-{}-comparison".format(query, i))
                 plt.ylim(bottom=0)
                 plt.ylabel("Latency")
@@ -135,7 +137,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 plt.close()
 
                 for approach in approaches:
-                    plt.plot(range(allValidList[approach][i].size), allValidList[approach][i], linestyle="None", marker=".", markersize=markerSize(allValidList[approach][i].size))
+                    plt.plot(range(allValidList[query][approach][i].size), allValidList[query][approach][i], linestyle="None", marker=".", markersize=markerSize(allValidList[query][approach][i].size))
                 plt.title("{}-{}-comparison".format(query, i))
                 plt.ylim(bottom=0)
                 plt.ylabel("Latency")
@@ -144,7 +146,21 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, st
                 plt.close()
 
         print("*** Welch test ***")
-        logDumpWelch(query, approaches, startTime, flag, allValidList)
+        logDumpWelch(query, approaches, startTime, flag, allValidList[query])
+
+    if violinPlot == True:
+        print("*** Violin plot ***")
+        for query in queries:
+            for idx in range(len(allValidList[query][approaches[0]])):
+                validListsIdx = [allValidList[query][approach][idx] for approach in approaches]
+                plt.violinplot(validListsIdx, showmeans=True)
+                plt.xticks(range(1, len(approaches)+1), [approach for approach in approaches])
+                plt.title("*{}* result (Latency, {}, {}, violin)".format(query, flag, idx))
+                plt.ylabel("Latency [ns]")
+                plt.savefig("./results/{}.violin.pdf".format(query))
+                plt.close()
+    else:
+        print("*** No violin plot ***")
 
     return results
 

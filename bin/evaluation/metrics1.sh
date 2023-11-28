@@ -6,8 +6,8 @@ source ../utils/flinkJob.sh
 source ../utils/logger.sh
 
 numOfLoop=3
-#throughput=${1}
-#granularityTemp=10
+throughput=${1}
+granularityTemp=10
 queries=(LR Nexmark NYC YSB)
 #queries=(Nexmark NYC Nexmark2 YSB)
 approaches=(baseline genealog l3stream l3streamlin)
@@ -22,18 +22,20 @@ do
   do
     for query in ${queries[@]}
     do
-<<OUT
+      echo "(sleep 120)"
+      sleep 120
+
       if [ ${query} = "Nexmark" ]; then
         #sleepTime=600
-        sleepTime=60
+        sleepTime=300
       elif [ ${query} = "Nexmark2" ]; then
         #sleepTime=600
-        sleepTime=60
+        sleepTime=300
       else
         #sleepTime=180
-        sleepTime=60
+        sleepTime=300
       fi
-OUT
+
       echo "*** Start evaluation (query = ${query}, approach = ${approach}, loop = ${loop}) ***"
 
       # restartTMifNeeded
@@ -75,7 +77,6 @@ OUT
       fi
 
       # Start data ingestion
-<<COMMENT
       echo "Start data ingestion"
       if [ ${query} = "LR" ] || [ ${query} = "NYC" ]; then
         filePath="${L3_HOME}/data/input/data/${(L)query}.csv"
@@ -92,7 +93,6 @@ OUT
       else
         ssh ${ingestNode} /bin/zsh ${L3_HOME}/bin/dataingest/ingestData.sh ${filePath} ${qName} ${topic} ${parallelism} ${throughput} ${granularity} &
       fi
-COMMENT
 
       # Sleep
       echo "*** Sleep predefined time (${sleepTime} [s]) ***"
@@ -111,7 +111,6 @@ COMMENT
         #stopCpMServer
       #fi
 
-<<COMMENT2
       # Stop data ingestion
       ## localhost
       echo "Stop data ingestion"
@@ -121,7 +120,6 @@ COMMENT
       else
         ssh ${ingestNode} /bin/zsh ${L3_HOME}/bin/dataingest/stopIngestion.sh
       fi
-COMMENT2
 
       # Read output
       echo "*** Read all outputs ***"
@@ -132,8 +130,8 @@ COMMENT2
       echo "*** Delete kafka topic ***"
       echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${outputTopicName} --bootstrap-server ${bootstrapServers})"
       ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${outputTopicName} --bootstrap-server ${bootstrapServers}
-      #echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers})"
-      #${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers}
+      echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers})"
+      ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers}
       echo "(sleep 30)"
       sleep 30
 
@@ -141,8 +139,8 @@ COMMENT2
       echo "*** Create kafka topic ***"
       echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${outputTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
       ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${outputTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
-      #echo "${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}"
-      #${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
+      echo "${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}"
+      ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
       echo "(sleep 10)"
       sleep 10
     done
@@ -157,7 +155,7 @@ python metrics1.py
 
 cd ${L3_HOME}/data/output
 ./getResult.sh
-#cp -r latency latency${throughput}
-#cp -r throughput throughput${throughput}
-#mv results results${throughput}
+cp -r latency latency${throughput}
+cp -r throughput throughput${throughput}
+mv results results${throughput}
 ./flesh.sh fleshAll
