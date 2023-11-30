@@ -44,7 +44,7 @@ public class GLNexmark2 {
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
                 .setGroupId("1" + String.valueOf(System.currentTimeMillis()))
-                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setStartingOffsets(OffsetsInitializer.latest())
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 

@@ -66,7 +66,7 @@ public class L3NYC {
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
                 .setGroupId(String.valueOf(System.currentTimeMillis()))
-                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setStartingOffsets(OffsetsInitializer.latest())
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 

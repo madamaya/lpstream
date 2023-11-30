@@ -68,7 +68,7 @@ public class L3LR {
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
                 .setGroupId(String.valueOf(System.currentTimeMillis()))
-                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setStartingOffsets(OffsetsInitializer.latest())
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 
@@ -87,7 +87,8 @@ public class L3LR {
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(4))))
                 //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.milliseconds(80))))
                 .aggregate(L3.aggregate(new LinearRoadVehicleAggregateL3())).uid("7")
-                .filter(L3.filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())).uid("8")
+                //.filter(L3.filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())).uid("8")
+                .filter(L3.filter(t -> t.getReports() >= (4 * settings.getWindowSize()) && t.isUniquePosition())).uid("8")
                 .keyBy(L3.keyBy(t -> t.getLatestPos(), Integer.class))
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
                         //ACCIDENT_WINDOW_SLIDE))

@@ -61,7 +61,7 @@ public class LR {
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
                 .setGroupId(String.valueOf(System.currentTimeMillis()))
-                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setStartingOffsets(OffsetsInitializer.latest())
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 
@@ -78,7 +78,8 @@ public class LR {
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(4))))
                 //.window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.milliseconds(80))))
                 .aggregate(new LinearRoadVehicleAggregate())
-                .filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())
+                //.filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())
+                .filter(t -> t.getReports() >= (4 * settings.getWindowSize()) && t.isUniquePosition())
                 .keyBy(t -> t.getLatestPos())
                 //.window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
                         //ACCIDENT_WINDOW_SLIDE))
