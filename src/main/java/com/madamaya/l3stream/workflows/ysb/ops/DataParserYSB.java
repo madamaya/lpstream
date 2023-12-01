@@ -35,7 +35,7 @@ public class DataParserYSB extends RichMapFunction<KafkaInputString, YSBInputTup
         long eventtime = Long.parseLong(jNode.get("event_time").textValue());
         count++;
         YSBInputTuple tuple = new YSBInputTuple(adId, eventType, campaignId, eventtime, input.getStimulus());
-        tuple.setEventtime(System.currentTimeMillis());
+        //tuple.setEventtime(System.currentTimeMillis());
         return tuple;
     }
 

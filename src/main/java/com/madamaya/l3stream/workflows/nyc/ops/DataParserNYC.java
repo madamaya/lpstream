@@ -39,7 +39,7 @@ public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTup
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
 
         NYCInputTuple tuple = new NYCInputTuple(line, input.getStimulus(), sdf);
-        tuple.setDropoffTime(System.currentTimeMillis());
+        //tuple.setDropoffTime(System.currentTimeMillis());
         return tuple;
     }
 

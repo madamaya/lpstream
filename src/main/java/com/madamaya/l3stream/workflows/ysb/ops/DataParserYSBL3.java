@@ -23,7 +23,7 @@ public class DataParserYSBL3 implements MapFunction<KafkaInputString, YSBInputTu
         long eventtime = Long.parseLong(jNode.get("event_time").textValue());
 
         YSBInputTuple tuple = new YSBInputTuple(adId, eventType, campaignId, eventtime);
-        tuple.setEventtime(System.currentTimeMillis());
+        //tuple.setEventtime(System.currentTimeMillis());
         return tuple;
     }
 }

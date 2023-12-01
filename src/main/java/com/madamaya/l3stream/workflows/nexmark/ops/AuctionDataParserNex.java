@@ -59,7 +59,7 @@ public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, Nexm
             String extra = jnode.get("extra").asText();
 
             NexmarkAuctionTuple tuple = new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getStimulus());
-            tuple.setDateTime(System.currentTimeMillis());
+            //tuple.setDateTime(System.currentTimeMillis());
             return tuple;
         } else {
             return new NexmarkAuctionTuple(eventType);

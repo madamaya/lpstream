@@ -22,7 +22,7 @@ public class DataParserNYCGL implements MapFunction<StringGL, NYCInputTupleGL> {
         String inputStr = input.getString();
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
         NYCInputTupleGL out = new NYCInputTupleGL(line, input.getStimulus(), sdf);
-        out.setDropoffTime(System.currentTimeMillis());
+        //out.setDropoffTime(System.currentTimeMillis());
         GenealogMapHelper.INSTANCE.annotateResult(input, out);
 
         return out;

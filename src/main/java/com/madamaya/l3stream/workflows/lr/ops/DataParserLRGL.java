@@ -31,10 +31,11 @@ public class DataParserLRGL implements MapFunction<StringGL, LinearRoadInputTupl
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
                 Integer.valueOf(elements[8]),
-                input.getStimulus()
+                // input.getStimulus()
+                input.getKafkaAppandTime()
         );
         out.setKey(String.valueOf(out.getVid()));
-        out.setTimestamp(System.currentTimeMillis());
+        //out.setTimestamp(System.currentTimeMillis());
         //out.setPartitionID(input.getPartitionID());
 
         GenealogMapHelper.INSTANCE.annotateResult(input, out);
