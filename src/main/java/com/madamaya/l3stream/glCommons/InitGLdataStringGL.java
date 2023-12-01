@@ -29,7 +29,7 @@ public class InitGLdataStringGL extends RichMapFunction<KafkaInputString, String
 
     @Override
     public StringGL map(KafkaInputString input) throws Exception {
-        StringGL out = new StringGL(input.getStr(), input.getStimulus());
+        StringGL out = new StringGL(input.getStr(), input.getKafkaAppandTime(), input.getStimulus());
         out.initGenealog(GenealogTupleType.SOURCE);
         count++;
         return out;

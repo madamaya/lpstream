@@ -73,7 +73,8 @@ public class L3DataReaderFromEarliest {
 
                 for (ConsumerRecord record : records) {
                     String recordValue = (String) record.value();
-                    bw.write(recordValue + "\n");
+                    long ts = record.timestamp();
+                    bw.write(ts + "," + recordValue + "\n");
                     if (++count % 100 == 0) {
                         System.out.print("\r" + count + " tuple(s) have been read.");
                     }

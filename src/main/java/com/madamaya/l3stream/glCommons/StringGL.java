@@ -8,16 +8,19 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.Obje
 public class StringGL implements GenealogTuple {
     private GenealogData gdata;
     private String string;
+    private long kafkaAppandTime;
     private long stimulus;
     private int partitionID;
 
-    public StringGL(String string, long stimulus) {
+    public StringGL(String string, long kafkaAppandTime, long stimulus) {
         this.string = string;
+        this.kafkaAppandTime = kafkaAppandTime;
         this.stimulus = stimulus;
     }
 
-    public StringGL(String string, long stimulus, int partitionID) {
+    public StringGL(String string, long kafkaAppandTime, long stimulus, int partitionID) {
         this.string = string;
+        this.kafkaAppandTime = kafkaAppandTime;
         this.stimulus = stimulus;
         this.partitionID = partitionID;
     }
@@ -36,6 +39,14 @@ public class StringGL implements GenealogTuple {
 
     public void setPartitionID(int partitionID) {
         this.partitionID = partitionID;
+    }
+
+    public long getKafkaAppandTime() {
+        return kafkaAppandTime;
+    }
+
+    public void setKafkaAppandTime(long kafkaAppandTime) {
+        this.kafkaAppandTime = kafkaAppandTime;
     }
 
     @Override

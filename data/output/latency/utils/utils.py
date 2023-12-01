@@ -67,7 +67,9 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                         line = f.readline()
                         if line == "":
                             break
-                        tmpLines.append(int(line.split(",")[0]))
+                        elements = line.split(",")
+                        #tmpLines.append(int(elements[2]) - int(elements[0]))
+                        tmpLines.append(int(elements[1]))
                 #nparray = np.loadtxt("{}".format(l), dtype="int64")
                 nparray = np.array(tmpLines)
                 filteredTuple = round(nparray.size * filterRate)
