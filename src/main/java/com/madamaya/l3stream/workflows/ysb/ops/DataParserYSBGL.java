@@ -25,7 +25,8 @@ public class DataParserYSBGL implements MapFunction<StringGL, YSBInputTupleGL> {
         String campaignId = jNode.get("campaign_id").textValue();
         long eventtime = Long.parseLong(jNode.get("event_time").textValue());
 
-        YSBInputTupleGL out = new YSBInputTupleGL(adId, eventType, campaignId, eventtime, input.getStimulus());
+        // YSBInputTupleGL out = new YSBInputTupleGL(adId, eventType, campaignId, eventtime, input.getStimulus());
+        YSBInputTupleGL out = new YSBInputTupleGL(adId, eventType, campaignId, eventtime, input.getKafkaAppandTime());
         //out.setEventtime(System.currentTimeMillis());
         GenealogMapHelper.INSTANCE.annotateResult(input, out);
 

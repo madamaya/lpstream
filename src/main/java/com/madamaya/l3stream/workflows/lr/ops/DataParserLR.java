@@ -39,7 +39,8 @@ public class DataParserLR extends RichMapFunction<KafkaInputString, LinearRoadIn
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
                 Integer.valueOf(elements[8]),
-                input.getStimulus()
+                // input.getStimulus()
+                input.getKafkaAppandTime()
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
         //tuple.setTimestamp(System.currentTimeMillis());
