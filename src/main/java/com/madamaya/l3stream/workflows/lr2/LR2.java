@@ -32,7 +32,7 @@ public class LR2 {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
 
-        final String queryFlag = "LR";
+        final String queryFlag = "LR2";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
