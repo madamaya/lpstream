@@ -31,7 +31,7 @@ public class LR2 {
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
-
+env.disableOperatorChaining();
         final String queryFlag = "LR2";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
@@ -53,8 +53,7 @@ public class LR2 {
         /* Query */
         //DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<LinearRoadInputTuple> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR")
-                .map(new DataParserLR(settings))
-                .filter(t -> t.getType() == 0 && t.getSpeed() == 0);
+                .map(new DataParserLR(settings));
 
         KafkaSink<LinearRoadInputTuple> sink;
         if (settings.getLatencyFlag() == 1) {

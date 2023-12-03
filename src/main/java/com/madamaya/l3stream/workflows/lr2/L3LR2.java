@@ -58,8 +58,7 @@ public class L3LR2 {
         DataStream<L3StreamTupleContainer<LinearRoadInputTuple>> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR").uid("1")
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserLRL3())).uid("3")
-                .map(L3.updateTsWM(new WatermarkStrategyLR(), 0)).uid("4")
-                .filter(L3.filter(t -> t.getType() == 0 && t.getSpeed() == 0)).uid("6");
+                .map(L3.updateTsWM(new WatermarkStrategyLR(), 0)).uid("4");
 
         // L5
         if (settings.isInvokeCpAssigner()) {
