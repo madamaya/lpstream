@@ -49,7 +49,7 @@ public class L3YSB {
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
         if (settings.getLineageMode() == "LineageMode") {
-            env.getCheckpointConfig().disableCheckpointing();
+            // env.getCheckpointConfig().disableCheckpointing();
         }
 
         final String queryFlag = "YSB";

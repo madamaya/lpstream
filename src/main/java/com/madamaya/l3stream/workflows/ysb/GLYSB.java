@@ -41,7 +41,7 @@ public class GLYSB {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
-        env.getCheckpointConfig().disableCheckpointing();
+        // env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "YSB";
         final String inputTopicName = queryFlag + "-i";

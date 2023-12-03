@@ -30,7 +30,7 @@ public class L3Nexmark2 {
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
         if (settings.getLineageMode() == "LineageMode") {
-            env.getCheckpointConfig().disableCheckpointing();
+            // env.getCheckpointConfig().disableCheckpointing();
         }
 
         final String queryFlag = "Nexmark2";
