@@ -31,7 +31,7 @@ public class LR2 {
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
-env.disableOperatorChaining();
+
         final String queryFlag = "LR2";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
