@@ -35,7 +35,7 @@ public class IngestKafkaPartition implements Runnable {
         this.map = map;
 
         // initialize data parser
-        if (qName.equals("LR")) {
+        if (qName.contains("LR")) {
             this.ip = new ParserLR();
         } else if (qName.contains("Nexmark")) {
             this.ip = new ParserNexmark();

@@ -5,9 +5,14 @@ import io.palyvos.provenance.genealog.GenealogTuple;
 import io.palyvos.provenance.genealog.GenealogTupleType;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class NYCInputTupleGL extends NYCInputTuple implements GenealogTuple {
     private GenealogData gdata;
+
+    public NYCInputTupleGL(String line, SimpleDateFormat sdf) {
+        super(line, sdf);
+    }
 
     public NYCInputTupleGL(String line, long stimulus, SimpleDateFormat sdf) {
         super(line, stimulus, sdf);
@@ -32,5 +37,20 @@ public class NYCInputTupleGL extends NYCInputTuple implements GenealogTuple {
     @Override
     public void setTimestamp(long timestamp) {
         super.setDropoffTime(timestamp);
+    }
+
+    @Override
+    public List<Long> getStimulusList() {
+        return super.getStimulusList();
+    }
+
+    @Override
+    public void setStimulusList(List<Long> stimulusList) {
+        super.setStimulusList(stimulusList);
+    }
+
+    @Override
+    public void setStimulusList(long stimulus) {
+        super.setStimulusList(stimulus);
     }
 }

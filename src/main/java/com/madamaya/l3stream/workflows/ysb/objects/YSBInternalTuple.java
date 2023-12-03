@@ -1,10 +1,13 @@
 package com.madamaya.l3stream.workflows.ysb.objects;
 
+import java.util.List;
+
 public class YSBInternalTuple {
     private String adId;
     private String campaignId;
     private long eventtime;
     private long stimulus = Long.MAX_VALUE;
+    private List<Long> stimulusList;
 
     public YSBInternalTuple(String adId, String campaignId, long eventtime, long stimulus) {
         this.adId = adId;
@@ -49,6 +52,18 @@ public class YSBInternalTuple {
 
     public void setStimulus(long stimulus) {
         this.stimulus = stimulus;
+    }
+
+    public List<Long> getStimulusList() {
+        return stimulusList;
+    }
+
+    public void setStimulusList(List<Long> stimulusList) {
+        this.stimulusList = stimulusList;
+    }
+
+    public void setStimulusList(long stimulus) {
+        this.stimulusList.add(stimulus);
     }
 
     @Override

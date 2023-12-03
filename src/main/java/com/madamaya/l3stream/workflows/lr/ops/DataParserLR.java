@@ -12,6 +12,8 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.Obje
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class DataParserLR extends RichMapFunction<KafkaInputString, LinearRoadInputTuple> {
@@ -26,6 +28,7 @@ public class DataParserLR extends RichMapFunction<KafkaInputString, LinearRoadIn
 
     @Override
     public LinearRoadInputTuple map(KafkaInputString input) throws Exception {
+        long ts = System.currentTimeMillis();
         String inputStr = input.getStr();
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
         String[] elements = delimiter.split(line);
@@ -38,13 +41,18 @@ public class DataParserLR extends RichMapFunction<KafkaInputString, LinearRoadIn
                 Integer.valueOf(elements[5]),
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
-                Integer.valueOf(elements[8]),
+                Integer.valueOf(elements[8])
                 // input.getStimulus()
-                input.getKafkaAppandTime()
+                //input.getKafkaAppandTime()
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
         //tuple.setTimestamp(System.currentTimeMillis());
         // tuple.setPartitionID(input.getPartitionID());
+        List<Long> stimulusList = new ArrayList<>();
+        stimulusList.add(input.getKafkaAppandTime());
+        stimulusList.add(input.getStimulus());
+        stimulusList.add(ts);
+        tuple.setStimulusList(stimulusList);
         count++;
         return tuple;
     }

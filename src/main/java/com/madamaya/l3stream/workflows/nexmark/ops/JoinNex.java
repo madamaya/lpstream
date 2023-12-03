@@ -9,26 +9,31 @@ import org.apache.flink.util.Collector;
 public class JoinNex extends ProcessJoinFunction<NexmarkAuctionTuple, NexmarkBidTuple, NexmarkJoinedTuple> {
     @Override
     public void processElement(NexmarkAuctionTuple auctionTuple, NexmarkBidTuple bidTuple, ProcessJoinFunction<NexmarkAuctionTuple, NexmarkBidTuple, NexmarkJoinedTuple>.Context context, Collector<NexmarkJoinedTuple> collector) throws Exception {
-        collector.collect(
-                new NexmarkJoinedTuple(
-                        bidTuple.getAuctionId(),
-                        bidTuple.getBidder(),
-                        bidTuple.getPrice(),
-                        bidTuple.getChannel(),
-                        bidTuple.getUrl(),
-                        bidTuple.getDateTime(),
-                        bidTuple.getExtra(),
-                        auctionTuple.getItemName(),
-                        auctionTuple.getDesc(),
-                        auctionTuple.getInitBid(),
-                        auctionTuple.getReserve(),
-                        auctionTuple.getDateTime(),
-                        auctionTuple.getExpires(),
-                        auctionTuple.getSeller(),
-                        auctionTuple.getCategory(),
-                        auctionTuple.getExtra(),
-                        Math.max(bidTuple.getStimulus(), auctionTuple.getStimulus())
-                )
+        long ts = System.currentTimeMillis();
+        NexmarkJoinedTuple tuple = new NexmarkJoinedTuple(
+                bidTuple.getAuctionId(),
+                bidTuple.getBidder(),
+                bidTuple.getPrice(),
+                bidTuple.getChannel(),
+                bidTuple.getUrl(),
+                bidTuple.getDateTime(),
+                bidTuple.getExtra(),
+                auctionTuple.getItemName(),
+                auctionTuple.getDesc(),
+                auctionTuple.getInitBid(),
+                auctionTuple.getReserve(),
+                auctionTuple.getDateTime(),
+                auctionTuple.getExpires(),
+                auctionTuple.getSeller(),
+                auctionTuple.getCategory(),
+                auctionTuple.getExtra()
         );
+        if (bidTuple.getStimulusList().get(0) >= auctionTuple.getStimulusList().get(0)) {
+            tuple.setStimulusList(bidTuple.getStimulusList());
+        } else {
+            tuple.setStimulusList(auctionTuple.getStimulusList());
+        }
+        tuple.setStimulusList(ts);
+        collector.collect(tuple);
     }
 }

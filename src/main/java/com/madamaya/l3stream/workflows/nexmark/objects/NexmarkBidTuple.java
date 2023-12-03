@@ -1,5 +1,7 @@
 package com.madamaya.l3stream.workflows.nexmark.objects;
 
+import java.util.List;
+
 public class NexmarkBidTuple extends NexmarkInputTuple {
     /*
      Sample Input:
@@ -15,6 +17,7 @@ public class NexmarkBidTuple extends NexmarkInputTuple {
     private long dateTime;
     private String extra;
     private long stimulus = Long.MAX_VALUE;
+    private List<Long> stimulusList;
 
     public NexmarkBidTuple(int eventType) {
         super(eventType);
@@ -105,6 +108,18 @@ public class NexmarkBidTuple extends NexmarkInputTuple {
 
     public void setStimulus(long stimulus) {
         this.stimulus = stimulus;
+    }
+
+    public List<Long> getStimulusList() {
+        return stimulusList;
+    }
+
+    public void setStimulusList(List<Long> stimulusList) {
+        this.stimulusList = stimulusList;
+    }
+
+    public void setStimulusList(long stimulus) {
+        this.stimulusList.add(stimulus);
     }
 
     @Override

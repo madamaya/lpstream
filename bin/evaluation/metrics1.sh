@@ -8,8 +8,8 @@ source ../utils/logger.sh
 numOfLoop=3
 throughput=${1}
 granularityTemp=10
-queries=(LR Nexmark NYC YSB)
-#queries=(Nexmark NYC Nexmark2 YSB)
+#queries=(LR Nexmark NYC YSB)
+queries=(LR2 Nexmark NYC Nexmark2 YSB)
 approaches=(baseline genealog l3stream l3streamlin)
 #approaches=(baseline)
 sleepTime=180
@@ -78,7 +78,7 @@ do
 
       # Start data ingestion
       echo "Start data ingestion"
-      if [ ${query} = "LR" ] || [ ${query} = "NYC" ]; then
+      if [ ${query} = "LR" ] || [ ${query} = "LR2" ] || [ ${query} = "NYC" ]; then
         filePath="${L3_HOME}/data/input/data/${(L)query}.csv"
       else
         filePath="${L3_HOME}/data/input/data/${(L)query}.json"

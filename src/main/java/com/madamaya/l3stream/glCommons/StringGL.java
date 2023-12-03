@@ -5,12 +5,19 @@ import io.palyvos.provenance.genealog.GenealogTuple;
 import io.palyvos.provenance.genealog.GenealogTupleType;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.util.List;
+
 public class StringGL implements GenealogTuple {
     private GenealogData gdata;
     private String string;
     private long kafkaAppandTime;
     private long stimulus;
+    private List<Long> stimulusList;
     private int partitionID;
+
+    public StringGL(String string) {
+        this.string = string;
+    }
 
     public StringGL(String string, long kafkaAppandTime, long stimulus) {
         this.string = string;
@@ -83,5 +90,20 @@ public class StringGL implements GenealogTuple {
     @Override
     public String toString() {
         return string.toString();
+    }
+
+    @Override
+    public List<Long> getStimulusList() {
+        return stimulusList;
+    }
+
+    @Override
+    public void setStimulusList(List<Long> stimulusList) {
+        this.stimulusList = stimulusList;
+    }
+
+    @Override
+    public void setStimulusList(long stimulus) {
+        this.stimulusList.add(stimulus);
     }
 }

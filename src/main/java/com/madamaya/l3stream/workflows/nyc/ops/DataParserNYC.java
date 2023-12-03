@@ -13,6 +13,8 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTuple> {
     long start;
@@ -34,12 +36,19 @@ public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTup
        'tolls_amount', 'improvement_surcharge', 'total_amount',
        'congestion_surcharge', 'airport_fee'] */
         // String line = jNode.get("value").textValue();
+        long ts = System.currentTimeMillis();
         count++;
         String inputStr = input.getStr();
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
 
         // NYCInputTuple tuple = new NYCInputTuple(line, input.getStimulus(), sdf);
-        NYCInputTuple tuple = new NYCInputTuple(line, input.getKafkaAppandTime(), sdf);
+        // NYCInputTuple tuple = new NYCInputTuple(line, input.getKafkaAppandTime(), sdf);
+        NYCInputTuple tuple = new NYCInputTuple(line, sdf);
+        List<Long> stimulusList = new ArrayList<>();
+        stimulusList.add(input.getKafkaAppandTime());
+        stimulusList.add(input.getStimulus());
+        stimulusList.add(ts);
+        tuple.setStimulusList(stimulusList);
         //tuple.setDropoffTime(System.currentTimeMillis());
         return tuple;
     }

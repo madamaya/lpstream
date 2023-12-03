@@ -1,5 +1,7 @@
 package com.madamaya.l3stream.workflows.ysb.objects;
 
+import java.util.List;
+
 public class YSBInputTuple {
     // {"user_id", "page_id", "ad_id", "ad_type", "event_type", "event_time", "ip_address", "campaign_id"}
     private String adId;
@@ -7,6 +9,7 @@ public class YSBInputTuple {
     private String campaignId;
     private long eventtime;
     private long stimulus = Long.MAX_VALUE;
+    private List<Long> stimulusList;
 
     public YSBInputTuple(String adId, String eventType, String campaignId, long eventtime, long stimulus) {
         this.adId = adId;
@@ -61,6 +64,18 @@ public class YSBInputTuple {
 
     public void setStimulus(long stimulus) {
         this.stimulus = stimulus;
+    }
+
+    public List<Long> getStimulusList() {
+        return stimulusList;
+    }
+
+    public void setStimulusList(List<Long> stimulusList) {
+        this.stimulusList = stimulusList;
+    }
+
+    public void setStimulusList(long stimulus) {
+        this.stimulusList.add(stimulus);
     }
 
     @Override

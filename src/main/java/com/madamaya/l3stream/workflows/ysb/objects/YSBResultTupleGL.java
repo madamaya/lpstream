@@ -4,8 +4,14 @@ import io.palyvos.provenance.genealog.GenealogData;
 import io.palyvos.provenance.genealog.GenealogTuple;
 import io.palyvos.provenance.genealog.GenealogTupleType;
 
+import java.util.List;
+
 public class YSBResultTupleGL extends YSBResultTuple implements GenealogTuple {
     private GenealogData gdata;
+
+    public YSBResultTupleGL(String campaignId, long count, long ts) {
+        super(campaignId, count, ts);
+    }
 
     public YSBResultTupleGL(String campaignId, long count, long ts, long stimulus) {
         super(campaignId, count, ts, stimulus);
@@ -30,5 +36,20 @@ public class YSBResultTupleGL extends YSBResultTuple implements GenealogTuple {
     @Override
     public void setTimestamp(long timestamp) {
         super.setTs(timestamp);
+    }
+
+    @Override
+    public List<Long> getStimulusList() {
+        return super.getStimulusList();
+    }
+
+    @Override
+    public void setStimulusList(List<Long> stimulusList) {
+        super.setStimulusList(stimulusList);
+    }
+
+    @Override
+    public void setStimulusList(long stimulus) {
+        super.setStimulusList(stimulus);
     }
 }

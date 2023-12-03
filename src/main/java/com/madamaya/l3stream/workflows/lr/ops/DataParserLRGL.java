@@ -15,6 +15,7 @@ public class DataParserLRGL implements MapFunction<StringGL, LinearRoadInputTupl
 
     @Override
     public LinearRoadInputTupleGL map(StringGL input) throws Exception {
+        long ts = System.currentTimeMillis();
         //ObjectNode jNode = jNodeGL.getObjectNode();
 
         //String line = jNode.get("value").textValue();
@@ -30,11 +31,13 @@ public class DataParserLRGL implements MapFunction<StringGL, LinearRoadInputTupl
                 Integer.valueOf(elements[5]),
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
-                Integer.valueOf(elements[8]),
+                Integer.valueOf(elements[8])
                 // input.getStimulus()
-                input.getKafkaAppandTime()
+                // input.getKafkaAppandTime()
         );
         out.setKey(String.valueOf(out.getVid()));
+        out.setStimulusList(out.getStimulusList());
+        out.setStimulusList(ts);
         //out.setTimestamp(System.currentTimeMillis());
         //out.setPartitionID(input.getPartitionID());
 

@@ -2,6 +2,7 @@ package com.madamaya.l3stream.workflows.lr.ops;
 
 import io.palyvos.provenance.genealog.GenealogGraphTraverser;
 import io.palyvos.provenance.l3stream.util.FormatLineage;
+import io.palyvos.provenance.l3stream.util.FormatStimulusList;
 import io.palyvos.provenance.usecases.CountTuple;
 import io.palyvos.provenance.usecases.CountTupleGL;
 import io.palyvos.provenance.util.ExperimentSettings;
@@ -21,8 +22,10 @@ public class LatencyKafkaSinkLRV2 implements KafkaRecordSerializationSchema<Coun
     @Nullable
     @Override
     public ProducerRecord<byte[], byte[]> serialize(CountTuple tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
-        String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
+        long ts = System.currentTimeMillis();
+        // String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
         // return new ProducerRecord<>(topic, latency.getBytes(StandardCharsets.UTF_8));
-        return new ProducerRecord<>(topic, (latency + "," + tuple.getStimulus() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        tuple.setStimulusList(ts);
+        return new ProducerRecord<>(topic, (FormatStimulusList.formatStimulusList(tuple.getStimulusList()) + "," + tuple.getStimulus() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }

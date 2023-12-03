@@ -4,8 +4,14 @@ import io.palyvos.provenance.genealog.GenealogData;
 import io.palyvos.provenance.genealog.GenealogTuple;
 import io.palyvos.provenance.genealog.GenealogTupleType;
 
+import java.util.List;
+
 public class NexmarkJoinedTupleGL extends NexmarkJoinedTuple implements GenealogTuple {
     private GenealogData gdata;
+
+    public NexmarkJoinedTupleGL(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra) {
+        super(auctionId, bidder, price, channel, url, bid_dateTime, bid_extra, itemName, desc, initBid, reserve, auction_dateTime, expires, seller, category, auction_extra);
+    }
 
     public NexmarkJoinedTupleGL(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long stimulus) {
         super(auctionId, bidder, price, channel, url, bid_dateTime, bid_extra, itemName, desc, initBid, reserve, auction_dateTime, expires, seller, category, auction_extra, stimulus);
@@ -30,5 +36,20 @@ public class NexmarkJoinedTupleGL extends NexmarkJoinedTuple implements Genealog
     @Override
     public void setTimestamp(long timestamp) {
         super.setAuction_dateTime(timestamp);
+    }
+
+    @Override
+    public List<Long> getStimulusList() {
+        return super.getStimulusList();
+    }
+
+    @Override
+    public void setStimulusList(List<Long> stimulusList) {
+        super.setStimulusList(stimulusList);
+    }
+
+    @Override
+    public void setStimulusList(long stimulus) {
+        super.setStimulusList(stimulus);
     }
 }

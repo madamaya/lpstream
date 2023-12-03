@@ -14,6 +14,8 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.Obje
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataParserYSB extends RichMapFunction<KafkaInputString, YSBInputTuple> {
     long start;
@@ -28,6 +30,7 @@ public class DataParserYSB extends RichMapFunction<KafkaInputString, YSBInputTup
 
     @Override
     public YSBInputTuple map(KafkaInputString input) throws Exception {
+        long ts = System.currentTimeMillis();
         JsonNode jNode = om.readTree(input.getStr());
         String adId = jNode.get("ad_id").textValue();
         String eventType = jNode.get("event_type").textValue();
@@ -35,7 +38,13 @@ public class DataParserYSB extends RichMapFunction<KafkaInputString, YSBInputTup
         long eventtime = Long.parseLong(jNode.get("event_time").textValue());
         count++;
         // YSBInputTuple tuple = new YSBInputTuple(adId, eventType, campaignId, eventtime, input.getStimulus());
-        YSBInputTuple tuple = new YSBInputTuple(adId, eventType, campaignId, eventtime, input.getKafkaAppandTime());
+        // YSBInputTuple tuple = new YSBInputTuple(adId, eventType, campaignId, eventtime, input.getKafkaAppandTime());
+        YSBInputTuple tuple = new YSBInputTuple(adId, eventType, campaignId, eventtime);
+        List<Long> stimulusList = new ArrayList<>();
+        stimulusList.add(input.getKafkaAppandTime());
+        stimulusList.add(input.getStimulus());
+        stimulusList.add(ts);
+        tuple.setStimulusList(stimulusList);
         //tuple.setEventtime(System.currentTimeMillis());
         return tuple;
     }

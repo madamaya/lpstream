@@ -32,6 +32,7 @@ public class AuctionDataParserNexGL implements MapFunction<StringGL, NexmarkAuct
      */
     @Override
     public NexmarkAuctionTupleGL map(StringGL input) throws Exception {
+        long ts = System.currentTimeMillis();
         JsonNode jsonNodes = om.readTree(input.getString());
 
         int eventType = jsonNodes.get("event_type").asInt();
@@ -52,7 +53,10 @@ public class AuctionDataParserNexGL implements MapFunction<StringGL, NexmarkAuct
             String extra = jnode.get("extra").asText();
 
             // NexmarkAuctionTupleGL out = new NexmarkAuctionTupleGL(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getStimulus());
-            NexmarkAuctionTupleGL out = new NexmarkAuctionTupleGL(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getKafkaAppandTime());
+            // NexmarkAuctionTupleGL out = new NexmarkAuctionTupleGL(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getKafkaAppandTime());
+            NexmarkAuctionTupleGL out = new NexmarkAuctionTupleGL(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra);
+            out.setStimulusList(input.getStimulusList());
+            out.setStimulusList(ts);
             //out.setDateTime(System.currentTimeMillis());
             GenealogMapHelper.INSTANCE.annotateResult(input, out);
 

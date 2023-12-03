@@ -16,13 +16,16 @@ public class DataParserNYCGL implements MapFunction<StringGL, NYCInputTupleGL> {
 
     @Override
     public NYCInputTupleGL map(StringGL input) throws Exception {
+        long ts = System.currentTimeMillis();
         // JsonNode jNode = jNodeGL.getJsonNode();
 
         // String line = jNode.get("value").textValue();
         String inputStr = input.getString();
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
         // NYCInputTupleGL out = new NYCInputTupleGL(line, input.getStimulus(), sdf);
-        NYCInputTupleGL out = new NYCInputTupleGL(line, input.getKafkaAppandTime(), sdf);
+        NYCInputTupleGL out = new NYCInputTupleGL(line, sdf);
+        out.setStimulusList(input.getStimulusList());
+        out.setStimulusList(ts);
         //out.setDropoffTime(System.currentTimeMillis());
         GenealogMapHelper.INSTANCE.annotateResult(input, out);
 

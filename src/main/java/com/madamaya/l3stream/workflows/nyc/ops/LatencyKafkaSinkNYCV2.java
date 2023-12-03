@@ -4,6 +4,7 @@ import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTuple;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTupleGL;
 import io.palyvos.provenance.genealog.GenealogGraphTraverser;
 import io.palyvos.provenance.l3stream.util.FormatLineage;
+import io.palyvos.provenance.l3stream.util.FormatStimulusList;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -21,8 +22,10 @@ public class LatencyKafkaSinkNYCV2 implements KafkaRecordSerializationSchema<NYC
     @Nullable
     @Override
     public ProducerRecord<byte[], byte[]> serialize(NYCResultTuple tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
-        String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
+        long ts = System.currentTimeMillis();
+        // String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
         // return new ProducerRecord<>(topic, latency.getBytes(StandardCharsets.UTF_8));
-        return new ProducerRecord<>(topic, (latency + "," + tuple.getStimulus() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        tuple.setStimulusList(ts);
+        return new ProducerRecord<>(topic, (FormatStimulusList.formatStimulusList(tuple.getStimulusList()) + "," + tuple.getStimulus() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }

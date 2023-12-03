@@ -31,6 +31,7 @@ public class BidderDataParserNexGL implements MapFunction<StringGL, NexmarkBidTu
     */
     @Override
     public NexmarkBidTupleGL map(StringGL input) throws Exception {
+        long ts = System.currentTimeMillis();
         JsonNode jsonNodes = om.readTree(input.getString());
         int eventType = jsonNodes.get("event_type").asInt();
 
@@ -46,7 +47,10 @@ public class BidderDataParserNexGL implements MapFunction<StringGL, NexmarkBidTu
             String extra = jnode.get("extra").asText();
 
             // NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getStimulus());
-            NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getKafkaAppandTime());
+            // NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getKafkaAppandTime());
+            NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra);
+            out.setStimulusList(input.getStimulusList());
+            out.setStimulusList(ts);
             //out.setDateTime(System.currentTimeMillis());
             GenealogMapHelper.INSTANCE.annotateResult(input, out);
 

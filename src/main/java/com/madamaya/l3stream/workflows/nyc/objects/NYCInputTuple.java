@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class NYCInputTuple {
     /* Column list
@@ -19,6 +20,7 @@ public class NYCInputTuple {
     private double tripDistance;
     private long dropoffLocationId;
     private long stimulus = Long.MAX_VALUE;
+    private List<Long> stimulusList;
     // CNFM
 
     public NYCInputTuple(int vendorId, long dropoffTime, double tripDistance, long dropoffLocationId, long stimulus) {
@@ -92,6 +94,18 @@ public class NYCInputTuple {
 
     public void setStimulus(long stimulus) {
         this.stimulus = stimulus;
+    }
+
+    public List<Long> getStimulusList() {
+        return stimulusList;
+    }
+
+    public void setStimulusList(List<Long> stimulusList) {
+        this.stimulusList = stimulusList;
+    }
+
+    public void setStimulusList(long stimulus) {
+        this.stimulusList.add(stimulus);
     }
 
     @Override

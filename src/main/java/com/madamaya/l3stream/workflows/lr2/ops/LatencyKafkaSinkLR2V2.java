@@ -1,5 +1,6 @@
 package com.madamaya.l3stream.workflows.lr2.ops;
 
+import io.palyvos.provenance.l3stream.util.FormatStimulusList;
 import io.palyvos.provenance.usecases.CountTuple;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
@@ -18,8 +19,10 @@ public class LatencyKafkaSinkLR2V2 implements KafkaRecordSerializationSchema<Lin
     @Nullable
     @Override
     public ProducerRecord<byte[], byte[]> serialize(LinearRoadInputTuple tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
-        String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
+        long ts = System.currentTimeMillis();
+        // String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
         // return new ProducerRecord<>(topic, latency.getBytes(StandardCharsets.UTF_8));
-        return new ProducerRecord<>(topic, (latency + "," + tuple.getStimulus() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        tuple.setStimulusList(ts);
+        return new ProducerRecord<>(topic, (FormatStimulusList.formatStimulusList(tuple.getStimulusList()) + "," + tuple.getStimulus() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }

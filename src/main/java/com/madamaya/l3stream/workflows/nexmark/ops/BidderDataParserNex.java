@@ -18,8 +18,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class BidderDataParserNex extends RichMapFunction<KafkaInputString, NexmarkBidTuple> {
     /*
@@ -40,6 +42,7 @@ public class BidderDataParserNex extends RichMapFunction<KafkaInputString, Nexma
 
     @Override
     public NexmarkBidTuple map(KafkaInputString input) throws Exception {
+        long ts = System.currentTimeMillis();
         JsonNode jsonNodes = om.readTree(input.getStr());
         int eventType = jsonNodes.get("event_type").asInt();
         count++;
@@ -55,7 +58,13 @@ public class BidderDataParserNex extends RichMapFunction<KafkaInputString, Nexma
             String extra = jnode.get("extra").asText();
 
             // NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getStimulus());
-            NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getKafkaAppandTime());
+            // NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getKafkaAppandTime());
+            NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra);
+            List<Long> stimulusList = new ArrayList<>();
+            stimulusList.add(input.getKafkaAppandTime());
+            stimulusList.add(input.getStimulus());
+            stimulusList.add(ts);
+            tuple.setStimulusList(stimulusList);
             //tuple.setDateTime(System.currentTimeMillis());
             return tuple;
         } else {

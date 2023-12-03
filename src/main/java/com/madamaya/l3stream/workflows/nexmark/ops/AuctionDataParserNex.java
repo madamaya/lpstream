@@ -17,8 +17,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, NexmarkAuctionTuple> {
     /*
@@ -40,6 +42,7 @@ public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, Nexm
 
     @Override
     public NexmarkAuctionTuple map(KafkaInputString input) throws Exception {
+        long ts = System.currentTimeMillis();
         JsonNode jsonNodes = om.readTree(input.getStr());
         int eventType = jsonNodes.get("event_type").asInt();
         count++;
@@ -59,7 +62,13 @@ public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, Nexm
             String extra = jnode.get("extra").asText();
 
             // NexmarkAuctionTuple tuple = new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getStimulus());
-            NexmarkAuctionTuple tuple = new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getKafkaAppandTime());
+            // NexmarkAuctionTuple tuple = new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getKafkaAppandTime());
+            NexmarkAuctionTuple tuple = new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra);
+            List<Long> stimulusList = new ArrayList<>();
+            stimulusList.add(input.getKafkaAppandTime());
+            stimulusList.add(input.getStimulus());
+            stimulusList.add(ts);
+            tuple.setStimulusList(stimulusList);
             //tuple.setDateTime(System.currentTimeMillis());
             return tuple;
         } else {

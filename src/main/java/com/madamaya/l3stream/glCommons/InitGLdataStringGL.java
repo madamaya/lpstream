@@ -10,6 +10,8 @@ import org.apache.flink.configuration.Configuration;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InitGLdataStringGL extends RichMapFunction<KafkaInputString, StringGL> {
     long start;
@@ -29,7 +31,13 @@ public class InitGLdataStringGL extends RichMapFunction<KafkaInputString, String
 
     @Override
     public StringGL map(KafkaInputString input) throws Exception {
-        StringGL out = new StringGL(input.getStr(), input.getKafkaAppandTime(), input.getStimulus());
+        long ts = System.currentTimeMillis();
+        StringGL out = new StringGL(input.getStr());
+        List<Long> stimulusList = new ArrayList<>();
+        stimulusList.add(input.getKafkaAppandTime());
+        stimulusList.add(input.getStimulus());
+        stimulusList.add(ts);
+        out.setStimulusList(stimulusList);
         out.initGenealog(GenealogTupleType.SOURCE);
         count++;
         return out;

@@ -58,7 +58,8 @@ public class GLLR2 {
         //DataStream<CountTupleGL> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<LinearRoadInputTupleGL> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR")
                 .map(new InitGLdataStringGL(settings))
-                .map(new DataParserLRGL());
+                .map(new DataParserLRGL())
+                .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL());
 
         KafkaSink<LinearRoadInputTupleGL> sink;
         if (settings.getLatencyFlag() == 1) {

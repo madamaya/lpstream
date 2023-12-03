@@ -4,11 +4,17 @@ import io.palyvos.provenance.genealog.GenealogData;
 import io.palyvos.provenance.genealog.GenealogTuple;
 import io.palyvos.provenance.genealog.GenealogTupleType;
 
+import java.util.List;
+
 public class NexmarkAuctionTupleGL extends NexmarkAuctionTuple implements GenealogTuple {
     private GenealogData gdata;
 
     public NexmarkAuctionTupleGL(int eventType) {
         super(eventType);
+    }
+
+    public NexmarkAuctionTupleGL(int eventType, int auctionId, String itemName, String desc, int initBid, int reserve, long dateTime, long expires, int seller, int category, String extra) {
+        super(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra);
     }
 
     public NexmarkAuctionTupleGL(int eventType, int auctionId, String itemName, String desc, int initBid, int reserve, long dateTime, long expires, int seller, int category, String extra, long stimulus) {
@@ -35,4 +41,20 @@ public class NexmarkAuctionTupleGL extends NexmarkAuctionTuple implements Geneal
     public void setTimestamp(long timestamp) {
         super.setDateTime(timestamp);
     }
+
+    @Override
+    public List<Long> getStimulusList() {
+        return super.getStimulusList();
+    }
+
+    @Override
+    public void setStimulusList(List<Long> stimulusList) {
+        super.setStimulusList(stimulusList);
+    }
+
+    @Override
+    public void setStimulusList(long stimulus) {
+        super.setStimulusList(stimulus);
+    }
+
 }

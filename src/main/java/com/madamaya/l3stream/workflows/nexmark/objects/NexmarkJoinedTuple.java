@@ -1,5 +1,7 @@
 package com.madamaya.l3stream.workflows.nexmark.objects;
 
+import java.util.List;
+
 public class NexmarkJoinedTuple {
     private int auctionId;
     private int bidder;
@@ -18,6 +20,7 @@ public class NexmarkJoinedTuple {
     private int category;
     private String auction_extra;
     private long stimulus = Long.MAX_VALUE;
+    private List<Long> stimulusList;
 
     public NexmarkJoinedTuple(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long stimulus) {
         this.auctionId = auctionId;
@@ -192,6 +195,18 @@ public class NexmarkJoinedTuple {
 
     public void setStimulus(long stimulus) {
         this.stimulus = stimulus;
+    }
+
+    public List<Long> getStimulusList() {
+        return stimulusList;
+    }
+
+    public void setStimulusList(List<Long> stimulusList) {
+        this.stimulusList = stimulusList;
+    }
+
+    public void setStimulusList(long stimulus) {
+        this.stimulusList.add(stimulus);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.madamaya.l3stream.workflows.nyc.objects;
 
+import java.util.List;
+
 public class NYCResultTuple {
     private int vendorId;
     private long dropoffLocationId;
@@ -7,6 +9,7 @@ public class NYCResultTuple {
     private double avgDistance;
     private long ts;
     private long stimulus = Long.MAX_VALUE;
+    private List<Long> stimulusList;
 
     public NYCResultTuple(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts, long stimulus) {
         this.vendorId = vendorId;
@@ -71,6 +74,18 @@ public class NYCResultTuple {
 
     public void setStimulus(long stimulus) {
         this.stimulus = stimulus;
+    }
+
+    public List<Long> getStimulusList() {
+        return stimulusList;
+    }
+
+    public void setStimulusList(List<Long> stimulusList) {
+        this.stimulusList = stimulusList;
+    }
+
+    public void setStimulusList(long stimulus) {
+        this.stimulusList.add(stimulus);
     }
 
     @Override
