@@ -16,6 +16,8 @@ redisIP="localhost"
 redisPort=6379
 flinkIP="localhost"
 flinkPort=8081
+flinkTMIP="localhost"
+zookeeperIP="localhost"
 bootstrapServers="localhost:9092"
 ingestNode="localhost"
 

@@ -11,7 +11,7 @@ if [ $1 = "flesh" ]; then
   rm -rf results
 elif [ $1 = "fleshAll" ]; then
   rm -rf results
-  rm -rf LR
+  rm -rf LR*
   rm -rf Nexmark*
   rm -rf NYC
   rm -rf YSB

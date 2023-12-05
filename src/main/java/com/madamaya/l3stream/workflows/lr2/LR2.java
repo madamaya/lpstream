@@ -53,7 +53,8 @@ public class LR2 {
         /* Query */
         //DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<LinearRoadInputTuple> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR")
-                .map(new DataParserLR(settings));
+                .map(new DataParserLR(settings))
+                .assignTimestampsAndWatermarks(new WatermarkStrategyLR());
 
         KafkaSink<LinearRoadInputTuple> sink;
         if (settings.getLatencyFlag() == 1) {
