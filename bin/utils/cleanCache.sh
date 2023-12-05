@@ -22,13 +22,13 @@ function cleanCache() {
     ssh ${redisIP} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
     # Kafka zookeeper
     echo "ssh ${zookeeperIP} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
-    ssh ${zookeeperIP} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
+    ssh ${zookeeperIP} /bin/bash sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
     # Kafka brokers
     brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
     for broker in ${brokers[@]}
     do
       echo "ssh ${broker} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
-      ssh ${broker} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
+      ssh ${broker} /bin/bash sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
    done
   fi
 }
