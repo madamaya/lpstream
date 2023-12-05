@@ -27,7 +27,7 @@ function stopBroker() {
     echo "${KAFKA_HOME}/bin/kafka-server-stop.sh"
     ${KAFKA_HOME}/bin/kafka-server-stop.sh
   else
-    brokers=(`echo ${bootstrapServers} | tr :9092 " " | tr , " "`)
+    brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
     for broker in ${brokers[@]}
     do
       echo "ssh ${broker} /bin/zsh ${KAFKA_HOME}/bin/kafka-server-stop.sh"
@@ -41,7 +41,7 @@ function startBroker() {
     echo "${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties"
     ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties
   else
-      brokers=(`echo ${bootstrapServers} | tr :9092 " " | tr , " "`)
+      brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
       for broker in ${brokers[@]}
       do
         echo "ssh ${broker} /bin/zsh ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties"

@@ -8,7 +8,7 @@ function cleanCache() {
     echo "ssh ${flinkIP} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
     ssh ${flinkIP} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
     # FlinkTM
-    TMs=(`echo ${flinkTMIP} | tr , " "`)
+    TMs=(`echo ${flinkTMIP} | sed -e "s/,/ /g"`)
     for TM in ${TMs[@]}
     do
       echo "ssh ${TM} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
@@ -24,7 +24,7 @@ function cleanCache() {
     echo "ssh ${zookeeperIP} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
     ssh ${zookeeperIP} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
     # Kafka brokers
-    brokers=(`echo ${bootstrapServers} | tr :9092 " " | tr , " "`)
+    brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
     for broker in ${brokers[@]}
     do
       echo "ssh ${broker} /bin/zsh sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
