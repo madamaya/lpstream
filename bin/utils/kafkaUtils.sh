@@ -44,8 +44,8 @@ function startBroker() {
       brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
       for broker in ${brokers[@]}
       do
-        echo "ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/broker-start.sh"
-        ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/startKafkaCluster/broker-start.sh
+        echo "ssh ${broker} /bin/zsh ${L3_HOME}/bin/utils/broker-start.sh"
+        ssh ${broker} /bin/zsh ${L3_HOME}/bin/utils/startKafkaCluster/broker-start.sh
       done
   fi
 }
