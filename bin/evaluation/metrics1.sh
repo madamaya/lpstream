@@ -25,6 +25,43 @@ do
   do
     for query in ${queries[@]}
     do
+      # Stop cluster (Flink, Kafka, Redis)
+      echo "(stopBroker)"
+      stopBroker
+      echo "(stopZookeeper)"
+      stopZookeeper
+      echo "(stopRedis)"
+      stopRedis
+      echo "(stopFlinkCluster)"
+      stopFlinkCluster
+
+      echo "(sleep 30)"
+      sleep 30
+
+      # Remove cache
+      echo "(cleanCache)"
+      cleanCache
+
+      echo "(sleep 30)"
+      sleep 30
+
+      # Start cluster (Flink, Kafka, Redis)
+      echo "(startZookeeper)"
+      startZookeeper
+      echo "(startBroker)"
+      startBroker
+      echo "(startRedis)"
+      startRedis
+      echo "(startFlinkCluster)"
+      startFlinkCluster
+
+      echo "(sleep 30)"
+      sleep 30
+
+      # Remove cache
+      echo "(cleanCache)"
+      cleanCache
+
       echo "(sleep 120)"
       sleep 120
 
@@ -146,46 +183,6 @@ do
       ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
       echo "(sleep 10)"
       sleep 10
-
-      # Stop cluster (Flink, Kafka, Redis)
-      echo "(stopBroker)"
-      stopBroker
-      echo "(stopZookeeper)"
-      stopZookeeper
-      echo "(stopRedis)"
-      stopRedis
-      echo "(stopFlinkCluster)"
-      stopFlinkCluster
-
-      echo "(sleep 30)"
-      sleep 30
-
-      # Remove cache
-      echo "(cleanCache)"
-      cleanCache
-
-      echo "(sleep 30)"
-      sleep 30
-
-      # Start cluster (Flink, Kafka, Redis)
-      echo "(startZookeeper)"
-      startZookeeper
-      echo "(startBroker)"
-      startBroker
-      echo "(startRedis)"
-      startRedis
-      echo "(startFlinkCluster)"
-      startFlinkCluster
-
-      echo "(sleep 30)"
-      sleep 30
-
-      # Remove cache
-      echo "(cleanCache)"
-      cleanCache
-
-      echo "(sleep 30)"
-      sleep 30
     done
   done
 done
