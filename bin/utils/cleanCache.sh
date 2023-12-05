@@ -5,30 +5,30 @@ source $(dirname $0)/../config.sh
 function cleanCache() {
   if [ `uname` = "Linux" ]; then
     # FlinkJM
-    echo "ssh ${flinkIP} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
-    ssh ${flinkIP} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
+    echo "ssh ${flinkIP} /bin/zsh ${L3_HOME}/run_drop_caches.sh"
+    ssh ${flinkIP} /bin/zsh ${L3_HOME}/run_drop_caches.sh
     # FlinkTM
     TMs=(`echo ${flinkTMIP} | sed -e "s/,/ /g"`)
     for TM in ${TMs[@]}
     do
-      echo "ssh ${TM} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
-      ssh ${TM} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
+      echo "ssh ${TM} /bin/zsh ${L3_HOME}/run_drop_caches.sh"
+      ssh ${TM} /bin/zsh ${L3_HOME}/run_drop_caches.sh
     done
     # IngestNode
-    echo "ssh ${ingestNode} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
-    ssh ${ingestNode} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
+    echo "ssh ${ingestNode} /bin/zsh ${L3_HOME}/run_drop_caches.sh"
+    ssh ${ingestNode} /bin/zsh ${L3_HOME}/run_drop_caches.sh
     # Redis
-    echo "ssh ${redisIP} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
-    ssh ${redisIP} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
+    echo "ssh ${redisIP} /bin/zsh ${L3_HOME}/run_drop_caches.sh"
+    ssh ${redisIP} /bin/zsh ${L3_HOME}/run_drop_caches.sh
     # Kafka zookeeper
-    echo "ssh ${zookeeperIP} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
-    ssh ${zookeeperIP} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
+    echo "ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/run_drop_caches.sh"
+    ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/run_drop_caches.sh
     # Kafka brokers
     brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
     for broker in ${brokers[@]}
     do
-      echo "ssh ${broker} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches"
-      ssh ${broker} sync; sync; sync; echo 3 | sudo tee /proc/sys/vm/drop_caches
+      echo "ssh ${broker} /bin/zsh ${L3_HOME}/run_drop_caches.sh"
+      ssh ${broker} /bin/zsh ${L3_HOME}/run_drop_caches.sh
    done
   fi
 }
