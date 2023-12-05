@@ -14,7 +14,7 @@ function stopRedis() {
 }
 
 function startRedis() {
-  if [ ${zookeeper} = "localhost" ]; then
+  if [ ${redisIP} = "localhost" ]; then
     # Unsupport
   else
     echo "ssh ${redisIP} sudo systemctl start redis-server.service"
