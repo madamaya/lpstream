@@ -7,8 +7,8 @@ function stopZookeeper() {
     echo "${KAFKA_HOME}/bin/zookeeper-server-stop.sh"
     ${KAFKA_HOME}/bin/zookeeper-server-stop.sh
   else
-    echo "ssh ${zookeeperIP} /bin/bash ${KAFKA_HOME}/bin/zookeeper-server-stop.sh"
-    ssh ${zookeeperIP} /bin/bash ${KAFKA_HOME}/bin/zookeeper-server-stop.sh
+    echo "ssh ${zookeeperIP} /bin/zsh ${KAFKA_HOME}/bin/zookeeper-server-stop.sh"
+    ssh ${zookeeperIP} /bin/zsh ${KAFKA_HOME}/bin/zookeeper-server-stop.sh
   fi
 }
 
@@ -17,8 +17,8 @@ function startZookeeper() {
     echo "${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties"
     ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
   else
-    echo "ssh ${zookeeperIP} /bin/bash ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties"
-    ssh ${zookeeperIP} /bin/bash ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
+    echo "ssh ${zookeeperIP} /bin/zsh ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties"
+    ssh ${zookeeperIP} /bin/zsh ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
   fi
 }
 
@@ -30,8 +30,8 @@ function stopBroker() {
     brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
     for broker in ${brokers[@]}
     do
-      echo "ssh ${broker} /bin/bash ${KAFKA_HOME}/bin/kafka-server-stop.sh"
-      ssh ${broker} /bin/bash ${KAFKA_HOME}/bin/kafka-server-stop.sh
+      echo "ssh ${broker} /bin/zsh ${KAFKA_HOME}/bin/kafka-server-stop.sh"
+      ssh ${broker} /bin/zsh ${KAFKA_HOME}/bin/kafka-server-stop.sh
     done
   fi
 }
@@ -44,8 +44,8 @@ function startBroker() {
       brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
       for broker in ${brokers[@]}
       do
-        echo "ssh ${broker} /bin/bash ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties"
-        ssh ${broker} /bin/bash ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties
+        echo "ssh ${broker} /bin/zsh ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties"
+        ssh ${broker} /bin/zsh ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties
       done
   fi
 }
