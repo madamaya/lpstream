@@ -18,7 +18,7 @@ function startZookeeper() {
     ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
   else
     echo "ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/zookeeper-start.sh"
-    ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/zookeeper-start.sh
+    ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/startKafkaCluster/zookeeper-start.sh
   fi
 }
 
@@ -45,7 +45,7 @@ function startBroker() {
       for broker in ${brokers[@]}
       do
         echo "ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/broker-start.sh"
-        ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/broker-start.sh
+        ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/startKafkaCluster/broker-start.sh
       done
   fi
 }
