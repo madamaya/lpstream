@@ -17,8 +17,8 @@ function startZookeeper() {
     echo "${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties"
     ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
   else
-    echo "ssh ${zookeeperIP} /bin/zsh ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties"
-    ssh ${zookeeperIP} /bin/zsh ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
+    echo "ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/zookeeper-start.sh"
+    ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/zookeeper-start.sh
   fi
 }
 
@@ -44,8 +44,8 @@ function startBroker() {
       brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
       for broker in ${brokers[@]}
       do
-        echo "ssh ${broker} /bin/zsh ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties"
-        ssh ${broker} /bin/zsh ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties
+        echo "ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/broker-start.sh"
+        ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/broker-start.sh
       done
   fi
 }
