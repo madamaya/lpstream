@@ -39,9 +39,9 @@ public class IngestKafkaPartition implements Runnable {
             this.ip = new ParserLR();
         } else if (qName.contains("Nexmark")) {
             this.ip = new ParserNexmark();
-        } else if (qName.equals("NYC")) {
+        } else if (qName.contains("NYC")) {
             this.ip = new ParserNYC();
-        } else if (qName.equals("YSB")) {
+        } else if (qName.contains("YSB")) {
             this.ip = new ParserYSB();
         } else {
             throw new IllegalArgumentException();
