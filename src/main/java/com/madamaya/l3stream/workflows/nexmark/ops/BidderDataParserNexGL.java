@@ -6,7 +6,9 @@ import com.madamaya.l3stream.glCommons.StringGL;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTupleGL;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkInputTuple;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
@@ -46,7 +48,8 @@ public class BidderDataParserNexGL implements MapFunction<StringGL, NexmarkBidTu
             String extra = jnode.get("extra").asText();
 
             // NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getStimulus());
-            NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getKafkaAppandTime());
+            NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra);
+            out.setTfl(new TimestampsForLatency(input.getKafkaAppandTime(), input.getStimulus()));
             //out.setDateTime(System.currentTimeMillis());
             GenealogMapHelper.INSTANCE.annotateResult(input, out);
 

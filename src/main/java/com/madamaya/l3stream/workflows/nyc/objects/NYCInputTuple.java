@@ -1,5 +1,8 @@
 package com.madamaya.l3stream.workflows.nyc.objects;
 
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
+import org.apache.flink.api.java.tuple.Tuple2;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -19,6 +22,8 @@ public class NYCInputTuple {
     private double tripDistance;
     private long dropoffLocationId;
     private long stimulus = Long.MAX_VALUE;
+    private TimestampsForLatency tfl;
+
     // CNFM
 
     public NYCInputTuple(int vendorId, long dropoffTime, double tripDistance, long dropoffLocationId, long stimulus) {
@@ -92,6 +97,14 @@ public class NYCInputTuple {
 
     public void setStimulus(long stimulus) {
         this.stimulus = stimulus;
+    }
+
+    public TimestampsForLatency getTfl() {
+        return tfl;
+    }
+
+    public void setTfl(TimestampsForLatency tfl) {
+        this.tfl = tfl;
     }
 
     @Override

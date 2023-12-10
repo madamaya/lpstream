@@ -11,6 +11,10 @@ public class NexmarkAuctionTupleGL extends NexmarkAuctionTuple implements Geneal
         super(eventType);
     }
 
+    public NexmarkAuctionTupleGL(int eventType, int auctionId, String itemName, String desc, int initBid, int reserve, long dateTime, long expires, int seller, int category, String extra) {
+        super(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra);
+    }
+
     public NexmarkAuctionTupleGL(int eventType, int auctionId, String itemName, String desc, int initBid, int reserve, long dateTime, long expires, int seller, int category, String extra, long stimulus) {
         super(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, stimulus);
     }

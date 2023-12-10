@@ -2,6 +2,7 @@ package com.madamaya.l3stream.workflows.nexmark.ops;
 
 import com.madamaya.l3stream.workflows.nexmark.objects.*;
 import io.palyvos.provenance.genealog.GenealogJoinHelper;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
 import org.apache.flink.util.Collector;
 
@@ -24,9 +25,19 @@ public class JoinNexGL extends ProcessJoinFunction<NexmarkAuctionTupleGL, Nexmar
                 auctionTuple.getExpires(),
                 auctionTuple.getSeller(),
                 auctionTuple.getCategory(),
-                auctionTuple.getExtra(),
-                Math.max(bidTuple.getStimulus(), auctionTuple.getStimulus())
-        );
+                auctionTuple.getExtra());
+        if (auctionTuple.getTfl().ts2 >= bidTuple.getTfl().ts2) {
+            long tmp = Math.max(auctionTuple.getTfl().ts1, bidTuple.getTfl().ts1);
+            out.setTfl(auctionTuple.getTfl());
+            out.getTfl().setTs1(tmp);
+        } else if (auctionTuple.getTfl().ts2 < bidTuple.getTfl().ts2) {
+            long tmp = Math.max(auctionTuple.getTfl().ts1, bidTuple.getTfl().ts1);
+            out.setTfl(bidTuple.getTfl());
+            out.getTfl().setTs1(tmp);
+        } else {
+            throw new IllegalStateException();
+        }
+
         GenealogJoinHelper.INSTANCE.annotateResult(auctionTuple, bidTuple, out);
 
         collector.collect(out);

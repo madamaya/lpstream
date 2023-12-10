@@ -2,10 +2,12 @@ package com.madamaya.l3stream.workflows.nyc.ops;
 
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import io.palyvos.provenance.l3stream.conf.L3conf;
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -39,7 +41,8 @@ public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTup
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
 
         // NYCInputTuple tuple = new NYCInputTuple(line, input.getStimulus(), sdf);
-        NYCInputTuple tuple = new NYCInputTuple(line, input.getKafkaAppandTime(), sdf);
+        NYCInputTuple tuple = new NYCInputTuple(line, sdf);
+        tuple.setTfl(new TimestampsForLatency(input.getKafkaAppandTime(), input.getStimulus()));
         //tuple.setDropoffTime(System.currentTimeMillis());
         return tuple;
     }

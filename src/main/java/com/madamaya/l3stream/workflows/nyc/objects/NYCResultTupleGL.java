@@ -7,6 +7,10 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 public class NYCResultTupleGL extends NYCResultTuple implements GenealogTuple {
     private GenealogData gdata;
 
+    public NYCResultTupleGL(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts) {
+        super(vendorId, dropoffLocationId, count, avgDistance, ts);
+    }
+
     public NYCResultTupleGL(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts, long stimulus) {
         super(vendorId, dropoffLocationId, count, avgDistance, ts, stimulus);
     }

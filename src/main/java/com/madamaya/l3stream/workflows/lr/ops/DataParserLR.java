@@ -1,11 +1,13 @@
 package com.madamaya.l3stream.workflows.lr.ops;
 
 import io.palyvos.provenance.l3stream.conf.L3conf;
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -38,11 +40,10 @@ public class DataParserLR extends RichMapFunction<KafkaInputString, LinearRoadIn
                 Integer.valueOf(elements[5]),
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
-                Integer.valueOf(elements[8]),
-                // input.getStimulus()
-                input.getKafkaAppandTime()
+                Integer.valueOf(elements[8])
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
+        tuple.setTfl(new TimestampsForLatency(input.getKafkaAppandTime(), input.getStimulus()));
         //tuple.setTimestamp(System.currentTimeMillis());
         // tuple.setPartitionID(input.getPartitionID());
         count++;

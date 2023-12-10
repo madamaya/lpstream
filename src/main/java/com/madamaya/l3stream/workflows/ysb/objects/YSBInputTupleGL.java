@@ -7,6 +7,10 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 public class YSBInputTupleGL extends YSBInputTuple implements GenealogTuple {
     private GenealogData gdata;
 
+    public YSBInputTupleGL(String adId, String eventType, String campaignId, long eventtime) {
+        super(adId, eventType, campaignId, eventtime);
+    }
+
     public YSBInputTupleGL(String adId, String eventType, String campaignId, long eventtime, long stimulus) {
         super(adId, eventType, campaignId, eventtime, stimulus);
     }

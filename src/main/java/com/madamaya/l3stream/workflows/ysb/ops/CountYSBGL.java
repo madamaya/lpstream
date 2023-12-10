@@ -6,8 +6,11 @@ import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTupleGL;
 import io.palyvos.provenance.ananke.aggregate.ProvenanceAggregateStrategy;
 import io.palyvos.provenance.genealog.GenealogAccumulator;
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
 import org.apache.flink.api.common.functions.AggregateFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.tuple.Tuple5;
 
 import java.util.function.Supplier;
 
@@ -42,7 +45,7 @@ public class CountYSBGL implements AggregateFunction<YSBInternalTupleGL, CountYS
     public static class Accumulator extends
             GenealogAccumulator<YSBInternalTupleGL, YSBResultTupleGL, Accumulator> {
 
-        private Tuple4<String, Long, Long, Long> acc = Tuple4.of("", 0L, 0L, -1L);
+        private Tuple4<String, Long, Long, TimestampsForLatency> acc = Tuple4.of("", 0L, 0L, null);
 
         public Accumulator(Supplier<ProvenanceAggregateStrategy> strategySupplier) {
             super(strategySupplier);
@@ -53,12 +56,26 @@ public class CountYSBGL implements AggregateFunction<YSBInternalTupleGL, CountYS
             acc.f0 = tuple.getCampaignId();
             acc.f1++;
             acc.f2 = Math.max(acc.f2, tuple.getEventtime());
-            acc.f3 = Math.max(acc.f3, tuple.getStimulus());
+            if (acc.f3 == null) {
+                acc.f3 = tuple.getTfl();
+            } else {
+                if (acc.f3.ts2 >= tuple.getTfl().ts2) {
+                    acc.f3.setTs1(Math.max(acc.f3.ts1, tuple.getTfl().ts1));
+                } else if (acc.f3.ts2 < tuple.getTfl().ts2) {
+                    long tmp = Math.max(acc.f3.ts1, tuple.getTfl().ts1);
+                    acc.f3 = tuple.getTfl();
+                    acc.f3.setTs1(tmp);
+                } else {
+                    throw new IllegalStateException();
+                }
+            }
         }
 
         @Override
         protected YSBResultTupleGL doGetAggregatedResult() {
-            return new YSBResultTupleGL(acc.f0, acc.f1, acc.f2, acc.f3);
+            YSBResultTupleGL out = new YSBResultTupleGL(acc.f0, acc.f1, acc.f2);
+            out.setTfl(acc.f3);
+            return out;
         }
     }
 }

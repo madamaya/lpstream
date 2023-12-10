@@ -11,11 +11,11 @@ public class ProjectAttributeYSBGL implements MapFunction<YSBInputTupleGL, YSBIn
 
     @Override
     public YSBInternalTupleGL map(YSBInputTupleGL tuple) throws Exception {
-        YSBInternalTupleGL out = new YSBInternalTupleGL(tuple.getAdId(), tuple.getCampaignId(), tuple.getEventtime(), tuple.getStimulus());
+        YSBInternalTupleGL out = new YSBInternalTupleGL(tuple.getAdId(), tuple.getCampaignId(), tuple.getEventtime());
         GenealogMapHelper.INSTANCE.annotateResult(tuple, out);
 
         out.setTimestamp(tuple.getTimestamp());
-        out.setStimulus(tuple.getStimulus());
+        out.setTfl(tuple.getTfl());
 
         return out;
     }

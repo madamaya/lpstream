@@ -1,5 +1,8 @@
 package com.madamaya.l3stream.workflows.ysb.objects;
 
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
+import org.apache.flink.api.java.tuple.Tuple2;
+
 public class YSBInputTuple {
     // {"user_id", "page_id", "ad_id", "ad_type", "event_type", "event_time", "ip_address", "campaign_id"}
     private String adId;
@@ -7,6 +10,7 @@ public class YSBInputTuple {
     private String campaignId;
     private long eventtime;
     private long stimulus = Long.MAX_VALUE;
+    private TimestampsForLatency tfl;
 
     public YSBInputTuple(String adId, String eventType, String campaignId, long eventtime, long stimulus) {
         this.adId = adId;
@@ -61,6 +65,14 @@ public class YSBInputTuple {
 
     public void setStimulus(long stimulus) {
         this.stimulus = stimulus;
+    }
+
+    public TimestampsForLatency getTfl() {
+        return tfl;
+    }
+
+    public void setTfl(TimestampsForLatency tfl) {
+        this.tfl = tfl;
     }
 
     @Override

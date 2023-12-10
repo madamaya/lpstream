@@ -4,10 +4,12 @@ import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkInputTuple;
 import io.palyvos.provenance.l3stream.conf.L3conf;
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +57,8 @@ public class BidderDataParserNex extends RichMapFunction<KafkaInputString, Nexma
             String extra = jnode.get("extra").asText();
 
             // NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getStimulus());
-            NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getKafkaAppandTime());
+            NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra);
+            tuple.setTfl(new TimestampsForLatency(input.getKafkaAppandTime(), input.getStimulus()));
             //tuple.setDateTime(System.currentTimeMillis());
             return tuple;
         } else {

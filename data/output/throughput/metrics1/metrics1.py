@@ -2,7 +2,7 @@ import os
 import time
 from utils import utils
 
-queries = ["LR", "Nexmark", "NYC", "Nexmark2", "YSB"]
+queries = ["LR2", "Nexmark", "NYC", "YSB", "Nexmark2", "NYC2", "YSB2"]
 approaches = ["baseline", "genealog", "l3stream", "l3streamlin"]
 startTime = time.time()
 flag = "metrics1"

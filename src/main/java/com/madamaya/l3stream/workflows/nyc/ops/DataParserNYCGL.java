@@ -5,7 +5,9 @@ import com.madamaya.l3stream.glCommons.JsonNodeGL;
 import com.madamaya.l3stream.glCommons.StringGL;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTupleGL;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -22,7 +24,8 @@ public class DataParserNYCGL implements MapFunction<StringGL, NYCInputTupleGL> {
         String inputStr = input.getString();
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
         // NYCInputTupleGL out = new NYCInputTupleGL(line, input.getStimulus(), sdf);
-        NYCInputTupleGL out = new NYCInputTupleGL(line, input.getKafkaAppandTime(), sdf);
+        NYCInputTupleGL out = new NYCInputTupleGL(line, sdf);
+        out.setTfl(new TimestampsForLatency(input.getKafkaAppandTime(), input.getStimulus()));
         //out.setDropoffTime(System.currentTimeMillis());
         GenealogMapHelper.INSTANCE.annotateResult(input, out);
 

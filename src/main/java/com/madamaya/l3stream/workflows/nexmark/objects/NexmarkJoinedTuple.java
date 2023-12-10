@@ -1,5 +1,8 @@
 package com.madamaya.l3stream.workflows.nexmark.objects;
 
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
+import org.apache.flink.api.java.tuple.Tuple2;
+
 public class NexmarkJoinedTuple {
     private int auctionId;
     private int bidder;
@@ -18,6 +21,7 @@ public class NexmarkJoinedTuple {
     private int category;
     private String auction_extra;
     private long stimulus = Long.MAX_VALUE;
+    private TimestampsForLatency tfl;
 
     public NexmarkJoinedTuple(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long stimulus) {
         this.auctionId = auctionId;
@@ -192,6 +196,14 @@ public class NexmarkJoinedTuple {
 
     public void setStimulus(long stimulus) {
         this.stimulus = stimulus;
+    }
+
+    public TimestampsForLatency getTfl() {
+        return tfl;
+    }
+
+    public void setTfl(TimestampsForLatency tfl) {
+        this.tfl = tfl;
     }
 
     @Override

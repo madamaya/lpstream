@@ -28,9 +28,9 @@ def logDump(query, approach, meanList, stdList, startTime, flag):
         w.write("STD: {}\n".format(npMeansArray.std()))
         w.write("\n")
 
-def logDumpWelch(query, approaches, startTime, flag, allValidList):
+def logDumpWelch(query, approaches, startTime, flag, allValidList, latency_flag):
     bonferroniCoef = (len(approaches) * (len(approaches) - 1)) // 2
-    with open("./results/latency.{}.info.{}.log".format(flag, round(startTime)), "a") as w:
+    with open("./results/latency.{}.info.{}.{}.log".format(flag, round(startTime)), "a", latency_flag) as w:
         w.write("===== Welch results ({}) =====\n".format(query))
         for pair in itertools.combinations(approaches, 2):
             for i in range(len(allValidList[approaches[0]])):
@@ -47,7 +47,7 @@ def logDumpWelch(query, approaches, startTime, flag, allValidList):
         w.write("=================================\n")
         w.write("\n")
 
-def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, violinPlot, startTime, flag):
+def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, violinPlot, startTime, flag, latency_flag):
     results = {}
     allValidList = {}
     for query in queries:
@@ -68,8 +68,10 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                         if line == "":
                             break
                         elements = line.split(",")
-                        tmpLines.append(int(elements[2]) - int(elements[0]))
-                        #tmpLines.append(int(elements[1]))
+                        if latency_flag == 0:
+                            tmpLines.append(int(elements[0]) - int(elements[1]))
+                        else:
+                            tmpLines.append(int(elements[2]))
                 #nparray = np.loadtxt("{}".format(l), dtype="int64")
                 nparray = np.array(tmpLines)
                 filteredTuple = round(nparray.size * filterRate)
@@ -98,19 +100,25 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                 for validList in allValidList[query][approach]:
                     plt.plot(range(validList.size), validList, linewidth=0.1)
                 print("*** Save fig ***")
-                plt.title("{}-{}".format(query, approach))
+                plt.title("{}-{}-{}".format(query, approach, latency_flag))
                 plt.ylim(bottom=0)
-                plt.ylabel("Latency [ns]")
-                plt.savefig("./results/figs/{}-{}.pdf".format(query, approach))
+                if latency_flag == 0:
+                    plt.ylabel("Latency [ns]")
+                else:
+                    plt.ylabel("Latency [ms]")
+                plt.savefig("./results/figs/{}-{}-{}.pdf".format(query, approach, latency_flag))
                 plt.close()
 
                 for validList in allValidList[query][approach]:
                     plt.plot(range(validList.size), validList, linestyle="None", marker=".", markersize=markerSize(validList.size))
                 print("*** Save fig ***")
-                plt.title("{}-{}".format(query, approach))
+                plt.title("{}-{}-{}".format(query, approach, latency_flag))
                 plt.ylim(bottom=0)
-                plt.ylabel("Latency [ns]")
-                plt.savefig("./results/figs/{}-{}.png".format(query, approach), dpi=900)
+                if latency_flag == 0:
+                    plt.ylabel("Latency [ns]")
+                else:
+                    plt.ylabel("Latency [ms]")
+                plt.savefig("./results/figs/{}-{}-{}.png".format(query, approach, latency_flag), dpi=900)
                 plt.close()
 
             # dump log
@@ -131,24 +139,30 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
             for i in range(len(allValidList[query][approaches[0]])):
                 for approach in approaches:
                     plt.plot(range(allValidList[query][approach][i].size), allValidList[query][approach][i], linewidth=0.1)
-                plt.title("{}-{}-comparison".format(query, i))
+                plt.title("{}-{}-comparison-{}".format(query, i, latency_flag))
                 plt.ylim(bottom=0)
-                plt.ylabel("Latency")
+                if latency_flag == 0:
+                    plt.ylabel("Latency [ns]")
+                else:
+                    plt.ylabel("Latency [ms]")
                 plt.legend(approaches)
-                plt.savefig("./results/figs/{}-{}-comparison.pdf".format(query, i))
+                plt.savefig("./results/figs/{}-{}-comparison-{}.pdf".format(query, i, latency_flag))
                 plt.close()
 
                 for approach in approaches:
                     plt.plot(range(allValidList[query][approach][i].size), allValidList[query][approach][i], linestyle="None", marker=".", markersize=markerSize(allValidList[query][approach][i].size))
-                plt.title("{}-{}-comparison".format(query, i))
+                plt.title("{}-{}-comparison-{}".format(query, i, latency_flag))
                 plt.ylim(bottom=0)
-                plt.ylabel("Latency")
+                if latency_flag == 0:
+                    plt.ylabel("Latency [ns]")
+                else:
+                    plt.ylabel("Latency [ms]")
                 plt.legend(approaches)
-                plt.savefig("./results/figs/{}-{}-comparison.png".format(query, i), dpi=900)
+                plt.savefig("./results/figs/{}-{}-comparison-{}.png".format(query, i, latency_flag), dpi=900)
                 plt.close()
 
         print("*** Welch test ***")
-        logDumpWelch(query, approaches, startTime, flag, allValidList[query])
+        logDumpWelch(query, approaches, startTime, flag, allValidList[query], latency_flag)
 
     if violinPlot == True:
         print("*** Violin plot ***")
@@ -157,16 +171,19 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                 validListsIdx = [allValidList[query][approach][idx] for approach in approaches]
                 plt.violinplot(validListsIdx, showmeans=True)
                 plt.xticks(range(1, len(approaches)+1), [approach for approach in approaches])
-                plt.title("*{}* result (Latency, {}, {}, violin)".format(query, flag, idx))
-                plt.ylabel("Latency [ns]")
-                plt.savefig("./results/{}.violin.pdf.{}".format(query, idx))
+                plt.title("*{}* result (Latency, {}, {}, {}, violin)".format(query, flag, idx, latency_flag))
+                if latency_flag == 0:
+                    plt.ylabel("Latency [ns]")
+                else:
+                    plt.ylabel("Latency [ms]")
+                plt.savefig("./results/{}.violin.{}.{}.pdf".format(query, idx, latency_flag))
                 plt.close()
     else:
         print("*** No violin plot ***")
 
     return results
 
-def resultFigsGen(results, queries, approaches, flag):
+def resultFigsGen(results, queries, approaches, flag, latency_flag):
     for query in queries:
         resultsList = [results[query][approach][0] for approach in approaches]
         colorList = []
@@ -181,23 +198,29 @@ def resultFigsGen(results, queries, approaches, flag):
                 colorList.append("m")
 
         plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
-        plt.title("*{}* result (Latency, {})".format(query, flag))
-        plt.ylabel("Latency [ns]")
-        plt.savefig("./results/{}.pdf".format(query))
+        plt.title("*{}* result (Latency, {}, {})".format(query, flag, latency_flag))
+        if latency_flag == 0:
+            plt.ylabel("Latency [ns]")
+        else:
+            plt.ylabel("Latency [ms]")
+        plt.savefig("./results/{}.{}.pdf".format(query, latency_flag))
         plt.close()
 
         for idx in range(results[query][approaches[0]][2]):
             resultsList = [results[query][approach][3][idx] for approach in approaches]
             for approach in approaches:
                 plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
-                plt.title("*{}* result (Latency, {}, {})".format(query, flag, idx))
-                plt.ylabel("Latency [ns]")
-                plt.savefig("./results/{}-{}.pdf".format(query, idx))
+                plt.title("*{}* result (Latency, {}, {}, {})".format(query, flag, idx, latency_flag))
+                if latency_flag == 0:
+                    plt.ylabel("Latency [ns]")
+                else:
+                    plt.ylabel("Latency [ms]")
+                plt.savefig("./results/{}-{}-{}.pdf".format(query, idx, latency_flag))
                 plt.close()
 
 
-def writeResults(results, queries, approaches, startTime, flag):
-    with open("./results/latency.{}.result.{}.txt".format(flag, startTime), "w") as w:
+def writeResults(results, queries, approaches, startTime, flag, latency_flag):
+    with open("./results/latency.{}.result.{}.{}.txt".format(flag, startTime, latency_flag), "w") as w:
         # Write mean
         w.write("MEAN,{}\n".format(",".join(approaches)))
         for query in queries:

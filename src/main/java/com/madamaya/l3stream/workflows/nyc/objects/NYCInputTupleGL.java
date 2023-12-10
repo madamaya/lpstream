@@ -9,6 +9,10 @@ import java.text.SimpleDateFormat;
 public class NYCInputTupleGL extends NYCInputTuple implements GenealogTuple {
     private GenealogData gdata;
 
+    public NYCInputTupleGL(String line, SimpleDateFormat sdf) {
+        super(line, sdf);
+    }
+
     public NYCInputTupleGL(String line, long stimulus, SimpleDateFormat sdf) {
         super(line, stimulus, sdf);
     }

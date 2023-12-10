@@ -1,5 +1,8 @@
 package com.madamaya.l3stream.workflows.nyc.objects;
 
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
+import org.apache.flink.api.java.tuple.Tuple2;
+
 public class NYCResultTuple {
     private int vendorId;
     private long dropoffLocationId;
@@ -7,6 +10,7 @@ public class NYCResultTuple {
     private double avgDistance;
     private long ts;
     private long stimulus = Long.MAX_VALUE;
+    private TimestampsForLatency tfl;
 
     public NYCResultTuple(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts, long stimulus) {
         this.vendorId = vendorId;
@@ -71,6 +75,14 @@ public class NYCResultTuple {
 
     public void setStimulus(long stimulus) {
         this.stimulus = stimulus;
+    }
+
+    public TimestampsForLatency getTfl() {
+        return tfl;
+    }
+
+    public void setTfl(TimestampsForLatency tfl) {
+        this.tfl = tfl;
     }
 
     @Override

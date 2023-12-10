@@ -5,7 +5,9 @@ import com.madamaya.l3stream.glCommons.JsonNodeGL;
 import com.madamaya.l3stream.glCommons.StringGL;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBInputTupleGL;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
+import io.palyvos.provenance.l3stream.util.object.TimestampsForLatency;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
@@ -26,7 +28,8 @@ public class DataParserYSBGL implements MapFunction<StringGL, YSBInputTupleGL> {
         long eventtime = Long.parseLong(jNode.get("event_time").textValue());
 
         // YSBInputTupleGL out = new YSBInputTupleGL(adId, eventType, campaignId, eventtime, input.getStimulus());
-        YSBInputTupleGL out = new YSBInputTupleGL(adId, eventType, campaignId, eventtime, input.getKafkaAppandTime());
+        YSBInputTupleGL out = new YSBInputTupleGL(adId, eventType, campaignId, eventtime);
+        out.setTfl(new TimestampsForLatency(input.getKafkaAppandTime(), input.getStimulus()));
         //out.setEventtime(System.currentTimeMillis());
         GenealogMapHelper.INSTANCE.annotateResult(input, out);
 
