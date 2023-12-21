@@ -1,6 +1,13 @@
 #!/bin/zsh
 
+source $(dirname $0)/../config.sh
+
 function startCpuMemoryLogger() {
+  logDir=$1
+  logFile=$2
+
+  mkdir -p ${logDir}
+
   echo "startCpuMemoryLogger"
   # get taskmanagers
   echo "get taskmanagers"
@@ -8,9 +15,11 @@ function startCpuMemoryLogger() {
   TMids=(`curl ${flinkIP}:${flinkPort}/taskmanagers | jq '.taskmanagers[] | .id'`)
 
   # start cpuMemoryLogger.py
+  cd ../utils
   echo "start cpuMemoryLogger.py"
-  echo "(python cpuMemoryLogger.py ${flinkIP}:${flinkPort} ${TMids})"
-  python cpuMemoryLogger.py ${flinkIP}:${flinkPort} ${TMids}
+  echo "(python cpuMemoryLogger.py ${flinkIP}:${flinkPort} ${logDir}/${logFile} ${TMids})"
+  python cpuMemoryLogger.py ${flinkIP}:${flinkPort} ${logDir}/${logFile} ${TMids}
+  cd ../templates
 }
 
 function stopCpuMemoryLogger() {

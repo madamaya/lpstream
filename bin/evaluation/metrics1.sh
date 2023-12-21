@@ -7,11 +7,13 @@ source ../utils/kafkaUtils.sh
 source ../utils/redisUtils.sh
 source ../utils/cleanCache.sh
 source ../utils/logger.sh
+source ../utils/cpuMemoryLoadLogger.sh
 
 numOfLoop=3
 throughput=${1}
 granularityTemp=10
-queries=(LR2 Nexmark NYC Nexmark2 YSB)
+#queries=(LR2 Nexmark NYC Nexmark2 YSB)
+queries=(LR2 NYC Nexmark2 YSB)
 #queries=(Nexmark NYC Nexmark2 YSB)
 approaches=(baseline genealog l3stream l3streamlin)
 #approaches=(baseline)
@@ -134,10 +136,16 @@ do
         ssh ${ingestNode} /bin/zsh ${L3_HOME}/bin/dataingest/ingestData.sh ${filePath} ${qName} ${topic} ${parallelism} ${throughput} ${granularity} &
       fi
 
+      # Start CPU/Memory logger
+      startCpuMemoryLogger ${L3_HOME}/data/output/cpu-memory/${query}/${approach} ${loop}.log &
+
       # Sleep
       echo "*** Sleep predefined time (${sleepTime} [s]) ***"
       echo "(sleep ${sleepTime})"
       sleep ${sleepTime}
+
+      # Stop CPU/Memory logger
+      stopCpuMemoryLogger
 
       # Stop query
       echo "*** Cancel running flink job ***"
@@ -187,6 +195,8 @@ do
   done
 done
 
+cd ${L3_HOME}/data/output/cpu-memory
+python cpu-memory.py
 cd ${L3_HOME}/data/output/latency/metrics1
 python metrics1.py
 cd ${L3_HOME}/data/output/throughput/metrics1
@@ -196,5 +206,6 @@ cd ${L3_HOME}/data/output
 ./getResult.sh
 cp -r latency latency${throughput}
 cp -r throughput throughput${throughput}
+cp -r cpu-memory cpu-memory${throughput}
 mv results results${throughput}
 ./flesh.sh fleshAll

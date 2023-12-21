@@ -2,6 +2,18 @@
 
 source $(dirname $0)/../config.sh
 
+function forceGConTM() {
+  tms=(`echo ${flinkTMIP} | sed -e 's/,/ /g'`)
+  for tm in ${tms[@]}
+  do
+    if [ ${tm} = "localhost" ]; then
+      jcmd | grep TaskManager | awk '{print $1}' | xargs -I {} jcmd {} GC.run
+    else
+      ssh ${tm} jcmd | grep TaskManager | awk '{print $1}' | xargs -I {} jcmd {} GC.run
+    fi
+  done
+}
+
 function cleanCache() {
   if [ `uname` = "Linux" ]; then
     # FlinkJM
@@ -31,4 +43,6 @@ function cleanCache() {
       ssh ${broker} /bin/zsh ${L3_HOME}/run_drop_caches.sh
    done
   fi
+
+  forceGConTM
 }
