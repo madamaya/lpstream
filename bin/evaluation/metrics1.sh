@@ -63,9 +63,13 @@ do
       # Remove cache
       echo "(cleanCache)"
       cleanCache
-
       echo "(sleep 120)"
       sleep 120
+
+      echo "(forceGConTM)"
+      forceGConTM
+      echo "(sleep 10)"
+      sleep 10
 
       if [ ${query} = "Nexmark" ]; then
         #sleepTime=600

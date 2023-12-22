@@ -15,6 +15,7 @@ function forceGConTM() {
 }
 
 function cleanCache() {
+  forceGConTM
   if [ `uname` = "Linux" ]; then
     # FlinkJM
     echo "ssh ${flinkIP} /bin/zsh ${L3_HOME}/run_drop_caches.sh"
@@ -43,6 +44,4 @@ function cleanCache() {
       ssh ${broker} /bin/zsh ${L3_HOME}/run_drop_caches.sh
    done
   fi
-
-  forceGConTM
 }
