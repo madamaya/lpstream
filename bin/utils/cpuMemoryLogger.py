@@ -29,14 +29,20 @@ if __name__ == "__main__":
             for TMid in TMids:
                 res = requests.get("http://{}/taskmanagers/{}/metrics?get={}".format(flinkJM, TMid, ",".join(metrics["CPU"])))
                 print("res.text = {}".format(res.text))
-                cpuUsedList.append(float(res.json()[0]["value"]) * 100)
+                if res.json() == []:
+                    cpuUsedList.append(0)
+                else:
+                    cpuUsedList.append(float(res.json()[0]["value"]) * 100)
             cpuUsed = sum(cpuUsedList)
 
             # Get Memory metrics
             memoryUsedList = []
             for TMid in TMids:
                 res = requests.get("http://" + flinkJM + "/taskmanagers/{}/metrics?get={}".format(TMid, ",".join(metrics["Memory"])))
-                memoryUsedList.append(sum([float(element["value"]) for element in res.json()]))
+                if res.json() == []:
+                    memoryUsedList.append(0)
+                else:
+                    memoryUsedList.append(sum([float(element["value"]) for element in res.json()]))
             memoryUsed = sum(memoryUsedList)
 
             #print("{}".format(time.time()))
