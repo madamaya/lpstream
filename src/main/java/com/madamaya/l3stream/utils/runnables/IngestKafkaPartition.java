@@ -73,13 +73,18 @@ public class IngestKafkaPartition implements Runnable {
             long count = 0;
             long dataNum = 0;
 
+            long currentTime = 0;
+            long incrementTime = 1000000000 / throughput;
+
             long stime = System.nanoTime();
             long prevTime = System.nanoTime();
             while (true) {
                 br = new BufferedReader(new FileReader(filePath));
                 while ((line = br.readLine()) != null) {
                     // Send data
-                    String sendLine = ip.attachTimestamp(line, System.currentTimeMillis());
+                    // String sendLine = ip.attachTimestamp(line, System.currentTimeMillis());
+                    String sendLine = ip.attachTimestamp(line, currentTime / 1000000);
+                    currentTime += incrementTime;
                     // System.out.println(sendLine);
                     producer.send(new ProducerRecord<String, String>(topic, partition, null, null, sendLine),
                             (recordMetadata, e) -> {
