@@ -9,7 +9,7 @@ function forceGConTM() {
     if [ ${tm} = "localhost" ]; then
       jcmd | grep TaskManager | awk '{print $1}' | xargs -I {} jcmd {} GC.run
     else
-      ssh ${tm} "jcmd | grep TaskManager | awk '{print $1}' | xargs -I {} jcmd {} GC.run"
+      ssh ${tm} "jcmd | grep TaskManager | awk '{print \$1}' | xargs -I {} jcmd {} GC.run"
     fi
   done
 }
