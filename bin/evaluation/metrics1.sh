@@ -9,7 +9,7 @@ source ../utils/cleanCache.sh
 source ../utils/logger.sh
 source ../utils/cpuMemoryLoadLogger.sh
 
-numOfLoop=3
+numOfLoop=1
 throughput=${1}
 granularityTemp=10
 #queries=(LR2 Nexmark NYC Nexmark2 YSB)
@@ -73,13 +73,13 @@ do
 
       if [ ${query} = "Nexmark" ]; then
         #sleepTime=600
-        sleepTime=300
+        sleepTime=900
       elif [ ${query} = "Nexmark2" ]; then
         #sleepTime=600
-        sleepTime=300
+        sleepTime=900
       else
         #sleepTime=180
-        sleepTime=300
+        sleepTime=900
       fi
 
       echo "*** Start evaluation (query = ${query}, approach = ${approach}, loop = ${loop}) ***"
