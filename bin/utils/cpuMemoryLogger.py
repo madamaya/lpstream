@@ -28,7 +28,7 @@ if __name__ == "__main__":
             cpuUsedList = []
             for TMid in TMids:
                 res = requests.get("http://{}/taskmanagers/{}/metrics?get={}".format(flinkJM, TMid, ",".join(metrics["CPU"])))
-                print("res.text = {}".format(res.text))
+                #print("res.text = {}".format(res.text))
                 if res.json() == []:
                     cpuUsedList.append(0)
                 else:
