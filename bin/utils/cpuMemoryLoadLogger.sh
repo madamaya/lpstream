@@ -18,7 +18,7 @@ function startCpuMemoryLogger() {
   cd ../utils
   echo "start cpuMemoryLogger.py"
   echo "(python cpuMemoryLogger.py ${flinkIP}:${flinkPort} ${logDir}/${logFile} ${TMids})"
-  python cpuMemoryLogger.py ${flinkIP}:${flinkPort} ${logDir}/${logFile} ${TMids}
+  python cpuMemoryLogger.py ${flinkIP}:${flinkPort} ${logDir}/${logFile} ${TMids} 2>&1 /dev/null
   cd ../templates
 }
 

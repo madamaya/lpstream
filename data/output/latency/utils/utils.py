@@ -68,8 +68,8 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                         if line == "":
                             break
                         elements = line.split(",")
-                        tmpLines.append(int(elements[2]) - int(elements[0]))
-                        #tmpLines.append(int(elements[1]))
+                        #tmpLines.append(int(elements[0]) - int(elements[2]))
+                        tmpLines.append(int(elements[1]))
                 #nparray = np.loadtxt("{}".format(l), dtype="int64")
                 nparray = np.array(tmpLines)
                 filteredTuple = round(nparray.size * filterRate)
@@ -159,7 +159,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                 plt.xticks(range(1, len(approaches)+1), [approach for approach in approaches])
                 plt.title("*{}* result (Latency, {}, {}, violin)".format(query, flag, idx))
                 plt.ylabel("Latency [ns]")
-                plt.savefig("./results/{}.violin.pdf.{}".format(query, idx))
+                plt.savefig("./results/{}.violin.{}.pdf".format(query, idx))
                 plt.close()
     else:
         print("*** No violin plot ***")

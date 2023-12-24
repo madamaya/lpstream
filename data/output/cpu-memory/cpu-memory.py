@@ -4,7 +4,7 @@ from utils import utils
 
 filterRate = 0.1
 plotTrends = True
-queries = ["LR2", "Nexmark", "NYC", "YSB", "Nexmark2"]
+queries = ["LR2", "NYC", "YSB", "Nexmark2"]
 approaches = ["baseline", "genealog", "l3stream", "l3streamlin"]
 startTime = time.time()
 flag = "metrics1"
