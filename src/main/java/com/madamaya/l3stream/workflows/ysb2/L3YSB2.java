@@ -2,6 +2,7 @@ package com.madamaya.l3stream.workflows.ysb2;
 
 import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
+import com.madamaya.l3stream.workflows.ysb.objects.YSBInternalTuple;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
 import com.madamaya.l3stream.workflows.ysb.ops.CountYSBL3;
 import com.madamaya.l3stream.workflows.ysb.ops.DataParserYSBL3;
@@ -14,6 +15,7 @@ import io.palyvos.provenance.l3stream.wrappers.operators.L3OpWrapperStrategy;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -64,7 +66,15 @@ public class L3YSB2 {
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyYSB(), settings.readPartitionNum(env.getParallelism()))).uid("5")
                 .filter(L3.filter(t -> t.getEventType().equals("view"))).uid("6")
                 .map(L3.map(new ProjectAttributeYSBL3())).uid("7")
-                .keyBy(L3.keyBy(t -> t.getCampaignId(), String.class))
+                //.keyBy(L3.keyBy(t -> t.getCampaignId(), String.class))
+                .keyBy(L3.keyBy(new KeySelector<YSBInternalTuple, Integer>() {
+                    int key = 0;
+                    @Override
+                    public Integer getKey(YSBInternalTuple ysbInternalTuple) throws Exception {
+                        key = (key + 1) % 20;
+                        return key;
+                    }
+                }, Integer.class))
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(30))))
                 .aggregate(L3.aggregate(new CountYSBL3())).uid("8");
 

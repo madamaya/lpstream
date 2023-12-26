@@ -54,10 +54,20 @@ public class NYC2 {
                 .map(new DataParserNYC(settings))
                 .assignTimestampsAndWatermarks(new WatermarkStrategyNYC())
                 .filter(t -> t.getTripDistance() > 5)
+                /*
                 .keyBy(new KeySelector<NYCInputTuple, Tuple2<Integer, Long>>() {
                     @Override
                     public Tuple2<Integer, Long> getKey(NYCInputTuple tuple) throws Exception {
                         return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
+                    }
+                })
+                 */
+                .keyBy(new KeySelector<NYCInputTuple, Integer>() {
+                    int key = 0;
+                    @Override
+                    public Integer getKey(NYCInputTuple tuple) throws Exception {
+                        key = (key + 1) % 20;
+                        return key;
                     }
                 })
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(30))))

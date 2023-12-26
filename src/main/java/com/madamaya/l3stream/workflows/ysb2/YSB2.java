@@ -1,12 +1,14 @@
 package com.madamaya.l3stream.workflows.ysb2;
 
 import com.madamaya.l3stream.conf.L3Config;
+import com.madamaya.l3stream.workflows.ysb.objects.YSBInternalTuple;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
 import com.madamaya.l3stream.workflows.ysb.ops.*;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
@@ -52,7 +54,15 @@ public class YSB2 {
                 .assignTimestampsAndWatermarks(new WatermarkStrategyYSB())
                 .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSB())
-                .keyBy(t -> t.getCampaignId())
+                //.keyBy(t -> t.getCampaignId())
+                .keyBy(new KeySelector<YSBInternalTuple, Integer>() {
+                    int key = 0;
+                    @Override
+                    public Integer getKey(YSBInternalTuple ysbInternalTuple) throws Exception {
+                        key = (key + 1) % 20;
+                        return key;
+                    }
+                })
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(30))))
                 // .trigger(new TriggerYSB())
                 .aggregate(new CountYSB());

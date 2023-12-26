@@ -2,6 +2,7 @@ package com.madamaya.l3stream.workflows.ysb2;
 
 import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.glCommons.InitGLdataStringGL;
+import com.madamaya.l3stream.workflows.ysb.objects.YSBInternalTupleGL;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTupleGL;
 import com.madamaya.l3stream.workflows.ysb.ops.*;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
@@ -9,6 +10,7 @@ import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
@@ -57,7 +59,15 @@ public class GLYSB2 {
                 .assignTimestampsAndWatermarks(new WatermarkStrategyYSBGL())
                 .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSBGL())
-                .keyBy(t -> t.getCampaignId())
+                //.keyBy(t -> t.getCampaignId())
+                .keyBy(new KeySelector<YSBInternalTupleGL, Integer>() {
+                    int key = 0;
+                    @Override
+                    public Integer getKey(YSBInternalTupleGL ysbInternalTupleGL) throws Exception {
+                        key = (key + 1) % 20;
+                        return key;
+                    }
+                })
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(30))))
                 .aggregate(new CountYSBGL(settings.aggregateStrategySupplier()));
 

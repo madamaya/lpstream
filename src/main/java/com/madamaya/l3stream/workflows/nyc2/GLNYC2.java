@@ -59,10 +59,20 @@ public class GLNYC2 {
                 .map(new DataParserNYCGL())
                 .assignTimestampsAndWatermarks(new WatermarkStrategyNYCGL())
                 .filter(t -> t.getTripDistance() > 5)
+                /*
                 .keyBy(new KeySelector<NYCInputTupleGL, Tuple2<Integer, Long>>() {
                     @Override
                     public Tuple2<Integer, Long> getKey(NYCInputTupleGL tuple) throws Exception {
                         return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
+                    }
+                })
+                 */
+                .keyBy(new KeySelector<NYCInputTupleGL, Integer>() {
+                    int key = 0;
+                    @Override
+                    public Integer getKey(NYCInputTupleGL tuple) throws Exception {
+                        key = (key + 1) % 20;
+                        return key;
                     }
                 })
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(30))))

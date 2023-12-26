@@ -66,12 +66,22 @@ public class L3NYC2 {
                 .map(L3.updateTsWM(new WatermarkStrategyNYC(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyNYC(), settings.readPartitionNum(env.getParallelism()))).uid("5")
                 .filter(L3.filter(t -> t.getTripDistance() > 5)).uid("6")
+                /*
                 .keyBy(L3.keyBy(new KeySelector<NYCInputTuple, Tuple2<Integer, Long>>() {
                     @Override
                     public Tuple2<Integer, Long> getKey(NYCInputTuple tuple) throws Exception {
                         return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
                     }
                 }), TupleTypeInfo.getBasicAndBasicValueTupleTypeInfo(Integer.class, Long.class))
+                 */
+                .keyBy(L3.keyBy(new KeySelector<NYCInputTuple, Integer>() {
+                    int key = 0;
+                    @Override
+                    public Integer getKey(NYCInputTuple tuple) throws Exception {
+                        key = (key + 1) % 20;
+                        return key;
+                    }
+                }, Integer.class))
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(30))))
                 .aggregate(L3.aggregate(new CountAndAvgDistanceL3())).uid("7");
 
