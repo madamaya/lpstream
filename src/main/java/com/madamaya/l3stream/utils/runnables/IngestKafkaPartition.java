@@ -24,6 +24,7 @@ public class IngestKafkaPartition implements Runnable {
     final InputParser ip;
     final KafkaProducer<String, String> producer;
     int granularity = 1; // 1 -> 1000ms, 10 -> 100ms, 100 -> 10ms, etc.
+    int stopDataNum = -1;
 
     public IngestKafkaPartition(String filePath, String qName, String topic, int partition, int throughput, Map<Integer, Double> map) {
         this.filePath = filePath + ".ingest." + partition;
@@ -43,6 +44,8 @@ public class IngestKafkaPartition implements Runnable {
             this.ip = new ParserNYC();
         } else if (qName.contains("YSB")) {
             this.ip = new ParserYSB();
+        } else if (qName.contains("Syn")) {
+            this.ip = new ParserSyn();
         } else {
             throw new IllegalArgumentException();
         }
@@ -60,6 +63,11 @@ public class IngestKafkaPartition implements Runnable {
         this.granularity = granularity;
     }
 
+    public IngestKafkaPartition(String filePath, String qName, String topic, int partition, int throughput, Map<Integer, Double> map, int granularity, int dataNum) {
+        this(filePath, qName, topic, partition, throughput, map, granularity);
+        this.stopDataNum = dataNum;
+    }
+
     @Override
     public void run() {
         // sendFromFile();
@@ -71,17 +79,21 @@ public class IngestKafkaPartition implements Runnable {
         try {
             String line;
             long count = 0;
+            long countAll = 0;
             long dataNum = 0;
 
             long currentTime = 0;
             long incrementTime = 1000000000 / throughput;
 
+            boolean active = true;
+
             long stime = System.nanoTime();
             long prevTime = System.nanoTime();
-            while (true) {
+            while (active) {
                 br = new BufferedReader(new FileReader(filePath));
                 while ((line = br.readLine()) != null) {
                     // Send data
+                    countAll++;
                     // String sendLine = ip.attachTimestamp(line, System.currentTimeMillis());
                     String sendLine = ip.attachTimestamp(line, currentTime / 1000000);
                     currentTime += incrementTime;
@@ -109,6 +121,10 @@ public class IngestKafkaPartition implements Runnable {
                         prevTime += (1000000000 / granularity);
                         map.put(partition, dataNum / ((System.nanoTime() - stime) / 1e9));
                     }
+                }
+                if (stopDataNum > 0 && countAll > stopDataNum) {
+                    System.out.println("stopDataNum > 0 && countAll > stopDataNum");
+                    active = false;
                 }
             }
         } catch (Exception e) {

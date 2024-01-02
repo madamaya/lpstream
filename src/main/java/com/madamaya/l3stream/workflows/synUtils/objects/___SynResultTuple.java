@@ -1,15 +1,14 @@
 package com.madamaya.l3stream.workflows.synUtils.objects;
 
-public class SynInternalTuple {
+public class ___SynResultTuple {
     private String asin;
-    private int sentiment; // sentiment == 1: Positive, sentiment == 0: Neutral, sentiment == -1: Negative
+    private int sentiment;
+    private long count;
 
-    public SynInternalTuple(String asin, int sentiment) {
-        if (!sentimentValidation(sentiment))
-            throw new IllegalArgumentException("SynInternalTuple(String asin=" + asin + ", int sentiment=" + sentiment + ");");
-
+    public ___SynResultTuple(String asin, int sentiment, long count) {
         this.asin = asin;
         this.sentiment = sentiment;
+        this.count = count;
     }
 
     public String getAsin() {
@@ -28,15 +27,20 @@ public class SynInternalTuple {
         this.sentiment = sentiment;
     }
 
-    private boolean sentimentValidation(int sentiment) {
-        return sentiment == 1 || sentiment == 0 || sentiment == -1;
+    public long getCount() {
+        return count;
+    }
+
+    public void setCount(long count) {
+        this.count = count;
     }
 
     @Override
     public String toString() {
-        return "SynInternalTuple{" +
+        return "SynResultTuple{" +
                 "asin='" + asin + '\'' +
                 ", sentiment=" + sentiment +
+                ", count=" + count +
                 '}';
     }
 }

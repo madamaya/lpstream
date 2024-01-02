@@ -25,8 +25,11 @@ elif [ $1 -eq 2 ]; then
   # 2
   java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataLoader ${inputFileName}.2 ${topicName}
 elif [ $1 -eq 3 ]; then
+  echo "Delete topic (${topicName})"
   ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${topicName} --bootstrap-server ${bootstrapServers}
+  echo "Sleep (${sleepTime} [s])"
   sleep ${sleepTime}
+  echo "Create topic (${topicName})"
   ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${topicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
 elif [ $1 -eq 4 ]; then
   ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${topicName} --bootstrap-server ${bootstrapServers}

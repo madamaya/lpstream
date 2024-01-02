@@ -18,7 +18,7 @@ elif [ $# -eq 5 ]; then
   queryNameOption="--queryName ${4}"
   latencyFlag=${5}
 elif [ $# -ne 3 ]; then
-  echo "Illegal args (evaluation/tamplates/original.sh)"
+  echo "Illegal args (evaluation/tamplates/nonlineage.sh)"
   exit 1
 fi
 

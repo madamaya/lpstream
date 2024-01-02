@@ -1,11 +1,11 @@
 package com.madamaya.l3stream.workflows.synUtils.objects;
 
-public class SynInputTuple {
+public class ___SynInputTuple {
     private String asin;
     private double overall;
     private long ts;
 
-    public SynInputTuple(String asin, double overall, long ts) {
+    public ___SynInputTuple(String asin, double overall, long ts) {
         this.asin = asin;
         this.overall = overall;
         this.ts = ts;

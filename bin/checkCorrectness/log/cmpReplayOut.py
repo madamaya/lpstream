@@ -20,22 +20,48 @@ if __name__ == "__main__":
     finalChkID = int(sys.argv[3])
     parseFlag = int(sys.argv[4])
 
-    # Create baseline output set
-    baselinePath = logDir + "/groundTruth.log"
-    baselineSet = set()
-    baselineList = getOutputList(baselinePath)
-    print("*** CREATE BASELINE OUTPUT SET ***")
-    for line in tqdm(baselineList):
+    # Create nonlineageMode output set
+    nonlinPath = logDir + "/nonlineageMode.log"
+    nonlinSet = set()
+    nonlinList = getOutputList(nonlinPath)
+    print("*** CREATE NONLINEAGEMODE OUTPUT SET ***")
+    for line in tqdm(nonlinList):
         if parseFlag == 1:
-            baselineSet.add(parseNYCOutputAndRoundAvg(json.loads(line)["OUT"]))
+            nonlinSet.add(parseNYCOutputAndRoundAvg(json.loads(line)["OUT"]))
         elif parseFlag == 2:
-            baselineSet.add(json.loads(line.replace("\\", ""))["OUT"])
+            nonlinSet.add(json.loads(line.replace("\\", ""))["OUT"])
         else:
-            baselineSet.add(json.loads(line)["OUT"])
+            nonlinSet.add(json.loads(line)["OUT"])
 
     result = True
+    # Create baseline output set
+    baselinePath = logDir + "/baseline.log"
+    baselineSet = set()
+    baselineList = getOutputList(baselinePath)
+    baselineErrList = []
+    print("*** CREATE BASELINE OUTPUT SET ***")
+    for line in tqdm(baselineList):
+        if parseFlag == 2:
+            line = line.replace("\\", "")
+        baselineSet.add(line)
+        if line not in nonlinSet:
+            baselineErrList.append(line)
+
+    # Create genealog output set
+    genealogPath = logDir + "/genealog.log"
+    genealogSet = set()
+    genealogList = getOutputList(genealogPath)
+    genealogErrList = []
+    print("*** CREATE Genealog OUTPUT SET ***")
+    for line in tqdm(genealogList):
+        if parseFlag == 2:
+            line = line.replace("\\", "")
+        genealogSet.add(line)
+        if line not in nonlinSet:
+            genealogErrList.append(line)
+
     for idx in range(startChkID, finalChkID + 1):
-        replayPath = logDir + "/output_from_chk-{}.log".format(idx)
+        replayPath = logDir + "/lineageMode{}.log".format(idx)
 
         # TEST1: Replay -> Baseline
         print("*** TEST1: Replay -> Baseline ***")
@@ -55,7 +81,7 @@ if __name__ == "__main__":
             else:
                 output = jdata["OUT"]
             replaySet.add(output)
-            if output not in baselineSet:
+            if output not in nonlinSet:
                 removedIdx.append(idx)
                 removedOut.append(output)
 
@@ -64,7 +90,7 @@ if __name__ == "__main__":
         idx2 = 0
         removedIdx2 = []
         removedOut2 = []
-        for line in tqdm(baselineList):
+        for line in tqdm(nonlinList):
             idx2 = idx2 + 1
             if parseFlag == 2:
                 jdata = json.loads(line.replace("\\", ""))
@@ -81,14 +107,18 @@ if __name__ == "__main__":
                 removedIdx2.append(idx2)
                 removedOut2.append(output)
 
-        print("RESULT:::")
-        print("  [ Replay -> Baseline ] len(removedIdx) = {},".format(len(removedIdx)))
-        print("  [ Baseline -> Replay ] len(removedIdx2) = {},".format(len(removedIdx2)))
+        print("::::::::::RESULT::::::::::")
+        print("\t[ Replay -> Nonlineage ] len(removedIdx) = {},".format(len(removedIdx)))
+        print("\t[ Nonlineage -> Replay ] len(removedIdx2) = {},".format(len(removedIdx2)))
+        print("\t[ Baseline -> Nonlineage ] len(baselineErrList) = {}".format(len(baselineErrList)))
+        print("\t[ Genealog -> Nonlineage ] len(genealogErrList) = {}".format(len(genealogErrList)))
         print()
-        print("VALIABLES:::")
-        print("  len(baselineList) = {},".format(len(baselineList)))
-        print("  len(baselineSet) = {},".format(len(baselineSet)))
-        print("  len(replaySet) = {})".format(len(replaySet)))
+        print("::::::::::VALIABLES::::::::::")
+        print("\tlen(nonlinList) = {},".format(len(nonlinList)))
+        print("\tlen(nonlinSet) = {},".format(len(nonlinSet)))
+        print("\tlen(baselineSet) = {}".format(len(baselineSet)))
+        print("\tlen(genealogSet) = {}".format(len(genealogSet)))
+        print("\tlen(replaySet) = {})".format(len(replaySet)))
 
         result = result and len(removedIdx) == 0 and len(removedIdx2) == 0
 
@@ -97,6 +127,7 @@ if __name__ == "__main__":
         else:
             print("idx = {} ❌".format(idx))
 
+    result = result and (baselineSet == genealogSet) and (baselineSet == nonlinSet)
     if result == True:
         print("result = ✅")
     else:

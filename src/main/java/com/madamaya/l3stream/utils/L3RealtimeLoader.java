@@ -19,6 +19,7 @@ public class L3RealtimeLoader {
         int parallelism = Integer.parseInt(args[3]);
         int throughput = Integer.parseInt(args[4]);
         int granularity = (args.length == 5) ? 1 : Integer.parseInt(args[5]);
+        int datanum = (args.length == 7) ? Integer.parseInt(args[6]) : -1;
 
         Map<Integer, Double> thMap = new HashMap<>();
 
@@ -29,10 +30,11 @@ public class L3RealtimeLoader {
         System.out.println("\tparallelism = " + parallelism);
         System.out.println("\tthroughput = " + throughput);
         System.out.println("\tgranularity = " + granularity);
+        System.out.println("\tdataNum = " + datanum);
         System.out.println("==============");
 
         for (int idx = 0; idx < parallelism; idx++) {
-            new Thread(new IngestKafkaPartition(filePath, qName, topic, idx, throughput / parallelism, thMap, granularity)).start();
+            new Thread(new IngestKafkaPartition(filePath, qName, topic, idx, throughput / parallelism, thMap, granularity, datanum / parallelism)).start();
         }
 
         Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownProcessing(thMap)));
