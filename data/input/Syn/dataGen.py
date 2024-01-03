@@ -9,14 +9,14 @@ def power_data_gen(machine_id: int, power_usage: float, log: str) -> str:
 
 if __name__ == "__main__":
     # Parameters
-    sensor_num = 100
+    sensor_num = 1000
     machine_num = 10
     temp_range = [100, 200]
     power_range = [1000, 2000]
-    log_size_0 = 1 # bytes
-    log_size_1 = 1 # bytes
-    minimum_generated_data_size = 0.001 # Gbytes
-    parallelism = 4
+    log_size_0 = 10000 # bytes
+    log_size_1 = 10000 # bytes
+    minimum_generated_data_size = 1 # Gbytes
+    parallelism = 10
 
     # Preprocessing
     rng = np.random.default_rng(137)

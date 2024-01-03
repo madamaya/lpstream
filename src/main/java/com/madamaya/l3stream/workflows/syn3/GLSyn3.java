@@ -55,7 +55,7 @@ public class GLSyn3 {
                 .filter(t -> t.getType() == 0)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyTempSynGL())
                 .keyBy(t -> t.getMachineId())
-                .window(TumblingEventTimeWindows.of(Time.seconds(3)))
+                .window(TumblingEventTimeWindows.of(Time.seconds(10)))
                 .aggregate(new AvgTemperatureGL(settings.aggregateStrategySupplier()));
 
         KafkaSink<SynResultTupleGL> sink;

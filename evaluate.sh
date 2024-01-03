@@ -11,7 +11,7 @@ fi
 
 if [ $1 = "m1" ]; then
   cd ./bin/evaluation
-  thList=(400 1000 5000 10000)
+  thList=(10000)
   for th in ${thList[@]}
   do
     ./metrics1.sh ${th}

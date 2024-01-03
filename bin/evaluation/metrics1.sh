@@ -13,7 +13,8 @@ numOfLoop=1
 throughput=${1}
 granularityTemp=10
 #queries=(LR2 Nexmark NYC Nexmark2 YSB)
-queries=(LR2 NYC Nexmark2 YSB)
+#queries=(LR2 NYC Nexmark2 YSB)
+queries=(Syn1 Syn2 Syn3)
 #queries=(Nexmark NYC Nexmark2 YSB)
 approaches=(baseline genealog l3stream l3streamlin)
 #approaches=(baseline)
@@ -124,7 +125,7 @@ do
 
       # Start data ingestion
       echo "Start data ingestion"
-      if [ ${query} = "LR" ] || [ ${query} = "LR2" ] || [ ${query} = "NYC" ]; then
+      if [ ${query} = "LR" ] || [ ${query} = "LR2" ] || [ ${query} = "NYC" ] || [ ${query} = "Syn1" ] || [ ${query} = "Syn2" ] || [ ${query} = "Syn3" ]; then
         filePath="${L3_HOME}/data/input/data/${(L)query}.csv"
       else
         filePath="${L3_HOME}/data/input/data/${(L)query}.json"

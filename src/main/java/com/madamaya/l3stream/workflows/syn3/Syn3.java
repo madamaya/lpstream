@@ -48,7 +48,7 @@ public class Syn3 {
                 .filter(t -> t.getType() == 0)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn())
                 .keyBy(t -> t.getMachineId())
-                .window(TumblingEventTimeWindows.of(Time.seconds(3)))
+                .window(TumblingEventTimeWindows.of(Time.seconds(10)))
                 .aggregate(new AvgTemperature());
 
         KafkaSink<SynResultTuple> sink;

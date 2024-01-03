@@ -50,7 +50,7 @@ public class L3Syn3 {
                 .filter(L3.filter(t -> t.getType() == 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn(), settings.readPartitionNum(env.getParallelism()))).uid("5")
                 .keyBy(L3.keyBy(t -> t.getMachineId(), Integer.class))
-                .window(TumblingEventTimeWindows.of(Time.seconds(3)))
+                .window(TumblingEventTimeWindows.of(Time.seconds(10)))
                 .aggregate(L3.aggregate(new AvgTemperatureL3())).uid("6");
 
         if (settings.isInvokeCpAssigner()) {

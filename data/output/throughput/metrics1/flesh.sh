@@ -15,6 +15,9 @@ elif [ $1 = "fleshAll" ]; then
   rm -rf Nexmark*
   rm -rf NYC*
   rm -rf YSB*
+  rm -rf Syn1*
+  rm -rf Syn2*
+  rm -rf Syn3*
 else
   echo "Illegal arguments (${1})"
   exit 1

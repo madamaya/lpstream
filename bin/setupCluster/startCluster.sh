@@ -17,7 +17,7 @@ source $(dirname $0)/../config.sh
 #sleep 10
 
 # Create topics
-for i in LR LR2 NYC NYC2 YSB YSB2 Nexmark Nexmark2 Test
+for i in LR LR2 NYC NYC2 YSB YSB2 Nexmark Nexmark2 Syn1 Syn2 Syn3 Test
 do
   for j in i o l
   do
