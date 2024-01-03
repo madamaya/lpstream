@@ -1,10 +1,9 @@
 package com.madamaya.l3stream.workflows.real;
 
-import com.madamaya.l3stream.workflows.synUtils.objects.SynInternalTuple;
+import com.madamaya.l3stream.workflows.synUtils.objects.___SynInternalTuple;
 import com.madamaya.l3stream.workflows.synUtils.ops.DataParserSyn;
 import com.madamaya.l3stream.workflows.synUtils.ops.SentimentClassificationSyn;
 import com.madamaya.l3stream.workflows.synUtils.ops.WatermarkStrategySyn;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
@@ -42,9 +41,9 @@ public class Real {
                 .map(new DataParserSyn())
                 .assignTimestampsAndWatermarks(new WatermarkStrategySyn())
                 .map(new SentimentClassificationSyn()).disableChaining()
-                .addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<SynInternalTuple>() {
+                .addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<___SynInternalTuple>() {
                     @Override
-                    public ProducerRecord<byte[], byte[]> serialize(SynInternalTuple tuple, @Nullable Long aLong) {
+                    public ProducerRecord<byte[], byte[]> serialize(___SynInternalTuple tuple, @Nullable Long aLong) {
                         return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
                     }
                 }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));

@@ -1,7 +1,7 @@
 package com.madamaya.l3stream.workflows.window;
 
-import com.madamaya.l3stream.workflows.synUtils.objects.SynInternalTuple;
-import com.madamaya.l3stream.workflows.synUtils.objects.SynResultTuple;
+import com.madamaya.l3stream.workflows.synUtils.objects.___SynInternalTuple;
+import com.madamaya.l3stream.workflows.synUtils.objects.___SynResultTuple;
 import com.madamaya.l3stream.workflows.synUtils.ops.CountPerAsinSentiment;
 import com.madamaya.l3stream.workflows.synUtils.ops.DataParserSyn;
 import com.madamaya.l3stream.workflows.synUtils.ops.SentimentClassificationSyn;
@@ -47,17 +47,17 @@ public class Window {
                 .map(new DataParserSyn())
                 .assignTimestampsAndWatermarks(new WatermarkStrategySyn())
                 .map(new SentimentClassificationSyn())
-                .keyBy(new KeySelector<SynInternalTuple, Tuple2<String, Integer>>() {
+                .keyBy(new KeySelector<___SynInternalTuple, Tuple2<String, Integer>>() {
                     @Override
-                    public Tuple2<String, Integer> getKey(SynInternalTuple tuple) throws Exception {
+                    public Tuple2<String, Integer> getKey(___SynInternalTuple tuple) throws Exception {
                         return Tuple2.of(tuple.getAsin(), tuple.getSentiment());
                     }
                 })
                 .window(TumblingEventTimeWindows.of(Time.milliseconds(250)))
                 .aggregate(new CountPerAsinSentiment())
-                .addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<SynResultTuple>() {
+                .addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<___SynResultTuple>() {
                     @Override
-                    public ProducerRecord<byte[], byte[]> serialize(SynResultTuple tuple, @Nullable Long aLong) {
+                    public ProducerRecord<byte[], byte[]> serialize(___SynResultTuple tuple, @Nullable Long aLong) {
                         return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
                     }
                 }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
