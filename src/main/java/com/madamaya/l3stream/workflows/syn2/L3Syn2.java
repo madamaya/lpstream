@@ -69,7 +69,7 @@ public class L3Syn2 {
                 return synTempTuple.getMachineId();
             }
         }, Integer.class)))
-        .between(Time.milliseconds(0), Time.milliseconds(1))
+        .between(Time.milliseconds(0), Time.milliseconds(100))
         .process(L3.processJoin(new JoinSynL3())).uid("10");
 
         if (settings.isInvokeCpAssigner()) {

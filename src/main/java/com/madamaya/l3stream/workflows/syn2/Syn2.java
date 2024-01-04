@@ -65,7 +65,7 @@ public class Syn2 {
                 return synTempTuple.getMachineId();
             }
         }))
-        .between(Time.milliseconds(0), Time.milliseconds(1))
+        .between(Time.milliseconds(0), Time.milliseconds(100))
         .process(new JoinSyn());
 
         KafkaSink<SynJoinedTuple> sink;

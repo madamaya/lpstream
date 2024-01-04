@@ -28,6 +28,6 @@ public class LatencyKafkaSinkSyn1GLV2 implements KafkaRecordSerializationSchema<
         String lineageStr = FormatLineage.formattedLineage(lineage);
 
         String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
-        return new ProducerRecord<>(topic, (latency + "," + tuple.getStimulus() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        return new ProducerRecord<>(topic, (latency + "," + tuple.getStimulus() + ", Lineage(" + lineage.size() + ")" + lineageStr + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }
