@@ -11,7 +11,7 @@ source ../utils/cpuMemoryLoadLogger.sh
 
 numOfLoop=1
 throughput=${1}
-granularityTemp=10
+granularityTemp=100
 #queries=(LR2 Nexmark NYC Nexmark2 YSB)
 #queries=(LR2 NYC Nexmark2 YSB)
 queries=(Syn1 Syn2 Syn3)
