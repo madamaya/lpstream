@@ -19,6 +19,9 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.kafka.clients.producer.ProducerConfig;
+
+import java.util.Properties;
 
 public class L3Syn3 {
     public static void main(String[] args) throws Exception {
@@ -53,10 +56,12 @@ public class L3Syn3 {
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
                 .aggregate(L3.aggregate(new AvgTemperatureL3())).uid("6");
 
+        Properties props = new Properties();
+        props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
         if (settings.isInvokeCpAssigner()) {
-            ds.map(new CpAssigner<>()).uid("7").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
+            ds.map(new CpAssigner<>()).uid("7").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings, props)).uid(settings.getLineageMode());
         } else {
-            ds.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
+            ds.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings, props)).uid(settings.getLineageMode());
         }
 
         env.execute("Query: " + queryFlag);
