@@ -31,6 +31,16 @@ public class SynTempTuple extends SynInputTuple {
         this.timestamp = timestamp;
     }
 
+    public SynTempTuple(SynTempTuple tuple) {
+        super(tuple.getType());
+        this.machineId = tuple.getMachineId();
+        this.sensorId = tuple.getSensorId();
+        this.temperature = tuple.getTemperature();
+        this.log = tuple.getLog();
+        this.timestamp = tuple.getTimestamp();
+        this.stimulus = tuple.getStimulus();
+    }
+
     public int getMachineId() {
         return machineId;
     }

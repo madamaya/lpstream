@@ -28,6 +28,15 @@ public class SynPowerTuple extends SynInputTuple {
         this.timestamp = timestamp;
     }
 
+    public SynPowerTuple(SynPowerTuple tuple) {
+        super(tuple.getType());
+        this.machineId = tuple.getMachineId();
+        this.power = tuple.getPower();
+        this.log = tuple.getLog();
+        this.timestamp = tuple.getTimestamp();
+        this.stimulus = tuple.getStimulus();
+    }
+
     public int getMachineId() {
         return machineId;
     }
