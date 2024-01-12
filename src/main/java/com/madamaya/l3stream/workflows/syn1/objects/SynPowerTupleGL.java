@@ -21,7 +21,6 @@ public class SynPowerTupleGL extends SynPowerTuple implements GenealogTuple {
 
     public SynPowerTupleGL(SynPowerTupleGL tuple) {
         super(tuple.getType(), tuple.getMachineId(), tuple.getPower(), tuple.getLog(), tuple.getTimestamp(), tuple.getStimulus());
-        this.gdata = tuple.getGenealogData();
     }
 
     @Override

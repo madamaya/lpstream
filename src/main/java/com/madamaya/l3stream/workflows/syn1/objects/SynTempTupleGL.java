@@ -21,7 +21,6 @@ public class SynTempTupleGL extends SynTempTuple implements GenealogTuple {
 
     public SynTempTupleGL(SynTempTupleGL tuple) {
         super(tuple.getType(), tuple.getMachineId(), tuple.getSensorId(), tuple.getTemperature(), tuple.getLog(), tuple.getTimestamp(), tuple.getStimulus());
-        this.gdata = tuple.getGenealogData();
     }
 
     @Override
