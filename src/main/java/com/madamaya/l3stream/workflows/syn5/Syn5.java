@@ -1,17 +1,15 @@
-package com.madamaya.l3stream.workflows.syn2;
+package com.madamaya.l3stream.workflows.syn5;
 
 import com.madamaya.l3stream.conf.L3Config;
-import com.madamaya.l3stream.glCommons.InitGLdataStringGL;
-import com.madamaya.l3stream.workflows.syn1.objects.SynJoinedTupleGL;
-import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTupleGL;
-import com.madamaya.l3stream.workflows.syn1.objects.SynTempTupleGL;
+import com.madamaya.l3stream.workflows.syn1.objects.SynJoinedTuple;
+import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTuple;
+import com.madamaya.l3stream.workflows.syn1.objects.SynTempTuple;
 import com.madamaya.l3stream.workflows.syn1.ops.*;
-import com.madamaya.l3stream.workflows.syn2.ops.LatencyKafkaSinkSyn2GLV2;
-import com.madamaya.l3stream.workflows.syn2.ops.LineageKafkaSinkSyn2GLV2;
+import com.madamaya.l3stream.workflows.syn5.ops.LatencyKafkaSinkSyn5V2;
+import com.madamaya.l3stream.workflows.syn5.ops.OutputKafkaSinkSyn5V2;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
-import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.connector.base.DeliveryGuarantee;
@@ -20,18 +18,18 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
-public class GLSyn2 {
+public class Syn5 {
     public static void main(String[] args) throws Exception {
 
         /* Define variables & Create environment */
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
 
-        final String queryFlag = "Syn2";
+        final String queryFlag = "Syn5";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
@@ -46,44 +44,41 @@ public class GLSyn2 {
 
         /* Query */
         DataStream<KafkaInputString> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceSyn2");
-        DataStream<SynTempTupleGL> temp = ds
-                .map(new InitGLdataStringGL(settings, 0))
-                .map(new TempParserSynGL())
+        DataStream<SynTempTuple> temp = ds
+                .map(new TempParserSyn(settings))
                 .filter(t -> t.getType() == 0)
-                .assignTimestampsAndWatermarks(new WatermarkStrategyTempSynGL());
+                .assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn());
 
-        DataStream<SynPowerTupleGL> power = ds
-                .map(new InitGLdataStringGL(settings, 1))
-                .map(new PowerParserSynGL())
+        DataStream<SynPowerTuple> power = ds
+                .map(new PowerParserSyn(settings))
                 .filter(t -> t.getType() == 1)
-                .assignTimestampsAndWatermarks(new WatermarkStrategyPowerSynGL());
+                .assignTimestampsAndWatermarks(new WatermarkStrategyPowerSyn());
 
-        DataStream<SynJoinedTupleGL> joined = power.keyBy(new KeySelector<SynPowerTupleGL, Integer>() {
-            @Override
-            public Integer getKey(SynPowerTupleGL synPowerTuple) throws Exception {
-                return synPowerTuple.getMachineId();
-            }
-        })
-        .intervalJoin(temp.keyBy(new KeySelector<SynTempTupleGL, Integer>() {
-            @Override
-            public Integer getKey(SynTempTupleGL synTempTuple) throws Exception {
-                return synTempTuple.getMachineId();
-            }
-        }))
-        .between(Time.milliseconds(0), Time.milliseconds(1))
-        .process(new ProcessJoinSynGL());
+        DataStream<SynJoinedTuple> joined = power.join(temp)
+                .where(new KeySelector<SynPowerTuple, Integer>() {
+                    @Override
+                    public Integer getKey(SynPowerTuple synPowerTuple) throws Exception {
+                        return synPowerTuple.getMachineId();
+                    }
+                }).equalTo(new KeySelector<SynTempTuple, Integer>() {
+                            @Override
+                            public Integer getKey(SynTempTuple synTempTuple) throws Exception {
+                                return synTempTuple.getMachineId();
+                            }
+                }).window(SlidingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
+                .apply(new JoinSyn());
 
-        KafkaSink<SynJoinedTupleGL> sink;
+        KafkaSink<SynJoinedTuple> sink;
         if (settings.getLatencyFlag() == 1) {
-            sink = KafkaSink.<SynJoinedTupleGL>builder()
+            sink = KafkaSink.<SynJoinedTuple>builder()
                     .setBootstrapServers(brokers)
-                    .setRecordSerializer(new LineageKafkaSinkSyn2GLV2(outputTopicName, settings))
+                    .setRecordSerializer(new OutputKafkaSinkSyn5V2(outputTopicName))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         } else {
-            sink = KafkaSink.<SynJoinedTupleGL>builder()
+            sink = KafkaSink.<SynJoinedTuple>builder()
                     .setBootstrapServers(brokers)
-                    .setRecordSerializer(new LatencyKafkaSinkSyn2GLV2(outputTopicName, settings))
+                    .setRecordSerializer(new LatencyKafkaSinkSyn5V2(outputTopicName))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         }

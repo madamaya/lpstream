@@ -1,4 +1,4 @@
-package com.madamaya.l3stream.workflows.syn2;
+package com.madamaya.l3stream.workflows.syn5;
 
 import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
@@ -18,9 +18,10 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
-public class L3Syn2 {
+public class L3Syn5 {
     public static void main(String[] args) throws Exception {
 
         /* Define variables & Create environment */
@@ -30,7 +31,7 @@ public class L3Syn2 {
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
 
-        final String queryFlag = "Syn2";
+        final String queryFlag = "Syn5";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
@@ -57,20 +58,21 @@ public class L3Syn2 {
                 .filter(L3.filter(t -> t.getType() == 1)).uid("8")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyPowerSyn(), settings.readPartitionNum(env.getParallelism()))).uid("9");
 
-        DataStream<L3StreamTupleContainer<SynJoinedTuple>> joined = power.keyBy(L3.keyBy(new KeySelector<SynPowerTuple, Integer>() {
-            @Override
-            public Integer getKey(SynPowerTuple synPowerTuple) throws Exception {
-                return synPowerTuple.getMachineId();
-            }
-        }, Integer.class))
-        .intervalJoin(temp.keyBy(L3.keyBy(new KeySelector<SynTempTuple, Integer>() {
-            @Override
-            public Integer getKey(SynTempTuple synTempTuple) throws Exception {
-                return synTempTuple.getMachineId();
-            }
-        }, Integer.class)))
-        .between(Time.milliseconds(0), Time.milliseconds(1))
-        .process(L3.processJoin(new ProcessJoinSynL3())).uid("10");
+        DataStream<L3StreamTupleContainer<SynJoinedTuple>> joined = power.join(temp)
+                .where(L3.keyBy(new KeySelector<SynPowerTuple, Integer>() {
+                    @Override
+                    public Integer getKey(SynPowerTuple synPowerTuple) throws Exception {
+                        return synPowerTuple.getMachineId();
+                    }
+                }, Integer.class))
+                .equalTo(L3.keyBy(new KeySelector<SynTempTuple, Integer>() {
+                    @Override
+                    public Integer getKey(SynTempTuple synTempTuple) throws Exception {
+                        return synTempTuple.getMachineId();
+                    }
+                }, Integer.class))
+                .window(SlidingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
+                .apply(L3.join(new JoinSynL3()));
 
         if (settings.isInvokeCpAssigner()) {
             joined.map(new CpAssigner<>()).uid("11").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());

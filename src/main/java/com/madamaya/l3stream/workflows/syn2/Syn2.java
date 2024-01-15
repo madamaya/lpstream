@@ -66,7 +66,7 @@ public class Syn2 {
             }
         }))
         .between(Time.milliseconds(0), Time.milliseconds(1))
-        .process(new JoinSyn());
+        .process(new ProcessJoinSyn());
 
         KafkaSink<SynJoinedTuple> sink;
         if (settings.getLatencyFlag() == 1) {

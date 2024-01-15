@@ -7,7 +7,6 @@ import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTuple;
 import com.madamaya.l3stream.workflows.syn1.objects.SynTempTuple;
 import com.madamaya.l3stream.workflows.syn1.ops.*;
 import com.madamaya.l3stream.workflows.syn4.ops.TsAssignPowerMapL3;
-import com.madamaya.l3stream.workflows.syn4.ops.TsAssignTempMap;
 import com.madamaya.l3stream.workflows.syn4.ops.TsAssignTempMapL3;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
@@ -75,7 +74,7 @@ public class L3Syn4 {
             }
         }, Integer.class)))
         .between(Time.milliseconds(0), Time.milliseconds(1))
-        .process(L3.processJoinTs(new JoinSynL3())).uid("10");
+        .process(L3.processJoinTs(new ProcessJoinSynL3())).uid("10");
 
         if (settings.isInvokeCpAssigner()) {
             joined.map(new CpAssigner<>()).uid("11").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings, true)).uid(settings.getLineageMode());

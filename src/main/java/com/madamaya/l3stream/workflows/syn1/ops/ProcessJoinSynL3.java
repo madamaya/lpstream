@@ -2,13 +2,13 @@ package com.madamaya.l3stream.workflows.syn1.ops;
 
 import com.madamaya.l3stream.workflows.syn1.objects.SynJoinedTuple;
 import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTuple;
-import com.madamaya.l3stream.workflows.syn1.objects.SynResultTuple;
 import com.madamaya.l3stream.workflows.syn1.objects.SynTempTuple;
-import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
+import org.apache.flink.util.Collector;
 
-public class JoinSyn implements JoinFunction<SynPowerTuple, SynTempTuple, SynJoinedTuple> {
+public class ProcessJoinSynL3 extends ProcessJoinFunction<SynPowerTuple, SynTempTuple, SynJoinedTuple> {
     @Override
-    public SynJoinedTuple join(SynPowerTuple synPowerTuple, SynTempTuple synTempTuple) throws Exception {
+    public void processElement(SynPowerTuple synPowerTuple, SynTempTuple synTempTuple, ProcessJoinFunction<SynPowerTuple, SynTempTuple, SynJoinedTuple>.Context context, Collector<SynJoinedTuple> collector) throws Exception {
         SynJoinedTuple tuple = new SynJoinedTuple(
                 synTempTuple.getMachineId(),
                 synTempTuple.getSensorId(),
@@ -16,9 +16,8 @@ public class JoinSyn implements JoinFunction<SynPowerTuple, SynTempTuple, SynJoi
                 synPowerTuple.getPower(),
                 synTempTuple.getLog(),
                 synPowerTuple.getLog(),
-                Math.max(synTempTuple.getTimestamp(), synPowerTuple.getTimestamp()),
-                Math.max(synTempTuple.getStimulus(), synPowerTuple.getStimulus())
+                Math.max(synTempTuple.getTimestamp(), synPowerTuple.getTimestamp())
         );
-        return tuple;
+        collector.collect(tuple);
     }
 }
