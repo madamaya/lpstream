@@ -19,6 +19,7 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
 public class Syn5 {
@@ -65,7 +66,7 @@ public class Syn5 {
                             public Integer getKey(SynTempTuple synTempTuple) throws Exception {
                                 return synTempTuple.getMachineId();
                             }
-                }).window(SlidingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
+                }).window(TumblingEventTimeWindows.of(Time.seconds(1)))
                 .apply(new JoinSyn());
 
         KafkaSink<SynJoinedTuple> sink;
