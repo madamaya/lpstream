@@ -70,7 +70,7 @@ public class GLSyn2 {
                 return synTempTuple.getMachineId();
             }
         }))
-        .between(Time.milliseconds(0), Time.milliseconds(1))
+        .between(Time.milliseconds(0), Time.milliseconds(1000))
         .process(new ProcessJoinSynGL());
 
         KafkaSink<SynJoinedTupleGL> sink;
