@@ -1,4 +1,4 @@
-package com.madamaya.l3stream.workflows.syn5.ops;
+package com.madamaya.l3stream.workflows.syn6.ops;
 
 import com.madamaya.l3stream.workflows.syn1.objects.SynJoinedTupleGL;
 import io.palyvos.provenance.genealog.GenealogGraphTraverser;
@@ -12,11 +12,11 @@ import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-public class LatencyKafkaSinkSyn5GLV2 implements KafkaRecordSerializationSchema<SynJoinedTupleGL> {
+public class LatencyKafkaSinkSyn6GLV2 implements KafkaRecordSerializationSchema<SynJoinedTupleGL> {
     private String topic;
     private GenealogGraphTraverser genealogGraphTraverser;
 
-    public LatencyKafkaSinkSyn5GLV2(String topic, ExperimentSettings settings) {
+    public LatencyKafkaSinkSyn6GLV2(String topic, ExperimentSettings settings) {
         this.topic = topic;
         this.genealogGraphTraverser = new GenealogGraphTraverser(settings.aggregateStrategySupplier().get());
     }
@@ -32,6 +32,6 @@ public class LatencyKafkaSinkSyn5GLV2 implements KafkaRecordSerializationSchema<
 
         String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
         String traversalLatency = Long.toString(traserseEnd - traverseStart);
-        return new ProducerRecord<>(topic, (latency + "," + tuple.getStimulus() + "," + traversalLatency + ", Lineage(" + lineageSize + ")" + lineageStr + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        return new ProducerRecord<>(topic, (tuple.getStimulus() + "," + latency + "," + traversalLatency + ", Lineage(" + lineageSize + ")" + lineageStr + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }
