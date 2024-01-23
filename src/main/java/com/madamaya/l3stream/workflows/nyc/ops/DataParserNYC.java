@@ -60,7 +60,7 @@ public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTup
             Files.createDirectories(Paths.get(dataPath));
         }
 
-        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + getRuntimeContext().getIndexOfThisSubtask() + ".log");
+        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + getRuntimeContext().getIndexOfThisSubtask() + "_" + settings.getDataSize() + ".log");
         pw.println(start + "," + end + "," + (end - start) + "," + count);
         pw.flush();
         pw.close();

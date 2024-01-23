@@ -37,49 +37,49 @@ def shapeData(queries, approaches, results, rawData, maxCount):
 
     return cpu, cpu_raw, memory, memory_raw
 
-def plotData(queries, approaches, cpu, memory, cpu_raw, memory_raw, maxCount):
+def plotData(queries, approaches, cpu, memory, cpu_raw, memory_raw, maxCount, size):
     for idx in range(maxCount):
         for query in queries:
             plt.bar(range(len(cpu[idx][query])), [tuple[0] for tuple in cpu[idx][query]], tick_label=approaches)
-            plt.title("CPU - {} - {}".format(query, idx))
+            plt.title("CPU - {} - {} - {}".format(query, idx, size))
             plt.ylabel("CPU Usage [%]")
-            plt.savefig("./results/cpu.{}.{}.pdf".format(query, idx))
+            plt.savefig("./results/cpu.{}.{}.{}.pdf".format(query, idx, size))
             plt.close()
 
             plt.bar(range(len(memory[idx][query])), [tuple[0] for tuple in memory[idx][query]], tick_label=approaches)
-            plt.title("Memory - {} - {}".format(query, idx))
+            plt.title("Memory - {} - {} - {}".format(query, idx, size))
             plt.ylabel("Memory Used [B]")
-            plt.savefig("./results/memory.{}.{}.pdf".format(query, idx))
+            plt.savefig("./results/memory.{}.{}.{}.pdf".format(query, idx, size))
             plt.close()
 
     for idx in range(maxCount):
         for query in queries:
             for value in cpu_raw[idx][query]:
                 plt.plot(range(len(value)), value)
-            plt.title("CPU - {} - {}".format(query, idx))
+            plt.title("CPU - {} - {} - {}".format(query, idx, size))
             plt.xlabel("Timestamp [s]")
             plt.ylabel("CPU Usage [%]")
             plt.legend(approaches)
-            plt.savefig("./results/figs/cpu.{}.{}.pdf".format(query, idx))
+            plt.savefig("./results/figs/cpu.{}.{}.{}.pdf".format(query, idx, size))
             plt.close()
 
             for value in memory_raw[idx][query]:
                 plt.plot(range(len(value)), value)
-            plt.title("Memory - {} - {}".format(query, idx))
+            plt.title("Memory - {} - {} - {}".format(query, idx, size))
             plt.xlabel("Timestamp [s]")
             plt.ylabel("Memory Used [B]")
             plt.legend(approaches)
-            plt.savefig("./results/figs/memory.{}.{}.pdf".format(query, idx))
+            plt.savefig("./results/figs/memory.{}.{}.{}.pdf".format(query, idx, size))
             plt.close()
 
 
-def calcResults(queries, approaches, filterRate, plotTrends, startTime):
+def calcResults(queries, approaches, filterRate, plotTrends, startTime, size):
     results = {}
     rawData = {}
     maxCount = 0
     for query in queries:
         for approach in approaches:
-            files = glob.glob("./{}/{}/*".format(query, approach))
+            files = glob.glob("./{}/{}/*_{}".format(query, approach, size))
             for file in files:
                 df = pd.read_csv(file, header=None, names=["ts", "CPU", "Memory"])
                 df = df.iloc[int(df.shape[0]*filterRate):]
@@ -119,5 +119,5 @@ def calcResults(queries, approaches, filterRate, plotTrends, startTime):
                 rawData[query][approach]["Memory"].append(memoryList)
 
     cpu, cpu_raw, memory, memory_raw = shapeData(queries, approaches, results, rawData, maxCount)
-    plotData(queries, approaches, cpu, memory, cpu_raw, memory_raw, maxCount)
+    plotData(queries, approaches, cpu, memory, cpu_raw, memory_raw, maxCount, size)
     return cpu, cpu_raw, memory, memory_raw

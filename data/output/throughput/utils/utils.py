@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from scipy import stats
 import itertools
 
-def logDump(query, approach, thList, startTime):
-    with open("./results/throughput.info.{}.log".format(round(startTime)), "a") as w:
+def logDump(query, approach, thList, startTime, size):
+    with open("./results/throughput.info.{}.{}.log".format(round(startTime), size), "a") as w:
         w.write("{}\n".format(query))
         w.write("{}\n".format(approach))
         for i in range(len(thList)):
@@ -16,10 +16,10 @@ def logDump(query, approach, thList, startTime):
         w.write("{}\n".format(npMeansArray.std()))
         w.write("\n")
 
-def logDumpWelch(query, approaches, startTime, allList):
+def logDumpWelch(query, approaches, startTime, allList, size):
     print(allList)
     bonferroniCoef = (len(approaches) * (len(approaches) - 1)) // 2
-    with open("./results/throughput.info.{}.log".format(round(startTime)), "a") as w:
+    with open("./results/throughput.info.{}.{}.log".format(round(startTime), size), "a") as w:
         w.write("===== Welch results ({}) =====\n".format(query))
         for pair in itertools.combinations(approaches, 2):
             #for i in range(len(allList[approaches[0]])):
@@ -50,7 +50,7 @@ def getFileNames(dirPath):
         fileSet.add(os.path.basename(file.split("_")[0]))
     return fileSet
 
-def calcResults(queries, approaches, startTime):
+def calcResults(queries, approaches, startTime, size):
     results = {}
     for query in queries:
         allList = {}
@@ -62,7 +62,7 @@ def calcResults(queries, approaches, startTime):
                 endTsMax = -1
                 allTupleNum = 0
                 fileList = []
-                for p in glob.glob("{}/{}/*{}*.log".format(query, approach, file)):
+                for p in glob.glob("{}/{}/{}*_{}.log".format(query, approach, file, size)):
                     fileList.append(p)
                     # read log data
                     print("*** Read log data ({}) ***".format(p))
@@ -77,7 +77,7 @@ def calcResults(queries, approaches, startTime):
 
             # dump log
             print("*** Dump log ***")
-            logDump(query, approach, thList, startTime)
+            logDump(query, approach, thList, startTime, size)
             allList[approach] = thList
 
             thNpList = np.array(thList)
@@ -89,11 +89,11 @@ def calcResults(queries, approaches, startTime):
             results[query][approach] = [thMean, thSed, thNpList.size, allDuration]
 
         print("*** Welch test ***")
-        logDumpWelch(query, approaches, startTime, allList)
+        logDumpWelch(query, approaches, startTime, allList, size)
 
     return results
 
-def resultFigsGen(results, queries, approaches, flag):
+def resultFigsGen(results, queries, approaches, flag, size):
     for query in queries:
         resultsList = [results[query][approach][0] for approach in approaches]
         colorList = []
@@ -108,13 +108,13 @@ def resultFigsGen(results, queries, approaches, flag):
                 colorList.append("m")
 
         plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
-        plt.title("*{}* result (Throughput, {})".format(query, flag))
+        plt.title("*{}* result (Throughput, {}, {})".format(query, flag, size))
         plt.ylabel("Throughput [tuples/s]")
-        plt.savefig("./results/{}.pdf".format(query))
+        plt.savefig("./results/{}.{}.pdf".format(query, size))
         plt.close()
 
-def writeResults(results, queries, approaches, startTime, flag):
-    with open("./results/throughput.{}.result.{}.txt".format(flag, startTime), "w") as w:
+def writeResults(results, queries, approaches, startTime, flag, size):
+    with open("./results/throughput.{}.result.{}.{}.txt".format(flag, startTime, size), "w") as w:
         # Write mean
         w.write("MEAN,{}\n".format(",".join(approaches)))
         for query in queries:
