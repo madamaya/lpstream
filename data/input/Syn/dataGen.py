@@ -9,13 +9,13 @@ def power_data_gen(machine_id: int, power_usage: float, log: str) -> str:
 
 if __name__ == "__main__":
     # Parameters
-    sensor_num = 1000
+    sensor_num = 500
     machine_num = 10
     temp_range = [100, 200]
     power_range = [1000, 2000]
-    log_size_0 = 10000 # bytes
-    log_size_1 = 10000 # bytes
-    minimum_generated_data_size = 1 # Gbytes
+    log_size_0 = 10 # *8 bytes
+    log_size_1 = 10 # *8 bytes
+    minimum_generated_data_size = 0.01 # Gbytes
     parallelism = 10
 
     # Preprocessing
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     all_start_time = time.time()
     for current_parallel_id in range(parallelism):
         all_size = 0
-        with open("../data/syn1.csv.ingest.{}".format(current_parallel_id), "w") as w:
+        with open("../data/syn1.{}.csv.ingest.{}".format(log_size_0, current_parallel_id), "w") as w:
         #with open("syn.csv.{}".format(current_parallel_id), "w") as w:
             ## Start Time
             start_time = time.time()
