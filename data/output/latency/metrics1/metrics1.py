@@ -17,13 +17,19 @@ if __name__ == "__main__":
     if not os.path.exists("./results/figs"):
         os.makedirs("./results/figs")
 
-    for size in dataSize:
-        print("* calcResults() *")
-        results = utils.calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, violinPlot, startTime, flag, size)
+    for idx in [1, 2]:
+        for size in dataSize:
+            if idx == 2:
+                tmp_approaches = [approach for approach in approaches if approach in ["genealog", "l3streamlin"]]
+            else:
+                tmp_approaches = approaches
 
-        print("* resultFigsGen *")
-        utils.resultFigsGen(results, queries, approaches, flag, size)
+            print("* calcResults() *")
+            results = utils.calcResults(queries, tmp_approaches, filterRate, plotLatency, plotLatencyCmp, violinPlot, startTime, flag, size, idx)
 
-        print("* writeResults(results) *")
-        utils.writeResults(results, queries, approaches, startTime, flag, size)
+            print("* resultFigsGen *")
+            utils.resultFigsGen(results, queries, tmp_approaches, flag, size, idx)
+
+            print("* writeResults(results) *")
+            utils.writeResults(results, queries, tmp_approaches, startTime, flag, size, idx)
 
