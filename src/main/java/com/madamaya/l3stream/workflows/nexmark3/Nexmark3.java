@@ -5,6 +5,7 @@ import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTuple;
 import com.madamaya.l3stream.workflows.nexmark.ops.*;
+import com.madamaya.l3stream.workflows.nexmark3.ops.JoinNex3;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
@@ -16,6 +17,7 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
 public class Nexmark3 {
@@ -26,7 +28,7 @@ public class Nexmark3 {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
 
-        final String queryFlag = "Nexmark";
+        final String queryFlag = "Nexmark3";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
@@ -40,46 +42,37 @@ public class Nexmark3 {
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
                 .setGroupId("1" + String.valueOf(System.currentTimeMillis()))
-                .setStartingOffsets(OffsetsInitializer.earliest())
-                .setDeserializer(new StringDeserializerV2())
-                .build();
-
-        KafkaSource<KafkaInputString> source2 = KafkaSource.<KafkaInputString>builder()
-                .setBootstrapServers(brokers)
-                .setTopics(inputTopicName)
-                .setGroupId("2" + String.valueOf(System.currentTimeMillis()))
-                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setStartingOffsets(OffsetsInitializer.latest())
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 
         /* Query */
-        // DataStream<KafkaInputString> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark");
-        // DataStream<NexmarkAuctionTuple> auction = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-        DataStream<NexmarkAuctionTuple> auction = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark1")
+        DataStream<KafkaInputString> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark");
+        DataStream<NexmarkAuctionTuple> auction = sourceDs
                 .map(new AuctionDataParserNex(settings))
                 .filter(t -> t.getEventType() == 1)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex());
 
-        // DataStream<NexmarkBidTuple> bid = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-        DataStream<NexmarkBidTuple> bid = env.fromSource(source2, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark2")
+        DataStream<NexmarkBidTuple> bid = sourceDs
                 .map(new BidderDataParserNex(settings))
                 .filter(t -> t.getEventType() == 2)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyBidNex());
 
-        DataStream<NexmarkJoinedTuple> joined = auction.keyBy(new KeySelector<NexmarkAuctionTuple, Integer>() {
-                @Override
-                public Integer getKey(NexmarkAuctionTuple tuple) throws Exception {
-                    return tuple.getAuctionId();
-                }
-                })
-                .intervalJoin(bid.keyBy(new KeySelector<NexmarkBidTuple, Integer>() {
+        DataStream<NexmarkJoinedTuple> joined = auction.join(bid)
+                .where(new KeySelector<NexmarkAuctionTuple, Integer>() {
                     @Override
-                    public Integer getKey(NexmarkBidTuple tuple) throws Exception {
-                        return tuple.getAuctionId();
+                    public Integer getKey(NexmarkAuctionTuple auctionTuple) throws Exception {
+                        return auctionTuple.getAuctionId();
                     }
-                }))
-                .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(5)))
-                .process(new JoinNex())
+                })
+                .equalTo(new KeySelector<NexmarkBidTuple, Integer>() {
+                    @Override
+                    public Integer getKey(NexmarkBidTuple bidTuple) throws Exception {
+                        return bidTuple.getAuctionId();
+                    }
+                })
+                .window(TumblingEventTimeWindows.of(Time.milliseconds(20)))
+                .apply(new JoinNex3())
                 .filter(t -> t.getCategory() == 10);
 
         KafkaSink<NexmarkJoinedTuple> sink;
