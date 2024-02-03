@@ -26,10 +26,10 @@ public class LatencyKafkaSinkSyn6GLV2 implements KafkaRecordSerializationSchema<
     public ProducerRecord<byte[], byte[]> serialize(SynJoinedTupleGL tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
         long traversalStartTime = System.nanoTime();
         Set<TimestampedUIDTuple> lineage = genealogGraphTraverser.getProvenance(tuple);
-        long traversalEndTime = System.nanoTime();
-        String traversalTime = Long.toString(traversalEndTime - traversalStartTime);
-
         String lineageStr = FormatLineage.formattedLineage(lineage);
-        return new ProducerRecord<>(topic, (tuple.getStimulus() + "," + traversalTime + ", Lineage(" + lineage.size() + ")" + lineageStr + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        long traversalEndTime = System.nanoTime();
+
+        String traversalTime = Long.toString(traversalEndTime - traversalStartTime);
+        return new ProducerRecord<>(topic, (tuple.getStimulus() + "," + tuple.getKafkaAppendTime() + "," + traversalTime + ", Lineage(" + lineage.size() + ")" + lineageStr + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }

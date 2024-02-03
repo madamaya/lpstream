@@ -6,19 +6,21 @@ public class SynTempTuple extends SynInputTuple {
      private double temperature;
     private String log;
     private long timestamp;
+    private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
     public SynTempTuple(int type) {
         super(type);
     }
 
-    public SynTempTuple(int type, int machineId, int sensorId, double temperature, String log, long timestamp, long stimulus) {
+    public SynTempTuple(int type, int machineId, int sensorId, double temperature, String log, long timestamp, long kafkaAppendTime, long stimulus) {
         super(type);
         this.machineId = machineId;
         this.sensorId = sensorId;
         this.temperature = temperature;
         this.log = log;
         this.timestamp = timestamp;
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
@@ -38,6 +40,7 @@ public class SynTempTuple extends SynInputTuple {
         this.temperature = tuple.getTemperature();
         this.log = tuple.getLog();
         this.timestamp = tuple.getTimestamp();
+        this.kafkaAppendTime = tuple.getKafkaAppendTime();
         this.stimulus = tuple.getStimulus();
     }
 
@@ -79,6 +82,14 @@ public class SynTempTuple extends SynInputTuple {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public long getKafkaAppendTime() {
+        return kafkaAppendTime;
+    }
+
+    public void setKafkaAppendTime(long kafkaAppendTime) {
+        this.kafkaAppendTime = kafkaAppendTime;
     }
 
     public long getStimulus() {

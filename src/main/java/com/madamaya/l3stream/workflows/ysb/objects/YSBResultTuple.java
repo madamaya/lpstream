@@ -4,12 +4,14 @@ public class YSBResultTuple {
     private String campaignId;
     private long count;
     private long ts;
+    private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
-    public YSBResultTuple(String campaignId, long count, long ts, long stimulus) {
+    public YSBResultTuple(String campaignId, long count, long ts, long kafkaAppendTime, long stimulus) {
         this.campaignId = campaignId;
         this.count = count;
         this.ts = ts;
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
@@ -41,6 +43,14 @@ public class YSBResultTuple {
 
     public void setTs(long ts) {
         this.ts = ts;
+    }
+
+    public long getKafkaAppendTime() {
+        return kafkaAppendTime;
+    }
+
+    public void setKafkaAppendTime(long kafkaAppendTime) {
+        this.kafkaAppendTime = kafkaAppendTime;
     }
 
     public long getStimulus() {

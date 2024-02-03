@@ -8,6 +8,7 @@ import io.palyvos.provenance.ananke.aggregate.ProvenanceAggregateStrategy;
 import io.palyvos.provenance.genealog.GenealogAccumulator;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.tuple.Tuple5;
 
 import java.util.function.Supplier;
 
@@ -42,7 +43,7 @@ public class CountYSBGL implements AggregateFunction<YSBInternalTupleGL, CountYS
     public static class Accumulator extends
             GenealogAccumulator<YSBInternalTupleGL, YSBResultTupleGL, Accumulator> {
 
-        private Tuple4<String, Long, Long, Long> acc = Tuple4.of("", 0L, 0L, -1L);
+        private Tuple5<String, Long, Long, Long, Long> acc = Tuple5.of("", 0L, 0L, -1L, -1L);
 
         public Accumulator(Supplier<ProvenanceAggregateStrategy> strategySupplier) {
             super(strategySupplier);
@@ -53,12 +54,13 @@ public class CountYSBGL implements AggregateFunction<YSBInternalTupleGL, CountYS
             acc.f0 = tuple.getCampaignId();
             acc.f1++;
             acc.f2 = Math.max(acc.f2, tuple.getEventtime());
-            acc.f3 = Math.max(acc.f3, tuple.getStimulus());
+            acc.f3 = Math.max(acc.f3, tuple.getKafkaAppendTime());
+            acc.f4 = Math.max(acc.f4, tuple.getStimulus());
         }
 
         @Override
         protected YSBResultTupleGL doGetAggregatedResult() {
-            return new YSBResultTupleGL(acc.f0, acc.f1, acc.f2, acc.f3);
+            return new YSBResultTupleGL(acc.f0, acc.f1, acc.f2, acc.f3, acc.f4);
         }
     }
 }

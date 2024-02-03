@@ -11,8 +11,8 @@ public class NexmarkBidTupleGL extends NexmarkBidTuple implements GenealogTuple 
         super(eventType);
     }
 
-    public NexmarkBidTupleGL(int eventType, int auctionId, int bidder, long price, String channel, String url, long dateTime, String extra, long stimulus) {
-        super(eventType, auctionId, bidder, price, channel, url, dateTime, extra, stimulus);
+    public NexmarkBidTupleGL(int eventType, int auctionId, int bidder, long price, String channel, String url, long dateTime, String extra, long kafkaAppendTime, long stimulus) {
+        super(eventType, auctionId, bidder, price, channel, url, dateTime, extra, kafkaAppendTime, stimulus);
     }
 
     @Override

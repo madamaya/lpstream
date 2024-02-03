@@ -23,6 +23,7 @@ public class TempParserSynGL implements MapFunction<StringGL, SynTempTupleGL> {
                     Double.parseDouble(elements[3]),
                     elements[4],
                     Long.parseLong(elements[5]),
+                    input.getKafkaAppandTime(),
                     input.getStimulus()
             );
             GenealogMapHelper.INSTANCE.annotateResult(input, tuple);

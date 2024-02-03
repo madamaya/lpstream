@@ -36,6 +36,7 @@ public class TempParserSyn extends RichMapFunction<KafkaInputString, SynTempTupl
                     Double.parseDouble(elements[3]),
                     elements[4],
                     Long.parseLong(elements[5]),
+                    input.getKafkaAppandTime(),
                     input.getStimulus()
             );
             return tuple;

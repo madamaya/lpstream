@@ -18,6 +18,7 @@ public class ProcessJoinSynGL extends ProcessJoinFunction<SynPowerTupleGL, SynTe
                 synTempTuple.getLog(),
                 synPowerTuple.getLog(),
                 Math.max(synTempTuple.getTimestamp(), synPowerTuple.getTimestamp()),
+                Math.max(synTempTuple.getKafkaAppendTime(), synPowerTuple.getKafkaAppendTime()),
                 Math.max(synTempTuple.getStimulus(), synPowerTuple.getStimulus())
         );
         GenealogJoinHelper.INSTANCE.annotateResult(synPowerTuple, synTempTuple, tuple);

@@ -37,6 +37,7 @@ public class PowerParserSyn extends RichMapFunction<KafkaInputString, SynPowerTu
                     Double.parseDouble(elements[2]),
                     elements[3],
                     Long.parseLong(elements[4]),
+                    input.getKafkaAppandTime(),
                     input.getStimulus()
             );
             return tuple;

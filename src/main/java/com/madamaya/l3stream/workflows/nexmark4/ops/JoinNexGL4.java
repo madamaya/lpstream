@@ -26,6 +26,7 @@ public class JoinNexGL4 implements JoinFunction<NexmarkAuctionTupleGL, NexmarkBi
                 auctionTuple.getSeller(),
                 auctionTuple.getCategory(),
                 auctionTuple.getExtra(),
+                Math.max(bidTuple.getKafkaAppendTime(), auctionTuple.getKafkaAppendTime()),
                 Math.max(bidTuple.getStimulus(), auctionTuple.getStimulus())
         );
         GenealogJoinHelper.INSTANCE.annotateResult(auctionTuple, bidTuple, out);

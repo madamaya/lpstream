@@ -17,7 +17,6 @@ public class LatencyKafkaSinkSyn6V2 implements KafkaRecordSerializationSchema<Sy
     @Nullable
     @Override
     public ProducerRecord<byte[], byte[]> serialize(SynJoinedTuple tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
-        String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
-        return new ProducerRecord<>(topic, (tuple.getStimulus() + "," + latency + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        return new ProducerRecord<>(topic, (tuple.getStimulus() + "," + tuple.getKafkaAppendTime() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }

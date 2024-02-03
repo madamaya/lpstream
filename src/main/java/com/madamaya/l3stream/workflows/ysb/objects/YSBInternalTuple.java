@@ -4,12 +4,14 @@ public class YSBInternalTuple {
     private String adId;
     private String campaignId;
     private long eventtime;
+    private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
-    public YSBInternalTuple(String adId, String campaignId, long eventtime, long stimulus) {
+    public YSBInternalTuple(String adId, String campaignId, long eventtime, long kafkaAppendTime, long stimulus) {
         this.adId = adId;
         this.campaignId = campaignId;
         this.eventtime = eventtime;
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
@@ -41,6 +43,14 @@ public class YSBInternalTuple {
 
     public void setEventtime(Long eventtime) {
         this.eventtime = eventtime;
+    }
+
+    public long getKafkaAppendTime() {
+        return kafkaAppendTime;
+    }
+
+    public void setKafkaAppendTime(long kafkaAppendTime) {
+        this.kafkaAppendTime = kafkaAppendTime;
     }
 
     public long getStimulus() {

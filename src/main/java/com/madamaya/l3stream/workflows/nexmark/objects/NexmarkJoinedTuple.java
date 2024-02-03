@@ -17,9 +17,10 @@ public class NexmarkJoinedTuple {
     private int seller;
     private int category;
     private String auction_extra;
+    private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
-    public NexmarkJoinedTuple(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long stimulus) {
+    public NexmarkJoinedTuple(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long kafkaAppendTime, long stimulus) {
         this.auctionId = auctionId;
         this.bidder = bidder;
         this.price = price;
@@ -36,6 +37,7 @@ public class NexmarkJoinedTuple {
         this.seller = seller;
         this.category = category;
         this.auction_extra = auction_extra;
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
@@ -184,6 +186,14 @@ public class NexmarkJoinedTuple {
 
     public void setAuction_extra(String auction_extra) {
         this.auction_extra = auction_extra;
+    }
+
+    public long getKafkaAppendTime() {
+        return kafkaAppendTime;
+    }
+
+    public void setKafkaAppendTime(long kafkaAppendTime) {
+        this.kafkaAppendTime = kafkaAppendTime;
     }
 
     public long getStimulus() {

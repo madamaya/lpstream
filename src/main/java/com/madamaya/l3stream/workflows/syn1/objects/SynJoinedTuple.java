@@ -8,9 +8,10 @@ public class SynJoinedTuple {
     private String logTemp;
     private String logPower;
     private long timestamp;
-    private long stimulus;
+    private long kafkaAppendTime = Long.MAX_VALUE;
+    private long stimulus = Long.MAX_VALUE;
 
-    public SynJoinedTuple(int machineId, int sensorId, double temperature, double power, String logTemp, String logPower, long timestamp, long stimulus) {
+    public SynJoinedTuple(int machineId, int sensorId, double temperature, double power, String logTemp, String logPower, long timestamp, long kafkaAppendTime, long stimulus) {
         this.machineId = machineId;
         this.sensorId = sensorId;
         this.temperature = temperature;
@@ -18,6 +19,7 @@ public class SynJoinedTuple {
         this.logTemp = logTemp;
         this.logPower = logPower;
         this.timestamp = timestamp;
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
@@ -85,6 +87,14 @@ public class SynJoinedTuple {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public long getKafkaAppendTime() {
+        return kafkaAppendTime;
+    }
+
+    public void setKafkaAppendTime(long kafkaAppendTime) {
+        this.kafkaAppendTime = kafkaAppendTime;
     }
 
     public long getStimulus() {

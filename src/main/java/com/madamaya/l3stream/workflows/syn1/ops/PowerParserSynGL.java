@@ -24,6 +24,7 @@ public class PowerParserSynGL implements MapFunction<StringGL, SynPowerTupleGL> 
                     Double.parseDouble(elements[2]),
                     elements[3],
                     Long.parseLong(elements[4]),
+                    input.getKafkaAppandTime(),
                     input.getStimulus()
             );
             GenealogMapHelper.INSTANCE.annotateResult(input, tuple);

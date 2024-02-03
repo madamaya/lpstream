@@ -11,8 +11,8 @@ public class SynPowerTupleGL extends SynPowerTuple implements GenealogTuple {
         super(type);
     }
 
-    public SynPowerTupleGL(int type, int machineId, double power, String log, long timestamp, long stimulus) {
-        super(type, machineId, power, log, timestamp, stimulus);
+    public SynPowerTupleGL(int type, int machineId, double power, String log, long timestamp, long kafkaAppendTime, long stimulus) {
+        super(type, machineId, power, log, timestamp, kafkaAppendTime, stimulus);
     }
 
     public SynPowerTupleGL(int type, int machineId, double power, String log, long timestamp) {
@@ -20,7 +20,7 @@ public class SynPowerTupleGL extends SynPowerTuple implements GenealogTuple {
     }
 
     public SynPowerTupleGL(SynPowerTupleGL tuple) {
-        super(tuple.getType(), tuple.getMachineId(), tuple.getPower(), tuple.getLog(), tuple.getTimestamp(), tuple.getStimulus());
+        super(tuple.getType(), tuple.getMachineId(), tuple.getPower(), tuple.getLog(), tuple.getTimestamp(), tuple.getKafkaAppendTime(), tuple.getStimulus());
     }
 
     @Override

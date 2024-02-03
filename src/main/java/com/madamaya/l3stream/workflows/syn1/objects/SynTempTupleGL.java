@@ -11,8 +11,8 @@ public class SynTempTupleGL extends SynTempTuple implements GenealogTuple {
         super(type);
     }
 
-    public SynTempTupleGL(int type, int machineId, int sensorId, double temperature, String log, long timestamp, long stimulus) {
-        super(type, machineId, sensorId, temperature, log, timestamp, stimulus);
+    public SynTempTupleGL(int type, int machineId, int sensorId, double temperature, String log, long timestamp, long kafkaAppendTime, long stimulus) {
+        super(type, machineId, sensorId, temperature, log, timestamp, kafkaAppendTime, stimulus);
     }
 
     public SynTempTupleGL(int type, int machineId, int sensorId, double temperature, String log, long timestamp) {
@@ -20,7 +20,7 @@ public class SynTempTupleGL extends SynTempTuple implements GenealogTuple {
     }
 
     public SynTempTupleGL(SynTempTupleGL tuple) {
-        super(tuple.getType(), tuple.getMachineId(), tuple.getSensorId(), tuple.getTemperature(), tuple.getLog(), tuple.getTimestamp(), tuple.getStimulus());
+        super(tuple.getType(), tuple.getMachineId(), tuple.getSensorId(), tuple.getTemperature(), tuple.getLog(), tuple.getTimestamp(), tuple.getKafkaAppendTime(), tuple.getStimulus());
     }
 
     @Override

@@ -25,6 +25,7 @@ public class JoinNexGL extends ProcessJoinFunction<NexmarkAuctionTupleGL, Nexmar
                 auctionTuple.getSeller(),
                 auctionTuple.getCategory(),
                 auctionTuple.getExtra(),
+                Math.max(bidTuple.getKafkaAppendTime(), auctionTuple.getKafkaAppendTime()),
                 Math.max(bidTuple.getStimulus(), auctionTuple.getStimulus())
         );
         GenealogJoinHelper.INSTANCE.annotateResult(auctionTuple, bidTuple, out);

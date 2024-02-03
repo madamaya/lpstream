@@ -14,13 +14,14 @@ public class NexmarkBidTuple extends NexmarkInputTuple {
     private String url;
     private long dateTime;
     private String extra;
+    private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
     public NexmarkBidTuple(int eventType) {
         super(eventType);
     }
 
-    public NexmarkBidTuple(int eventType, int auctionId, int bidder, long price, String channel, String url, long dateTime, String extra, long stimulus) {
+    public NexmarkBidTuple(int eventType, int auctionId, int bidder, long price, String channel, String url, long dateTime, String extra, long kafkaAppendTime, long stimulus) {
         super(eventType);
         this.auctionId = auctionId;
         this.bidder = bidder;
@@ -29,6 +30,7 @@ public class NexmarkBidTuple extends NexmarkInputTuple {
         this.url = url;
         this.dateTime = dateTime;
         this.extra = extra.replace("\\", "");
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
@@ -97,6 +99,14 @@ public class NexmarkBidTuple extends NexmarkInputTuple {
 
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+
+    public long getKafkaAppendTime() {
+        return kafkaAppendTime;
+    }
+
+    public void setKafkaAppendTime(long kafkaAppendTime) {
+        this.kafkaAppendTime = kafkaAppendTime;
     }
 
     public long getStimulus() {

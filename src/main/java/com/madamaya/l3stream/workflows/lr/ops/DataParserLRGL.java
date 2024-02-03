@@ -31,8 +31,8 @@ public class DataParserLRGL implements MapFunction<StringGL, LinearRoadInputTupl
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
                 Integer.valueOf(elements[8]),
+                input.getKafkaAppandTime(),
                 input.getStimulus()
-                // input.getKafkaAppandTime()
         );
         out.setKey(String.valueOf(out.getVid()));
         //out.setTimestamp(System.currentTimeMillis());

@@ -17,6 +17,7 @@ public class ProcessJoinSyn extends ProcessJoinFunction<SynPowerTuple, SynTempTu
                 synTempTuple.getLog(),
                 synPowerTuple.getLog(),
                 Math.max(synTempTuple.getTimestamp(), synPowerTuple.getTimestamp()),
+                Math.max(synTempTuple.getKafkaAppendTime(), synPowerTuple.getKafkaAppendTime()),
                 Math.max(synTempTuple.getStimulus(), synPowerTuple.getStimulus())
         );
         collector.collect(tuple);

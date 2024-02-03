@@ -46,7 +46,7 @@ public class BidderDataParserNexGL implements MapFunction<StringGL, NexmarkBidTu
             String extra = jnode.get("extra").asText();
 
             // NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getStimulus());
-            NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getStimulus());
+            NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getKafkaAppandTime(), input.getStimulus());
             // NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getKafkaAppandTime());
             //out.setDateTime(System.currentTimeMillis());
             GenealogMapHelper.INSTANCE.annotateResult(input, out);

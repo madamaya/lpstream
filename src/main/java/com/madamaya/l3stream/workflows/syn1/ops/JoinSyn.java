@@ -17,6 +17,7 @@ public class JoinSyn implements JoinFunction<SynPowerTuple, SynTempTuple, SynJoi
                 synTempTuple.getLog(),
                 synPowerTuple.getLog(),
                 Math.max(synTempTuple.getTimestamp(), synPowerTuple.getTimestamp()),
+                Math.max(synTempTuple.getKafkaAppendTime(), synPowerTuple.getKafkaAppendTime()),
                 Math.max(synTempTuple.getStimulus(), synPowerTuple.getStimulus())
         );
         return tuple;

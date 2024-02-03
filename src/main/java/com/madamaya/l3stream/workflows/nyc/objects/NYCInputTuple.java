@@ -18,14 +18,16 @@ public class NYCInputTuple {
     private long dropoffTime;
     private double tripDistance;
     private long dropoffLocationId;
+    private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
     // CNFM
 
-    public NYCInputTuple(int vendorId, long dropoffTime, double tripDistance, long dropoffLocationId, long stimulus) {
+    public NYCInputTuple(int vendorId, long dropoffTime, double tripDistance, long dropoffLocationId, long kafkaAppendTime, long stimulus) {
         this.vendorId = vendorId;
         this.dropoffTime = dropoffTime;
         this.tripDistance = tripDistance;
         this.dropoffLocationId = dropoffLocationId;
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
@@ -37,11 +39,12 @@ public class NYCInputTuple {
     }
 
 
-    public NYCInputTuple(String line, long stimulus, SimpleDateFormat sdf) {
+    public NYCInputTuple(String line, long kafkaAppendTime, long stimulus, SimpleDateFormat sdf) {
         String[] elements = line.split(",");
         this.vendorId = Integer.parseInt(elements[0]);
         this.tripDistance = Double.parseDouble(elements[4]);
         this.dropoffLocationId = Long.parseLong(elements[8]);
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
         this.dropoffTime = convertDateFormat(elements[2], sdf);
     }
@@ -84,6 +87,14 @@ public class NYCInputTuple {
 
     public void setDropoffLocationId(long dropoffLocationId) {
         this.dropoffLocationId = dropoffLocationId;
+    }
+
+    public long getKafkaAppendTime() {
+        return kafkaAppendTime;
+    }
+
+    public void setKafkaAppendTime(long kafkaAppendTime) {
+        this.kafkaAppendTime = kafkaAppendTime;
     }
 
     public long getStimulus() {

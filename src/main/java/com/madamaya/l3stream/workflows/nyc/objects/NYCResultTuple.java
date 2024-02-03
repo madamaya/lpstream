@@ -6,14 +6,16 @@ public class NYCResultTuple {
     private long count;
     private double avgDistance;
     private long ts;
+    private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
-    public NYCResultTuple(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts, long stimulus) {
+    public NYCResultTuple(int vendorId, long dropoffLocationId, long count, double avgDistance, long ts, long kafkaAppendTime, long stimulus) {
         this.vendorId = vendorId;
         this.dropoffLocationId = dropoffLocationId;
         this.count = count;
         this.avgDistance = avgDistance;
         this.ts = ts;
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
@@ -63,6 +65,14 @@ public class NYCResultTuple {
 
     public void setTs(long ts) {
         this.ts = ts;
+    }
+
+    public long getKafkaAppendTime() {
+        return kafkaAppendTime;
+    }
+
+    public void setKafkaAppendTime(long kafkaAppendTime) {
+        this.kafkaAppendTime = kafkaAppendTime;
     }
 
     public long getStimulus() {

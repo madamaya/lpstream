@@ -4,12 +4,14 @@ public class SynResultTuple {
     private int machineId;
     private double avgTemp;
     private long timestamp;
-    private long stimulus;
+    private long kafkaAppendTime = Long.MAX_VALUE;
+    private long stimulus = Long.MAX_VALUE;
 
-    public SynResultTuple(int machineId, double avgTemp, long timestamp, long stimulus) {
+    public SynResultTuple(int machineId, double avgTemp, long timestamp, long kafkaAppendTime, long stimulus) {
         this.machineId = machineId;
         this.avgTemp = avgTemp;
         this.timestamp = timestamp;
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
@@ -41,6 +43,14 @@ public class SynResultTuple {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public long getKafkaAppendTime() {
+        return kafkaAppendTime;
+    }
+
+    public void setKafkaAppendTime(long kafkaAppendTime) {
+        this.kafkaAppendTime = kafkaAppendTime;
     }
 
     public long getStimulus() {

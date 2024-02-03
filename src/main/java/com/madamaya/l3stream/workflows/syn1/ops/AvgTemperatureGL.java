@@ -6,6 +6,7 @@ import io.palyvos.provenance.ananke.aggregate.ProvenanceAggregateStrategy;
 import io.palyvos.provenance.genealog.GenealogAccumulator;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.tuple.Tuple6;
 
 import java.util.function.Supplier;
 
@@ -42,7 +43,7 @@ public class AvgTemperatureGL implements AggregateFunction<SynTempTupleGL, AvgTe
     public static class Accumulator extends
             GenealogAccumulator<SynTempTupleGL, SynResultTupleGL, Accumulator> {
 
-        private Tuple5<Integer, Double, Long, Long, Long> acc = Tuple5.of(-1, 0.0, 0L, -1L, -1L);
+        private Tuple6<Integer, Double, Long, Long, Long, Long> acc = Tuple6.of(-1, 0.0, 0L, -1L, -1L, -1L);
 
         public Accumulator(Supplier<ProvenanceAggregateStrategy> strategySupplier) {
             super(strategySupplier);
@@ -54,12 +55,13 @@ public class AvgTemperatureGL implements AggregateFunction<SynTempTupleGL, AvgTe
             acc.f1 = acc.f1 + tuple.getTemperature();
             acc.f2++;
             acc.f3 = Math.max(acc.f3, tuple.getTimestamp());
-            acc.f4 = Math.max(acc.f4, tuple.getStimulus());
+            acc.f4 = Math.max(acc.f4, tuple.getKafkaAppendTime());
+            acc.f5 = Math.max(acc.f5, tuple.getStimulus());
         }
 
         @Override
         protected SynResultTupleGL doGetAggregatedResult() {
-            return new SynResultTupleGL(acc.f0, acc.f1 / acc.f2, acc.f3, acc.f4);
+            return new SynResultTupleGL(acc.f0, acc.f1 / acc.f2, acc.f3, acc.f4, acc.f5);
         }
     }
 }

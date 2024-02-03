@@ -7,8 +7,8 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 public class YSBInputTupleGL extends YSBInputTuple implements GenealogTuple {
     private GenealogData gdata;
 
-    public YSBInputTupleGL(String adId, String eventType, String campaignId, long eventtime, long stimulus) {
-        super(adId, eventType, campaignId, eventtime, stimulus);
+    public YSBInputTupleGL(String adId, String eventType, String campaignId, long eventtime, long kafkaAppendTime, long stimulus) {
+        super(adId, eventType, campaignId, eventtime, kafkaAppendTime, stimulus);
     }
 
     @Override
