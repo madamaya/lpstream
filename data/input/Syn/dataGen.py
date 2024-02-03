@@ -2,10 +2,12 @@ import time
 import numpy as np
 
 def temp_data_gen(machine_id: int, sensor_id: int, temperature: float, log: str) -> str:
-    return "0,{},{},{},{}\n".format(machine_id, sensor_id, temperature, log)
+    temp_str = format(temperature, ".1f")
+    return "0,{},{},{},{}\n".format(machine_id, sensor_id, temp_str, log)
 
 def power_data_gen(machine_id: int, power_usage: float, log: str) -> str:
-    return "1,{},{},{}\n".format(machine_id, power_usage, log)
+    power_str = format(power_usage, ".1f")
+    return "1,{},{},{}\n".format(machine_id, power_str, log)
 
 if __name__ == "__main__":
     # Parameters

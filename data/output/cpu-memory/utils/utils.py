@@ -79,7 +79,7 @@ def calcResults(queries, approaches, filterRate, plotTrends, startTime, size):
     maxCount = 0
     for query in queries:
         for approach in approaches:
-            files = glob.glob("./{}/{}/*_{}".format(query, approach, size))
+            files = glob.glob("./{}/{}/*_{}.log".format(query, approach, size))
             for file in files:
                 df = pd.read_csv(file, header=None, names=["ts", "CPU", "Memory"])
                 df = df.iloc[int(df.shape[0]*filterRate):]

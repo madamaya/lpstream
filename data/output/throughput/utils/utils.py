@@ -43,8 +43,8 @@ def extractTsAndTupleNum(filePath):
     elements = getLine(filePath).split(",")
     return int(elements[0]), int(elements[1]), int(elements[3])
 
-def getFileNames(dirPath):
-    files = glob.glob("{}/*.log".format(dirPath))
+def getFileNames(dirPath, size):
+    files = glob.glob("{}/*_{}.log".format(dirPath, size))
     fileSet = set()
     for file in files:
         fileSet.add(os.path.basename(file.split("_")[0]))
@@ -57,7 +57,7 @@ def calcResults(queries, approaches, startTime, size):
         for approach in approaches:
             thList = []
             allDuration = 0
-            for file in getFileNames("{}/{}".format(query, approach)):
+            for file in getFileNames("{}/{}".format(query, approach), size):
                 startTsMin = -1
                 endTsMax = -1
                 allTupleNum = 0
@@ -70,8 +70,8 @@ def calcResults(queries, approaches, startTime, size):
                     startTsMin = startTs if (startTsMin < 0) else min(startTsMin, startTs)
                     endTsMax = endTs if (endTsMax < 0) else max(endTsMax, endTs)
                     allTupleNum = allTupleNum + tupleNum
-                thList.append(allTupleNum / ((endTs - startTs) // 1e9))
-                allDuration = allDuration + (endTs - startTs)
+                thList.append(allTupleNum / ((endTsMax - startTsMin) // 1e9))
+                allDuration = allDuration + (endTsMax - startTsMin)
 
                 print("p = {}".format(fileList))
 
