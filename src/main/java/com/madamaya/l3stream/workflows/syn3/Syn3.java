@@ -4,6 +4,7 @@ import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.workflows.syn1.objects.SynResultTuple;
 import com.madamaya.l3stream.workflows.syn1.ops.AvgTemperature;
 import com.madamaya.l3stream.workflows.syn1.ops.TempParserSyn;
+import com.madamaya.l3stream.workflows.syn1.ops.TsAssignTempMap;
 import com.madamaya.l3stream.workflows.syn1.ops.WatermarkStrategyTempSyn;
 import com.madamaya.l3stream.workflows.syn3.ops.LatencyKafkaSinkSyn3V2;
 import com.madamaya.l3stream.workflows.syn3.ops.OutputKafkaSinkSyn3V2;
@@ -47,6 +48,7 @@ public class Syn3 {
                 .map(new TempParserSyn(settings))
                 .filter(t -> t.getType() == 0)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn())
+                .map(new TsAssignTempMap())
                 .keyBy(t -> t.getMachineId())
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
                 .aggregate(new AvgTemperature());

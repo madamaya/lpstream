@@ -28,6 +28,7 @@ public class DataParserLRGL implements MapFunction<StringGL, LinearRoadInputTupl
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
                 Integer.valueOf(elements[8]),
+                input.getDominantOpTime(),
                 input.getKafkaAppandTime(),
                 input.getStimulus()
         );

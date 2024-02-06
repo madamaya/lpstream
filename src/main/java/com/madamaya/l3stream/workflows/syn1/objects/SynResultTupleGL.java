@@ -7,8 +7,8 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 public class SynResultTupleGL extends SynResultTuple implements GenealogTuple {
     private GenealogData gdata;
 
-    public SynResultTupleGL(int machineId, double avgTemp, long timestamp, long kafkaAppendTime, long stimulus) {
-        super(machineId, avgTemp, timestamp, kafkaAppendTime, stimulus);
+    public SynResultTupleGL(int machineId, double avgTemp, long timestamp, long dominantOpTime, long kafkaAppendTime, long stimulus) {
+        super(machineId, avgTemp, timestamp, dominantOpTime, kafkaAppendTime, stimulus);
     }
 
     public SynResultTupleGL(int machineId, double avgTemp, long timestamp) {

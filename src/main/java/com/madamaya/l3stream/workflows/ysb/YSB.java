@@ -52,6 +52,7 @@ public class YSB {
                 .assignTimestampsAndWatermarks(new WatermarkStrategyYSB())
                 .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSB())
+                .map(new TsAssignYSB())
                 .keyBy(t -> t.getCampaignId())
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(1))))
                 // .trigger(new TriggerYSB())

@@ -5,11 +5,7 @@ import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTuple;
-import com.madamaya.l3stream.workflows.nexmark.ops.JoinNexL3;
-import com.madamaya.l3stream.workflows.nexmark.ops.AuctionDataParserNexL3;
-import com.madamaya.l3stream.workflows.nexmark.ops.BidderDataParserNexL3;
-import com.madamaya.l3stream.workflows.nexmark.ops.WatermarkStrategyAuctionNex;
-import com.madamaya.l3stream.workflows.nexmark.ops.WatermarkStrategyBidNex;
+import com.madamaya.l3stream.workflows.nexmark.ops.*;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
@@ -38,7 +34,7 @@ public class L3Nexmark {
             // env.getCheckpointConfig().disableCheckpointing();
         }
 
-        final String queryFlag = "Nexmark3";
+        final String queryFlag = "Nexmark";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
@@ -63,14 +59,16 @@ public class L3Nexmark {
                 .map(L3.map(new AuctionDataParserNexL3())).uid("3")
                 .filter(L3.filter(t -> t.getEventType() == 1)).uid("4")
                 .map(L3.updateTsWM(new WatermarkStrategyAuctionNex(), 0)).uid("5")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.readPartitionNum(env.getParallelism()))).uid("6");
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.readPartitionNum(env.getParallelism()))).uid("6")
+                .map(L3.mapTs(new TsAssignAuctionNexL3())).uid("TsAssignAuctionNexL3");
 
         DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = sourceDs
                 .map(L3.initMap(settings, 1)).uid("8")
                 .map(L3.map(new BidderDataParserNexL3())).uid("9")
                 .filter(L3.filter(t -> t.getEventType() == 2)).uid("10")
                 .map(L3.updateTsWM(new WatermarkStrategyBidNex(), 1)).uid("11")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.readPartitionNum(env.getParallelism()))).uid("12");
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.readPartitionNum(env.getParallelism()))).uid("12")
+                .map(L3.mapTs(new TsAssignBidderNexL3())).uid("TsAssignBidderNexL3");
 
         DataStream<L3StreamTupleContainer<NexmarkJoinedTuple>> joined = auction.join(bid)
                 .where(L3.keyBy(new KeySelector<NexmarkAuctionTuple, Integer>() {
@@ -86,7 +84,7 @@ public class L3Nexmark {
                     }
                 }, Integer.class))
                 .window(TumblingEventTimeWindows.of(Time.milliseconds(20)))
-                .apply(L3.join(new JoinNexL3()))
+                .apply(L3.joinTs(new JoinNexL3()))
                 .filter(L3.filter(t -> t.getCategory() == 10)).uid("14");
 
         // L5

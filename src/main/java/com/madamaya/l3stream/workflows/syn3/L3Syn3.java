@@ -5,6 +5,7 @@ import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.syn1.objects.SynResultTuple;
 import com.madamaya.l3stream.workflows.syn1.ops.AvgTemperatureL3;
 import com.madamaya.l3stream.workflows.syn1.ops.TempParserSynL3;
+import com.madamaya.l3stream.workflows.syn1.ops.TsAssignTempMapL3;
 import com.madamaya.l3stream.workflows.syn1.ops.WatermarkStrategyTempSyn;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
@@ -52,9 +53,10 @@ public class L3Syn3 {
                 .map(L3.map(new TempParserSynL3())).uid("3")
                 .filter(L3.filter(t -> t.getType() == 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn(), settings.readPartitionNum(env.getParallelism()))).uid("5")
+                .map(L3.mapTs(new TsAssignTempMapL3())).uid("TsAssignTempMapL3")
                 .keyBy(L3.keyBy(t -> t.getMachineId(), Integer.class))
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
-                .aggregate(L3.aggregate(new AvgTemperatureL3())).uid("6");
+                .aggregate(L3.aggregateTs(new AvgTemperatureL3())).uid("6");
 
         Properties props = new Properties();
         props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);

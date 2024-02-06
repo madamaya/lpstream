@@ -30,7 +30,7 @@ public class L3LR {
             // env.getCheckpointConfig().disableCheckpointing();
         }
 
-        final String queryFlag = "LR2";
+        final String queryFlag = "LR";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;

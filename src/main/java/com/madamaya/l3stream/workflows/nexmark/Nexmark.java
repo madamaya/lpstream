@@ -27,7 +27,7 @@ public class Nexmark {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
 
-        final String queryFlag = "Nexmark3";
+        final String queryFlag = "Nexmark";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
@@ -50,12 +50,14 @@ public class Nexmark {
         DataStream<NexmarkAuctionTuple> auction = sourceDs
                 .map(new AuctionDataParserNex(settings))
                 .filter(t -> t.getEventType() == 1)
-                .assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex());
+                .assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex())
+                .map(new TsAssignAuctionNex());
 
         DataStream<NexmarkBidTuple> bid = sourceDs
                 .map(new BidderDataParserNex(settings))
                 .filter(t -> t.getEventType() == 2)
-                .assignTimestampsAndWatermarks(new WatermarkStrategyBidNex());
+                .assignTimestampsAndWatermarks(new WatermarkStrategyBidNex())
+                .map(new TsAssignBidderNex());
 
         DataStream<NexmarkJoinedTuple> joined = auction.join(bid)
                 .where(new KeySelector<NexmarkAuctionTuple, Integer>() {

@@ -59,6 +59,7 @@ public class GLNYC {
                 .map(new DataParserNYCGL())
                 .assignTimestampsAndWatermarks(new WatermarkStrategyNYCGL())
                 .filter(t -> t.getTripDistance() > 5)
+                .map(new TsAssignNYCGL())
                 .keyBy(new KeySelector<NYCInputTupleGL, Tuple2<Integer, Long>>() {
                     @Override
                     public Tuple2<Integer, Long> getKey(NYCInputTupleGL tuple) throws Exception {

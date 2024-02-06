@@ -29,7 +29,7 @@ public class Syn2 {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.getConfig().enableObjectReuse();
 
-        final String queryFlag = "Syn5";
+        final String queryFlag = "Syn2";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
@@ -47,12 +47,14 @@ public class Syn2 {
         DataStream<SynTempTuple> temp = ds
                 .map(new TempParserSyn(settings))
                 .filter(t -> t.getType() == 0)
-                .assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn());
+                .assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn())
+                .map(new TsAssignTempMap());
 
         DataStream<SynPowerTuple> power = ds
                 .map(new PowerParserSyn(settings))
                 .filter(t -> t.getType() == 1)
-                .assignTimestampsAndWatermarks(new WatermarkStrategyPowerSyn());
+                .assignTimestampsAndWatermarks(new WatermarkStrategyPowerSyn())
+                .map(new TsAssignPowerMap());
 
         DataStream<SynJoinedTuple> joined = power.join(temp)
                 .where(new KeySelector<SynPowerTuple, Integer>() {

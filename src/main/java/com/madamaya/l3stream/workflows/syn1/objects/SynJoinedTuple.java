@@ -8,10 +8,11 @@ public class SynJoinedTuple {
     private String logTemp;
     private String logPower;
     private long timestamp;
+    private long dominantOpTime = Long.MAX_VALUE;
     private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
-    public SynJoinedTuple(int machineId, int sensorId, double temperature, double power, String logTemp, String logPower, long timestamp, long kafkaAppendTime, long stimulus) {
+    public SynJoinedTuple(int machineId, int sensorId, double temperature, double power, String logTemp, String logPower, long timestamp, long dominantOpTime, long kafkaAppendTime, long stimulus) {
         this.machineId = machineId;
         this.sensorId = sensorId;
         this.temperature = temperature;
@@ -19,6 +20,7 @@ public class SynJoinedTuple {
         this.logTemp = logTemp;
         this.logPower = logPower;
         this.timestamp = timestamp;
+        this.dominantOpTime = dominantOpTime;
         this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
@@ -87,6 +89,14 @@ public class SynJoinedTuple {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public long getDominantOpTime() {
+        return dominantOpTime;
+    }
+
+    public void setDominantOpTime(long dominantOpTime) {
+        this.dominantOpTime = dominantOpTime;
     }
 
     public long getKafkaAppendTime() {

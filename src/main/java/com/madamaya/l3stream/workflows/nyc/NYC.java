@@ -57,6 +57,7 @@ public class NYC {
                 .map(new DataParserNYC(settings))
                 .assignTimestampsAndWatermarks(new WatermarkStrategyNYC())
                 .filter(t -> t.getTripDistance() > 5)
+                .map(new TsAssignNYC())
                 .keyBy(new KeySelector<NYCInputTuple, Tuple2<Integer, Long>>() {
                     @Override
                     public Tuple2<Integer, Long> getKey(NYCInputTuple tuple) throws Exception {

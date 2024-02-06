@@ -31,6 +31,6 @@ public class LatencyKafkaSinkNexmarkGLV2 implements KafkaRecordSerializationSche
 
         String latency = Long.toString(traversalEndTime - tuple.getStimulus());
         String traversalTime = Long.toString(traversalEndTime - traversalStartTime);
-        return new ProducerRecord<>(topic, (latency + "," + tuple.getKafkaAppendTime() + "," + traversalTime + ", Lineage(" + lineage.size() + ")" + lineageStr + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        return new ProducerRecord<>(topic, (latency + "," + tuple.getKafkaAppendTime() + "," + tuple.getDominantOpTime() + "," + traversalTime + ", Lineage(" + lineage.size() + ")" + lineageStr + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }

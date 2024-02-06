@@ -31,7 +31,7 @@ public class GLNexmark {
         env.getConfig().enableObjectReuse();
         // env.getCheckpointConfig().disableCheckpointing();
 
-        final String queryFlag = "Nexmark3";
+        final String queryFlag = "Nexmark";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
@@ -55,13 +55,15 @@ public class GLNexmark {
                 .map(new InitGLdataStringGL(settings, 0))
                 .map(new AuctionDataParserNexGL())
                 .filter(t -> t.getEventType() == 1)
-                .assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNexGL());
+                .assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNexGL())
+                .map(new TsAssignAuctionNexGL());
 
         DataStream<NexmarkBidTupleGL> bid = sourceDs
                 .map(new InitGLdataStringGL(settings, 1))
                 .map(new BidderDataParserNexGL())
                 .filter(t -> t.getEventType() == 2)
-                .assignTimestampsAndWatermarks(new WatermarkStrategyBidNexGL());
+                .assignTimestampsAndWatermarks(new WatermarkStrategyBidNexGL())
+                .map(new TsAssignBidderNexGL());
 
         DataStream<NexmarkJoinedTupleGL> joined = auction.join(bid)
                 .where(new KeySelector<NexmarkAuctionTupleGL, Integer>() {

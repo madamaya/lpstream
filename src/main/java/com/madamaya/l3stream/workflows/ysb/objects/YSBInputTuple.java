@@ -6,14 +6,16 @@ public class YSBInputTuple {
     private String eventType;
     private String campaignId;
     private long eventtime;
+    private long dominantOpTime = Long.MAX_VALUE;
     private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
-    public YSBInputTuple(String adId, String eventType, String campaignId, long eventtime, long kafkaAppendTime, long stimulus) {
+    public YSBInputTuple(String adId, String eventType, String campaignId, long eventtime, long dominantOpTime, long kafkaAppendTime, long stimulus) {
         this.adId = adId;
         this.eventType = eventType;
         this.campaignId = campaignId;
         this.eventtime = eventtime;
+        this.dominantOpTime = dominantOpTime;
         this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
@@ -55,6 +57,14 @@ public class YSBInputTuple {
 
     public void setEventtime(Long eventtime) {
         this.eventtime = eventtime;
+    }
+
+    public long getDominantOpTime() {
+        return dominantOpTime;
+    }
+
+    public void setDominantOpTime(long dominantOpTime) {
+        this.dominantOpTime = dominantOpTime;
     }
 
     public long getKafkaAppendTime() {

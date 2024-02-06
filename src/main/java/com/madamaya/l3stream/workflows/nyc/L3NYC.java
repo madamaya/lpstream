@@ -78,6 +78,7 @@ public class L3NYC {
                 .map(L3.updateTsWM(new WatermarkStrategyNYC(), 0)).uid("4")
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyNYC(), settings.readPartitionNum(env.getParallelism()))).uid("5")
                 .filter(L3.filter(t -> t.getTripDistance() > 5)).uid("6")
+                .map(L3.mapTs(new TsAssignNYCL3())).uid("TsAssignNYCL3")
                 .keyBy(L3.keyBy(new KeySelector<NYCInputTuple, Tuple2<Integer, Long>>() {
                     @Override
                     public Tuple2<Integer, Long> getKey(NYCInputTuple tuple) throws Exception {
@@ -85,7 +86,7 @@ public class L3NYC {
                     }
                 }), TupleTypeInfo.getBasicAndBasicValueTupleTypeInfo(Integer.class, Long.class))
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(3))))
-                .aggregate(L3.aggregate(new CountAndAvgDistanceL3())).uid("7");
+                .aggregate(L3.aggregateTs(new CountAndAvgDistanceL3())).uid("7");
 
         // L5
         Properties props = new Properties();

@@ -5,6 +5,7 @@ import com.madamaya.l3stream.glCommons.InitGLdataStringGL;
 import com.madamaya.l3stream.workflows.syn1.objects.SynResultTupleGL;
 import com.madamaya.l3stream.workflows.syn1.ops.AvgTemperatureGL;
 import com.madamaya.l3stream.workflows.syn1.ops.TempParserSynGL;
+import com.madamaya.l3stream.workflows.syn1.ops.TsAssignTempMapGL;
 import com.madamaya.l3stream.workflows.syn1.ops.WatermarkStrategyTempSynGL;
 import com.madamaya.l3stream.workflows.syn3.ops.LatencyKafkaSinkSyn3GLV2;
 import com.madamaya.l3stream.workflows.syn3.ops.LineageKafkaSinkSyn3GLV2;
@@ -54,6 +55,7 @@ public class GLSyn3 {
                 .map(new TempParserSynGL())
                 .filter(t -> t.getType() == 0)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyTempSynGL())
+                .map(new TsAssignTempMapGL())
                 .keyBy(t -> t.getMachineId())
                 .window(TumblingEventTimeWindows.of(Time.seconds(10)))
                 .aggregate(new AvgTemperatureGL(settings.aggregateStrategySupplier()));

@@ -69,6 +69,7 @@ public class GLYSB {
                 .assignTimestampsAndWatermarks(new WatermarkStrategyYSBGL())
                 .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSBGL())
+                .map(new TsAssignYSBGL())
                 .keyBy(t -> t.getCampaignId())
                 .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(1))))
                 .aggregate(new CountYSBGL(settings.aggregateStrategySupplier()));

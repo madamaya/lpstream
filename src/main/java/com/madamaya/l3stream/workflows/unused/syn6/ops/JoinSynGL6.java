@@ -19,6 +19,7 @@ public class JoinSynGL6 implements JoinFunction<SynPowerTupleGL, SynTempTupleGL,
                 synTempTuple.getLog(),
                 synPowerTuple.getLog(),
                 Math.max(synTempTuple.getTimestamp(), synPowerTuple.getTimestamp()),
+                Math.max(synTempTuple.getDominantOpTime(), synPowerTuple.getDominantOpTime()),
                 Math.max(synTempTuple.getKafkaAppendTime(), synPowerTuple.getKafkaAppendTime()),
                 System.nanoTime() - Math.max(synTempTuple.getStimulus(), synPowerTuple.getStimulus())
         );

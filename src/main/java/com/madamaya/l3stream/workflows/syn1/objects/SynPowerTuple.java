@@ -5,6 +5,7 @@ public class SynPowerTuple extends SynInputTuple {
     private double power;
     private String log;
     private long timestamp;
+    private long dominantOpTime = Long.MAX_VALUE;
     private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
@@ -12,12 +13,13 @@ public class SynPowerTuple extends SynInputTuple {
         super(type);
     }
 
-    public SynPowerTuple(int type, int machineId, double power, String log, long timestamp, long kafkaAppendTime, long stimulus) {
+    public SynPowerTuple(int type, int machineId, double power, String log, long timestamp, long dominantOpTime, long kafkaAppendTime, long stimulus) {
         super(type);
         this.machineId = machineId;
         this.power = power;
         this.log = log;
         this.timestamp = timestamp;
+        this.dominantOpTime = dominantOpTime;
         this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
@@ -70,6 +72,14 @@ public class SynPowerTuple extends SynInputTuple {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public long getDominantOpTime() {
+        return dominantOpTime;
+    }
+
+    public void setDominantOpTime(long dominantOpTime) {
+        this.dominantOpTime = dominantOpTime;
     }
 
     public long getKafkaAppendTime() {

@@ -32,7 +32,7 @@ public class GLSyn2 {
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
 
-        final String queryFlag = "Syn5";
+        final String queryFlag = "Syn2";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
@@ -51,13 +51,15 @@ public class GLSyn2 {
                 .map(new InitGLdataStringGL(settings, 0))
                 .map(new TempParserSynGL())
                 .filter(t -> t.getType() == 0)
-                .assignTimestampsAndWatermarks(new WatermarkStrategyTempSynGL());
+                .assignTimestampsAndWatermarks(new WatermarkStrategyTempSynGL())
+                .map(new TsAssignTempMapGL());
 
         DataStream<SynPowerTupleGL> power = ds
                 .map(new InitGLdataStringGL(settings, 1))
                 .map(new PowerParserSynGL())
                 .filter(t -> t.getType() == 1)
-                .assignTimestampsAndWatermarks(new WatermarkStrategyPowerSynGL());
+                .assignTimestampsAndWatermarks(new WatermarkStrategyPowerSynGL())
+                .map(new TsAssignPowerMapGL());
 
         DataStream<SynJoinedTupleGL> joined = power.join(temp)
                 .where(new KeySelector<SynPowerTupleGL, Integer>() {

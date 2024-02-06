@@ -27,6 +27,7 @@ public class JoinNexGL1 extends ProcessJoinFunction<NexmarkAuctionTupleGL, Nexma
                 auctionTuple.getSeller(),
                 auctionTuple.getCategory(),
                 auctionTuple.getExtra(),
+                Math.max(bidTuple.getDominantOpTime(), auctionTuple.getDominantOpTime()),
                 Math.max(bidTuple.getKafkaAppendTime(), auctionTuple.getKafkaAppendTime()),
                 Math.max(bidTuple.getStimulus(), auctionTuple.getStimulus())
         );

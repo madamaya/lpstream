@@ -7,8 +7,8 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 public class SynJoinedTupleGL extends SynJoinedTuple implements GenealogTuple {
     private GenealogData gdata;
 
-    public SynJoinedTupleGL(int machineId, int sensorId, double temperature, double power, String logTemp, String logPower, long timestamp, long kafkaAppendTime, long stimulus) {
-        super(machineId, sensorId, temperature, power, logTemp, logPower, timestamp, kafkaAppendTime, stimulus);
+    public SynJoinedTupleGL(int machineId, int sensorId, double temperature, double power, String logTemp, String logPower, long timestamp, long dominantOpTime, long kafkaAppendTime, long stimulus) {
+        super(machineId, sensorId, temperature, power, logTemp, logPower, timestamp, dominantOpTime, kafkaAppendTime, stimulus);
     }
 
     public SynJoinedTupleGL(int machineId, int sensorId, double temperature, double power, String logTemp, String logPower, long timestamp) {

@@ -27,6 +27,7 @@ public class JoinNex1 extends ProcessJoinFunction<NexmarkAuctionTuple, NexmarkBi
                         auctionTuple.getSeller(),
                         auctionTuple.getCategory(),
                         auctionTuple.getExtra(),
+                        Math.max(bidTuple.getDominantOpTime(), auctionTuple.getDominantOpTime()),
                         Math.max(bidTuple.getKafkaAppendTime(), auctionTuple.getKafkaAppendTime()),
                         Math.max(bidTuple.getStimulus(), auctionTuple.getStimulus())
                 )

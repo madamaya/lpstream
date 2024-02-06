@@ -25,6 +25,7 @@ public class JoinNex implements JoinFunction<NexmarkAuctionTuple, NexmarkBidTupl
                 auctionTuple.getSeller(),
                 auctionTuple.getCategory(),
                 auctionTuple.getExtra(),
+                System.nanoTime() - Math.max(bidTuple.getDominantOpTime(), auctionTuple.getDominantOpTime()),
                 Math.max(bidTuple.getKafkaAppendTime(), auctionTuple.getKafkaAppendTime()),
                 Math.max(bidTuple.getStimulus(), auctionTuple.getStimulus())
         );

@@ -8,6 +8,6 @@ public class ProjectAttributeYSB implements MapFunction<YSBInputTuple, YSBIntern
 
     @Override
     public YSBInternalTuple map(YSBInputTuple tuple) throws Exception {
-        return new YSBInternalTuple(tuple.getAdId(), tuple.getCampaignId(), tuple.getEventtime(), tuple.getKafkaAppendTime(), tuple.getStimulus());
+        return new YSBInternalTuple(tuple.getAdId(), tuple.getCampaignId(), tuple.getEventtime(), tuple.getDominantOpTime(), tuple.getKafkaAppendTime(), tuple.getStimulus());
     }
 }

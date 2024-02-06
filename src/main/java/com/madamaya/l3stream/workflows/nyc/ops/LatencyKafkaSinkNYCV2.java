@@ -23,6 +23,6 @@ public class LatencyKafkaSinkNYCV2 implements KafkaRecordSerializationSchema<NYC
     public ProducerRecord<byte[], byte[]> serialize(NYCResultTuple tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
         String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
         // return new ProducerRecord<>(topic, latency.getBytes(StandardCharsets.UTF_8));
-        return new ProducerRecord<>(topic, (latency + "," + tuple.getKafkaAppendTime() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        return new ProducerRecord<>(topic, (latency + "," + tuple.getKafkaAppendTime() + "," + tuple.getDominantOpTime() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }

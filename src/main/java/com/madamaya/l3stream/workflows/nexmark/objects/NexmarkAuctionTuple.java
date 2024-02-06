@@ -1,5 +1,7 @@
 package com.madamaya.l3stream.workflows.nexmark.objects;
 
+import com.madamaya.l3stream.workflows.nexmark.Nexmark;
+
 public class NexmarkAuctionTuple extends NexmarkInputTuple {
     /*
      Sample Input:
@@ -16,6 +18,7 @@ public class NexmarkAuctionTuple extends NexmarkInputTuple {
     private int seller;
     private int category;
     private String extra;
+    private long dominantOpTime = Long.MAX_VALUE;
     private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
@@ -23,7 +26,7 @@ public class NexmarkAuctionTuple extends NexmarkInputTuple {
         super(eventType);
     }
 
-    public NexmarkAuctionTuple(int eventType, int auctionId, String itemName, String desc, int initBid, int reserve, long dateTime, long expires, int seller, int category, String extra, long kafkaAppendTime, long stimulus) {
+    public NexmarkAuctionTuple(int eventType, int auctionId, String itemName, String desc, int initBid, int reserve, long dateTime, long expires, int seller, int category, String extra, long dominantOpTime, long kafkaAppendTime, long stimulus) {
         super(eventType);
         this.auctionId = auctionId;
         this.itemName = itemName;
@@ -35,6 +38,7 @@ public class NexmarkAuctionTuple extends NexmarkInputTuple {
         this.seller = seller;
         this.category = category;
         this.extra = extra.replace("\\", "");
+        this.dominantOpTime = dominantOpTime;
         this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
@@ -51,6 +55,23 @@ public class NexmarkAuctionTuple extends NexmarkInputTuple {
         this.seller = seller;
         this.category = category;
         this.extra = extra.replace("\\", "");
+    }
+
+    public NexmarkAuctionTuple(NexmarkAuctionTuple tuple) {
+        super(tuple.getEventType());
+        this.auctionId = tuple.getAuctionId();
+        this.itemName = tuple.getItemName();
+        this.desc = tuple.getDesc();
+        this.initBid = tuple.getInitBid();
+        this.reserve = tuple.getReserve();
+        this.dateTime = tuple.getDateTime();
+        this.expires = tuple.getExpires();
+        this.seller = tuple.getSeller();
+        this.category = tuple.getCategory();
+        this.extra = tuple.getExtra();
+        this.dominantOpTime = tuple.getDominantOpTime();
+        this.kafkaAppendTime = tuple.getKafkaAppendTime();
+        this.stimulus = tuple.getStimulus();
     }
 
     public int getAuctionId() {
@@ -131,6 +152,14 @@ public class NexmarkAuctionTuple extends NexmarkInputTuple {
 
     public void setExtra(String extra) {
         this.extra = extra;
+    }
+
+    public long getDominantOpTime() {
+        return dominantOpTime;
+    }
+
+    public void setDominantOpTime(long dominantOpTime) {
+        this.dominantOpTime = dominantOpTime;
     }
 
     public long getKafkaAppendTime() {

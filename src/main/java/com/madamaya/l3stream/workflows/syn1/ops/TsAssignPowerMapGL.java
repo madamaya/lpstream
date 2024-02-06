@@ -1,4 +1,4 @@
-package com.madamaya.l3stream.workflows.unused.syn4.ops;
+package com.madamaya.l3stream.workflows.syn1.ops;
 
 import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTuple;
 import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTupleGL;
@@ -12,7 +12,7 @@ public class TsAssignPowerMapGL implements MapFunction<SynPowerTupleGL, SynPower
     public SynPowerTupleGL map(SynPowerTupleGL synPowerTupleGL) throws Exception {
         SynPowerTupleGL out = new SynPowerTupleGL(synPowerTupleGL);
         GenealogMapHelper.INSTANCE.annotateResult(synPowerTupleGL, out);
-        out.setStimulus(System.nanoTime());
+        out.setDominantOpTime(System.nanoTime());
         return out;
     }
 }
