@@ -6,8 +6,7 @@ filterRate = 0.1
 plotLatency = True
 plotLatencyCmp = True
 violinPlot = True
-#queries = ["LR2", "NYC", "Nexmark2", "YSB"]
-queries = ["Syn1", "Syn5", "Syn3", "LR2", "NYC", "Nexmark3", "YSB"]
+queries = ["Syn1", "Syn2", "Syn3", "LR", "NYC", "Nexmark", "YSB"]
 approaches = ["baseline", "genealog", "l3stream", "l3streamlin"]
 dataSize = [-1, 10]
 startTime = time.time()
@@ -19,7 +18,7 @@ def main(idx, size, queries, approaches, filterRate, plotLatency, plotLatencyCmp
     else:
         tmp_queries = [query for query in queries if "Syn" in query]
 
-    if idx == 2:
+    if idx == 4:
         tmp_approaches = [approach for approach in approaches if approach in ["genealog", "l3streamlin"]]
     else:
         tmp_approaches = approaches
@@ -37,6 +36,6 @@ if __name__ == "__main__":
     if not os.path.exists("./results/figs"):
         os.makedirs("./results/figs")
 
-    for idx in [1, 2]:
+    for idx in [1, 2, 3, 4]:
         for size in dataSize:
             main(idx, size, queries, approaches, filterRate, plotLatency, plotLatencyCmp, violinPlot, startTime, flag)

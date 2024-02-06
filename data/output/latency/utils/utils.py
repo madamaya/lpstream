@@ -70,7 +70,14 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                             break
                         elements = line.split(",")
                         #tmpLines.append(int(elements[0]) - int(elements[2]))
-                        tmpLines.append(int(elements[lat_idx]))
+                        if lat_idx == 1: # s2s latency
+                            tmpLines.append(int(elements[1]))
+                        elif lat_idx == 2: # k2k latency
+                            tmpLines.append(int(elements[0]) - int(elements[2]))
+                        elif lat_idx == 3:
+                            tmpLines.append(int(elements[3]))
+                        else: # trasersal time
+                            tmpLines.append(int(elements[4]))
                 #nparray = np.loadtxt("{}".format(l), dtype="int64")
                 nparray = np.array(tmpLines)
                 filteredTuple = round(nparray.size * filterRate)
@@ -105,12 +112,20 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                 print("*** Save fig ***")
                 if lat_idx == 1:
                     plt.title("{}-{}-{}-s2s latency".format(query, approach, size))
+                elif lat_idx == 2:
+                    plt.title("{}-{}-{}-k2k latency".format(query, approach, size))
+                elif lat_idx == 3:
+                    plt.title("{}-{}-{}-dominant latency".format(query, approach, size))
                 else:
                     plt.title("{}-{}-{}-traverse".format(query, approach, size))
                 plt.ylim(bottom=0)
                 plt.ylabel("Latency [ns]")
                 if lat_idx == 1:
                     plt.savefig("./results/figs/{}-{}-{}-s2s.pdf".format(query, approach, size))
+                elif lat_idx == 2:
+                    plt.savefig("./results/figs/{}-{}-{}-k2k.pdf".format(query, approach, size))
+                elif lat_idx == 3:
+                    plt.savefig("./results/figs/{}-{}-{}-dominant.pdf".format(query, approach, size))
                 else:
                     plt.savefig("./results/figs/{}-{}-{}-traverse.pdf".format(query, approach, size))
                 plt.close()
@@ -120,14 +135,22 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                 print("*** Save fig ***")
                 if lat_idx == 1:
                     plt.title("{}-{}-{}-s2s".format(query, approach, size))
+                elif lat_idx == 2:
+                    plt.title("{}-{}-{}-k2k".format(query, approach, size))
+                elif lat_idx == 3:
+                    plt.title("{}-{}-{}-dominant".format(query, approach, size))
                 else:
                     plt.title("{}-{}-{}-traverse".format(query, approach, size))
                 plt.ylim(bottom=0)
                 plt.ylabel("Latency [ns]")
                 if lat_idx == 1:
-                    plt.savefig("./results/figs/{}-{}-{}-s2s.png".format(query, approach, size), dpi=900)
+                    plt.savefig("./results/figs/{}-{}-{}-s2s.png".format(query, approach, size), dpi=450)
+                elif lat_idx == 2:
+                    plt.savefig("./results/figs/{}-{}-{}-k2k.png".format(query, approach, size), dpi=450)
+                elif lat_idx == 3:
+                    plt.savefig("./results/figs/{}-{}-{}-dominant.png".format(query, approach, size), dpi=450)
                 else:
-                    plt.savefig("./results/figs/{}-{}-{}-traverse.png".format(query, approach, size), dpi=900)
+                    plt.savefig("./results/figs/{}-{}-{}-traverse.png".format(query, approach, size), dpi=450)
                 plt.close()
 
             # dump log
@@ -150,6 +173,10 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                     plt.plot(range(allValidList[query][approach][i].size), allValidList[query][approach][i], linewidth=0.1)
                 if lat_idx == 1:
                     plt.title("{}-{}-{}-s2s-comparison".format(query, i, size))
+                elif lat_idx == 2:
+                    plt.title("{}-{}-{}-k2k-comparison".format(query, i, size))
+                elif lat_idx == 3:
+                    plt.title("{}-{}-{}-dominant-comparison".format(query, i, size))
                 else:
                     plt.title("{}-{}-{}-traverse-comparison".format(query, i, size))
                 plt.ylim(bottom=0)
@@ -157,6 +184,10 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                 plt.legend(approaches)
                 if lat_idx == 1:
                     plt.savefig("./results/figs/{}-{}-{}-s2s-comparison.pdf".format(query, i, size))
+                elif lat_idx == 2:
+                    plt.savefig("./results/figs/{}-{}-{}-k2k-comparison.pdf".format(query, i, size))
+                elif lat_idx == 3:
+                    plt.savefig("./results/figs/{}-{}-{}-dominant-comparison.pdf".format(query, i, size))
                 else:
                     plt.savefig("./results/figs/{}-{}-{}-traverse-comparison.pdf".format(query, i, size))
                 plt.close()
@@ -165,15 +196,23 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                     plt.plot(range(allValidList[query][approach][i].size), allValidList[query][approach][i], linestyle="None", marker=".", markersize=markerSize(allValidList[query][approach][i].size))
                 if lat_idx == 1:
                     plt.title("{}-{}-{}-s2s-comparison".format(query, i, size))
+                elif lat_idx == 2:
+                    plt.title("{}-{}-{}-k2k-comparison".format(query, i, size))
+                elif lat_idx == 3:
+                    plt.title("{}-{}-{}-dominant-comparison".format(query, i, size))
                 else:
                     plt.title("{}-{}-{}-traverse-comparison".format(query, i, size))
                 plt.ylim(bottom=0)
                 plt.ylabel("Latency")
                 plt.legend(approaches)
                 if lat_idx == 1:
-                    plt.savefig("./results/figs/{}-{}-{}-s2s-comparison.png".format(query, i, size), dpi=900)
+                    plt.savefig("./results/figs/{}-{}-{}-s2s-comparison.png".format(query, i, size), dpi=450)
+                elif lat_idx == 2:
+                    plt.savefig("./results/figs/{}-{}-{}-k2k-comparison.png".format(query, i, size), dpi=450)
+                elif lat_idx == 3:
+                    plt.savefig("./results/figs/{}-{}-{}-dominant-comparison.png".format(query, i, size), dpi=450)
                 else:
-                    plt.savefig("./results/figs/{}-{}-{}-traverse-comparison.png".format(query, i, size), dpi=900)
+                    plt.savefig("./results/figs/{}-{}-{}-traverse-comparison.png".format(query, i, size), dpi=450)
                 plt.close()
 
         print("*** Welch test ***")
@@ -189,11 +228,19 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                 plt.xticks(range(1, len(approaches)+1), [approach for approach in approaches])
                 if lat_idx == 1:
                     plt.title("*{}* result (Latency, {}, {}, {}, s2s, violin)".format(query, flag, idx, size))
+                elif lat_idx == 2:
+                    plt.title("*{}* result (Latency, {}, {}, {}, k2k, violin)".format(query, flag, idx, size))
+                elif lat_idx == 3:
+                    plt.title("*{}* result (Latency, {}, {}, {}, dominant, violin)".format(query, flag, idx, size))
                 else:
                     plt.title("*{}* result (Latency, {}, {}, {}, traverse, violin)".format(query, flag, idx, size))
                 plt.ylabel("Latency [ns]")
                 if lat_idx == 1:
                     plt.savefig("./results/{}.violin.{}.{}.s2s.pdf".format(query, idx, size))
+                elif lat_idx == 2:
+                    plt.savefig("./results/{}.violin.{}.{}.k2k.pdf".format(query, idx, size))
+                elif lat_idx == 3:
+                    plt.savefig("./results/{}.violin.{}.{}.dominant.pdf".format(query, idx, size))
                 else:
                     plt.savefig("./results/{}.violin.{}.{}.traverse.pdf".format(query, idx, size))
                 plt.close()
@@ -219,11 +266,19 @@ def resultFigsGen(results, queries, approaches, flag, size, lat_idx):
         plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
         if lat_idx == 1:
             plt.title("*{}* result (Latency, {}, {}, s2s)".format(query, flag, size))
+        elif lat_idx == 2:
+            plt.title("*{}* result (Latency, {}, {}, k2k)".format(query, flag, size))
+        elif lat_idx == 3:
+            plt.title("*{}* result (Latency, {}, {}, dominant)".format(query, flag, size))
         else:
             plt.title("*{}* result (Latency, {}, {}, traverse)".format(query, flag, size))
         plt.ylabel("Latency (mean) [ns]")
         if lat_idx == 1:
             plt.savefig("./results/{}-{}-mean.s2s.pdf".format(query, size))
+        elif lat_idx == 2:
+            plt.savefig("./results/{}-{}-mean.k2k.pdf".format(query, size))
+        elif lat_idx == 3:
+            plt.savefig("./results/{}-{}-mean.dominant.pdf".format(query, size))
         else:
             plt.savefig("./results/{}-{}-mean.traverse.pdf".format(query, size))
         plt.close()
@@ -233,11 +288,19 @@ def resultFigsGen(results, queries, approaches, flag, size, lat_idx):
             plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
             if lat_idx == 1:
                 plt.title("*{}* result (Latency, {}, {}, {}, s2s)".format(query, flag, idx, size))
+            elif lat_idx == 2:
+                plt.title("*{}* result (Latency, {}, {}, {}, k2k)".format(query, flag, idx, size))
+            elif lat_idx == 3:
+                plt.title("*{}* result (Latency, {}, {}, {}, dominant)".format(query, flag, idx, size))
             else:
                 plt.title("*{}* result (Latency, {}, {}, {}, traverse)".format(query, flag, idx, size))
             plt.ylabel("Latency (mean) [ns]")
             if lat_idx == 1:
                 plt.savefig("./results/{}-{}-{}-mean.s2s.pdf".format(query, idx, size))
+            elif lat_idx == 2:
+                plt.savefig("./results/{}-{}-{}-mean.k2k.pdf".format(query, idx, size))
+            elif lat_idx == 3:
+                plt.savefig("./results/{}-{}-{}-mean.dominant.pdf".format(query, idx, size))
             else:
                 plt.savefig("./results/{}-{}-{}-mean.traverse.pdf".format(query, idx, size))
             plt.close()
@@ -247,11 +310,19 @@ def resultFigsGen(results, queries, approaches, flag, size, lat_idx):
             plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
             if lat_idx == 1:
                 plt.title("*{}* result (Latency, {}, {}, {}, s2s)".format(query, flag, idx, size))
+            elif lat_idx == 2:
+                plt.title("*{}* result (Latency, {}, {}, {}, k2k)".format(query, flag, idx, size))
+            elif lat_idx == 3:
+                plt.title("*{}* result (Latency, {}, {}, {}, dominant)".format(query, flag, idx, size))
             else:
                 plt.title("*{}* result (Latency, {}, {}, {}, traverse)".format(query, flag, idx, size))
             plt.ylabel("Latency (median) [ns]")
             if lat_idx == 1:
                 plt.savefig("./results/{}-{}-{}-median.s2s.pdf".format(query, idx, size))
+            elif lat_idx == 2:
+                plt.savefig("./results/{}-{}-{}-median.k2k.pdf".format(query, idx, size))
+            elif lat_idx == 3:
+                plt.savefig("./results/{}-{}-{}-median.dominant.pdf".format(query, idx, size))
             else:
                 plt.savefig("./results/{}-{}-{}-median.traverse.pdf".format(query, idx, size))
             plt.close()

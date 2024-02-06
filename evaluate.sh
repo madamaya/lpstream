@@ -12,13 +12,9 @@ fi
 if [ $1 = "m1" ]; then
   cd ./bin/evaluation
   thList=(50100)
-  sizeList=(-1 10 100 1000)
   for th in ${thList[@]}
   do
-    for size in ${sizeList[@]}
-    do
-      ./metrics1.sh ${th} ${size}
-    done
+    ./metrics1.sh ${th} ${size}
   done
   restartFlinkCluster
 elif [ $1 = "m2" ]; then

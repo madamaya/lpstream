@@ -2,8 +2,7 @@ import os
 import time
 from utils import utils
 
-#queries = ["LR2", "NYC", "Nexmark2", "YSB"]
-queries = ["Syn1", "Syn5", "Syn3", "LR2", "NYC", "Nexmark3", "YSB"]
+queries = ["Syn1", "Syn2", "Syn3", "LR", "NYC", "Nexmark", "YSB"]
 approaches = ["baseline", "genealog", "l3stream", "l3streamlin"]
 dataSize = [-1, 10]
 startTime = time.time()
