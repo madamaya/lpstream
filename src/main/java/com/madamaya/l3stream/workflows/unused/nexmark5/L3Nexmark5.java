@@ -84,7 +84,7 @@ public class L3Nexmark5 {
                     }
                 }, Integer.class)))
                 .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(5)))
-                .process(L3.processJoin(new JoinNexL3())).uid("13")
+                .process(L3.processJoin(new JoinNexL31())).uid("13")
                 .filter(L3.filter(t -> t.getCategory() == 10)).uid("14");
 
         // L5

@@ -7,7 +7,7 @@ import io.palyvos.provenance.genealog.GenealogJoinHelper;
 import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
 import org.apache.flink.util.Collector;
 
-public class JoinNexGL extends ProcessJoinFunction<NexmarkAuctionTupleGL, NexmarkBidTupleGL, NexmarkJoinedTupleGL> {
+public class JoinNexGL1 extends ProcessJoinFunction<NexmarkAuctionTupleGL, NexmarkBidTupleGL, NexmarkJoinedTupleGL> {
     @Override
     public void processElement(NexmarkAuctionTupleGL auctionTuple, NexmarkBidTupleGL bidTuple, ProcessJoinFunction<NexmarkAuctionTupleGL, NexmarkBidTupleGL, NexmarkJoinedTupleGL>.Context context, Collector<NexmarkJoinedTupleGL> collector) throws Exception {
         NexmarkJoinedTupleGL out = new NexmarkJoinedTupleGL(

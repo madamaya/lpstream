@@ -80,7 +80,7 @@ public class Nexmark {
                     }
                 }))
                 .between(Time.milliseconds(0), settings.assignExperimentWindowSize(Time.milliseconds(20)))
-                .process(new JoinNex())
+                .process(new JoinNex1())
                 .filter(t -> t.getCategory() == 10);
 
         KafkaSink<NexmarkJoinedTuple> sink;
