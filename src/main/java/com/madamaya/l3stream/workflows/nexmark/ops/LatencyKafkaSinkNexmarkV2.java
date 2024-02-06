@@ -1,10 +1,6 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTuple;
-import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTupleGL;
-import io.palyvos.provenance.genealog.GenealogGraphTraverser;
-import io.palyvos.provenance.l3stream.util.FormatLineage;
-import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 

@@ -1,15 +1,11 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
-import com.madamaya.l3stream.glCommons.InputGL;
-import com.madamaya.l3stream.glCommons.JsonNodeGL;
 import com.madamaya.l3stream.glCommons.StringGL;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTupleGL;
-import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkInputTuple;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

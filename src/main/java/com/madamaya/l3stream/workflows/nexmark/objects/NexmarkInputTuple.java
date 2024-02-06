@@ -1,12 +1,5 @@
 package com.madamaya.l3stream.workflows.nexmark.objects;
 
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
 public class NexmarkInputTuple {
     /*
      Sample Input:

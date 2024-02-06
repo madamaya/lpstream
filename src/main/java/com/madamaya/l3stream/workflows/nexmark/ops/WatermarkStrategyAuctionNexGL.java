@@ -1,6 +1,5 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
-import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTupleGL;
 import org.apache.flink.api.common.eventtime.*;
 

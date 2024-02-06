@@ -1,12 +1,9 @@
 package com.madamaya.l3stream.workflows.lr.ops;
 
-import com.madamaya.l3stream.glCommons.InputGL;
-import com.madamaya.l3stream.glCommons.JsonNodeGL;
 import com.madamaya.l3stream.glCommons.StringGL;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
 import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadInputTupleGL;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.regex.Pattern;
 

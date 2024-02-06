@@ -2,7 +2,7 @@ package com.madamaya.l3stream.workflows.lr.ops;
 
 import io.palyvos.provenance.genealog.GenealogGraphTraverser;
 import io.palyvos.provenance.l3stream.util.FormatLineage;
-import io.palyvos.provenance.usecases.CountTupleGL;
+import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadInputTupleGL;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.TimestampedUIDTuple;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
-public class LatencyKafkaSinkLRGLV2 implements KafkaRecordSerializationSchema<CountTupleGL> {
+public class LatencyKafkaSinkLRGLV2 implements KafkaRecordSerializationSchema<LinearRoadInputTupleGL> {
     private String topic;
     private GenealogGraphTraverser genealogGraphTraverser;
 
@@ -23,11 +23,14 @@ public class LatencyKafkaSinkLRGLV2 implements KafkaRecordSerializationSchema<Co
 
     @Nullable
     @Override
-    public ProducerRecord<byte[], byte[]> serialize(CountTupleGL tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
+    public ProducerRecord<byte[], byte[]> serialize(LinearRoadInputTupleGL tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
+        long traversalStartTime = System.nanoTime();
         Set<TimestampedUIDTuple> lineage = genealogGraphTraverser.getProvenance(tuple);
         String lineageStr = FormatLineage.formattedLineage(lineage);
+        long traversalEndTime = System.nanoTime();
 
-        String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
-        return new ProducerRecord<>(topic, (latency + "," + tuple.getStimulus() + ", Lineage(" + lineage.size() + ")" + lineageStr + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        String latency = Long.toString(traversalEndTime - tuple.getStimulus());
+        String traversalTime = Long.toString(traversalEndTime - traversalStartTime);
+        return new ProducerRecord<>(topic, (latency + "," + tuple.getKafkaAppendTime() + "," + traversalTime + ", Lineage(" + lineage.size() + ")" + lineageStr + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }

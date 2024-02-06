@@ -1,6 +1,5 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
-import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTupleGL;
 import org.apache.flink.api.common.eventtime.*;
 

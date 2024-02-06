@@ -1,11 +1,7 @@
 package com.madamaya.l3stream.workflows.lr.ops;
 
-import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadInputTupleGL;
 import org.apache.flink.api.common.eventtime.*;
-import org.apache.flink.api.common.time.Time;
-
-import java.util.*;
 
 public class WatermarkStrategyLRGL implements WatermarkStrategy<LinearRoadInputTupleGL> {
     @Override

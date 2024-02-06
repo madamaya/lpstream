@@ -1,17 +1,13 @@
 package com.madamaya.l3stream.workflows.lr.ops;
 
-import io.palyvos.provenance.genealog.GenealogGraphTraverser;
-import io.palyvos.provenance.l3stream.util.FormatLineage;
-import io.palyvos.provenance.usecases.CountTuple;
-import io.palyvos.provenance.usecases.CountTupleGL;
-import io.palyvos.provenance.util.ExperimentSettings;
+import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 
-public class OutputKafkaSinkLRV2 implements KafkaRecordSerializationSchema<CountTuple> {
+public class OutputKafkaSinkLRV2 implements KafkaRecordSerializationSchema<LinearRoadInputTuple> {
     private String topic;
 
     public OutputKafkaSinkLRV2(String topic) {
@@ -20,7 +16,7 @@ public class OutputKafkaSinkLRV2 implements KafkaRecordSerializationSchema<Count
 
     @Nullable
     @Override
-    public ProducerRecord<byte[], byte[]> serialize(CountTuple tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
+    public ProducerRecord<byte[], byte[]> serialize(LinearRoadInputTuple tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
         return new ProducerRecord<>(topic, tuple.toString().getBytes(StandardCharsets.UTF_8));
     }
 }

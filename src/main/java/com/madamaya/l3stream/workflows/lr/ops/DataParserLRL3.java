@@ -3,7 +3,6 @@ package com.madamaya.l3stream.workflows.lr.ops;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.regex.Pattern;
 

@@ -20,6 +20,7 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 
 public class GLSyn2 {
@@ -31,7 +32,7 @@ public class GLSyn2 {
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
 
-        final String queryFlag = "Syn2";
+        final String queryFlag = "Syn5";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
@@ -58,20 +59,21 @@ public class GLSyn2 {
                 .filter(t -> t.getType() == 1)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyPowerSynGL());
 
-        DataStream<SynJoinedTupleGL> joined = power.keyBy(new KeySelector<SynPowerTupleGL, Integer>() {
+        DataStream<SynJoinedTupleGL> joined = power.join(temp)
+                .where(new KeySelector<SynPowerTupleGL, Integer>() {
             @Override
             public Integer getKey(SynPowerTupleGL synPowerTuple) throws Exception {
                 return synPowerTuple.getMachineId();
             }
         })
-        .intervalJoin(temp.keyBy(new KeySelector<SynTempTupleGL, Integer>() {
+        .equalTo(new KeySelector<SynTempTupleGL, Integer>() {
             @Override
             public Integer getKey(SynTempTupleGL synTempTuple) throws Exception {
                 return synTempTuple.getMachineId();
             }
-        }))
-        .between(Time.milliseconds(0), Time.milliseconds(1000))
-        .process(new ProcessJoinSynGL());
+        })
+        .window(TumblingEventTimeWindows.of(Time.seconds(1)))
+        .apply(new JoinSynGL());
 
         KafkaSink<SynJoinedTupleGL> sink;
         if (settings.getLatencyFlag() == 1) {
