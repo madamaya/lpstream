@@ -47,7 +47,8 @@ if __name__ == "__main__":
                     dataLine = power_data_gen(current_machine_id, power, log1)
                     all_size += len(dataLine)
                     w.write(dataLine)
-                    for current_sensor_id in range(sensor_num * current_parallel_id, sensor_num * (current_parallel_id + 1)):
+                for current_sensor_id in range(sensor_num * current_parallel_id, sensor_num * (current_parallel_id + 1)):
+                    for current_machine_id in range(machine_num * current_parallel_id, machine_num * (current_parallel_id + 1)):
                         temp = rng.normal(temp_mean_dist[current_machine_id], temp_mean_dist[current_parallel_id]/3)
                         dataLine = temp_data_gen(current_machine_id, current_sensor_id, temp, log0)
                         all_size += len(dataLine)

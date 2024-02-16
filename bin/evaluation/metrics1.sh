@@ -140,7 +140,7 @@ do
         echo "Start data ingestion"
         if [[ ${query} == *Syn* ]]; then
           filePath="${L3_HOME}/data/input/data/${(L)query}.${size}.csv"
-        elif [[ ${query} == *LR* ]] || [ ${query} = "NYC" ]; then
+        elif [[ ${query} == *LR* ]] || [[ ${query} == *NYC* ]]; then
           filePath="${L3_HOME}/data/input/data/${(L)query}.csv"
         else
           filePath="${L3_HOME}/data/input/data/${(L)query}.json"
