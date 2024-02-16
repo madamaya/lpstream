@@ -217,11 +217,11 @@ do
 done
 
 cd ${L3_HOME}/data/output/cpu-memory
-python cpu-memory.py
+python cpu-memory.py "${queries}" "${approaches}" "${sizes}"
 cd ${L3_HOME}/data/output/latency/metrics1
-python metrics1.py
+python metrics1.py latency True True True "${queries}" "${approaches}" "${sizes}"
 cd ${L3_HOME}/data/output/throughput/metrics1
-python metrics1.py
+python metrics1.py "${queries}" "${approaches}" "${sizes}"
 
 cd ${L3_HOME}/data/output
 ./getResult.sh
