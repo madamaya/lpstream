@@ -15,8 +15,10 @@ granularityTemp=100
 queries=(Syn1 Syn2 Syn3 LR NYC Nexmark YSB)
 approaches=(baseline genealog l3stream l3streamlin)
 sizes=(-1 10)
-sleepTime=30
-inputRates=(100000 500000 1000000 1500000 2000000)
+#sleepTime=360
+sleepTime=10
+#inputRates=(100000 500000 1000000 1500000 2000000)
+inputRates=(50000)
 homedir=`pwd`
 loop=1
 
