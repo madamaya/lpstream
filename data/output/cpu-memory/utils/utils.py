@@ -2,6 +2,37 @@ import glob
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Format:
+# results[query][approach][XXX][YYY] -> [value1, ...]
+# XXX: "CPU" or "Memory"
+# YYY: "value" or "std"
+def writeResults(results, queries, approaches, startTime, size):
+    with open("./results/cpumem.result.{}.{}.txt".format(startTime, size), "w") as w:
+        # Write CPU mean
+        w.write("CPU(Mean),{}\n".format(",".join(approaches)))
+        for query in queries:
+            w.write("{},".format(query))
+
+            means = []
+            for approach in approaches:
+                cpu_values = [v for v in results[query][approach]["CPU"]["value"]]
+                means.append(str(sum(cpu_values) / len(cpu_values)))
+            w.write("{}\n".format(",".join(means)))
+
+        w.write("\n")
+
+        # Write Mem mean
+        w.write("Memory(Mean),{}\n".format(",".join(approaches)))
+        for query in queries:
+            w.write("{},".format(query))
+
+            means = []
+            for approach in approaches:
+                mem_values = [v for v in results[query][approach]["Memory"]["value"]]
+                means.append(str(sum(mem_values) / len(mem_values)))
+            w.write("{}\n".format(",".join(means)))
+
+
 def shapeData(queries, approaches, results, rawData, maxCount):
     cpu = []
     cpu_raw = []
@@ -82,7 +113,8 @@ def calcResults(queries, approaches, filterRate, plotTrends, startTime, size):
             files = glob.glob("./{}/{}/*_{}.log".format(query, approach, size))
             for file in files:
                 df = pd.read_csv(file, header=None, names=["ts", "CPU", "Memory"])
-                df = df.iloc[int(df.shape[0]*filterRate):]
+                # df = df.iloc[int(df.shape[0]*filterRate):]
+                df = df.iloc[min(int(df.shape[0]*filterRate), 121):] # 最初の2分間を削除
 
                 cpuList = df["CPU"].tolist()
                 memoryList = df["Memory"].tolist()
@@ -118,6 +150,7 @@ def calcResults(queries, approaches, filterRate, plotTrends, startTime, size):
                 rawData[query][approach]["CPU"].append(cpuList)
                 rawData[query][approach]["Memory"].append(memoryList)
 
+    writeResults(results, queries, approaches, startTime, size)
     cpu, cpu_raw, memory, memory_raw = shapeData(queries, approaches, results, rawData, maxCount)
     plotData(queries, approaches, cpu, memory, cpu_raw, memory_raw, maxCount, size)
     return cpu, cpu_raw, memory, memory_raw
