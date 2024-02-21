@@ -11,8 +11,8 @@ source ../utils/cpuMemoryLoadLogger.sh
 source ./thUtils/thUtils.sh
 
 granularityTemp=100
-#queries=(Syn1 Syn2 Syn3 LR NYC Nexmark YSB)
-queries=(Syn1 Syn2 Syn3 LR NYC Nexmark YSB)
+#queries=(Syn1 Syn2 Syn3 LR NYC Nexmark YSB NYC2 Nexmark2 YSB2)
+queries=(Syn1 Syn2 Syn3 LR NYC Nexmark2 YSB2)
 approaches=(baseline genealog l3stream l3streamlin)
 sizes=(-1 10)
 #sleepTime=360
