@@ -186,13 +186,14 @@ do
 
         # Start latency calc
         echo "*** Latency calculation on Flink ***"
+        mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}
         ## Start flink program
         echo "(./latencyCalc.sh ${JAR_PATH} ${parallelism} ${query} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}.log)"
         ./latencyCalc.sh ${JAR_PATH} ${parallelism} ${query} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}.log
         echo "(sleep 30)"
         sleep 30
         ## notify program end
-        for idx in `seq 0 ${parallelism}`
+        for idx in `seq 0 $((parallelism-1))`
         do
           echo "(notifyEnd ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}_${idx}.log)"
           notifyEnd ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}_${idx}.log
