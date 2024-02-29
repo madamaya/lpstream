@@ -3,8 +3,9 @@ package com.madamaya.l3stream.workflows.utils.ops;
 import com.madamaya.l3stream.workflows.utils.objects.MedianCalc;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple4;
 
-public class Aggregation implements AggregateFunction<Tuple3<Integer, Long, Long>, Tuple3<Integer, Long, MedianCalc>, Tuple3<Integer, Long, Double>> {
+public class Aggregation implements AggregateFunction<Tuple3<Integer, Long, Long>, Tuple3<Integer, Long, MedianCalc>, Tuple4<Integer, Long, Double, Long>> {
     @Override
     public Tuple3<Integer, Long, MedianCalc> createAccumulator() {
         return Tuple3.of(1, 0L, new MedianCalc());
@@ -19,8 +20,8 @@ public class Aggregation implements AggregateFunction<Tuple3<Integer, Long, Long
     }
 
     @Override
-    public Tuple3<Integer, Long, Double> getResult(Tuple3<Integer, Long, MedianCalc> acc) {
-        return Tuple3.of(acc.f0, acc.f1, acc.f2.getMedian());
+    public Tuple4<Integer, Long, Double, Long> getResult(Tuple3<Integer, Long, MedianCalc> acc) {
+        return Tuple4.of(acc.f0, acc.f1, acc.f2.getMedian(), acc.f2.getDataNum());
     }
 
     @Override
