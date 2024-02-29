@@ -25,13 +25,13 @@ def main(idx, size, queries, approaches, filterRate, plotLatency, plotLatencyCmp
         tmp_approaches = approaches
 
     print("* calcResults() *")
-    results = utils.calcResults(tmp_queries, tmp_approaches, filterRate, plotLatency, plotLatencyCmp, violinPlot, startTime, flag, size, idx)
+    results, maxCount = utils.calcResults(tmp_queries, tmp_approaches, filterRate, plotLatency, plotLatencyCmp, violinPlot, startTime, flag, size, idx)
 
     print("* resultFigsGen *")
-    utils.resultFigsGen(results, tmp_queries, tmp_approaches, flag, size, idx)
+    utils.resultFigsGen(results, tmp_queries, tmp_approaches, flag, size, idx, maxCount)
 
     print("* writeResults(results) *")
-    utils.writeResults(results, tmp_queries, tmp_approaches, startTime, flag, size, idx)
+    utils.writeResults(results, tmp_queries, tmp_approaches, startTime, flag, size, idx, maxCount)
 
 def arg_parser(elements):
     result_type = elements[0]

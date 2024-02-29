@@ -11,9 +11,9 @@ startTime = time.time()
 flag = "metrics1"
 
 def arg_parser(elements):
-    queries = elements[1].split()
-    approaches = elements[2].split()
-    dataSize = list(map(int, elements[3].split()))
+    queries = elements[0].split()
+    approaches = elements[1].split()
+    dataSize = list(map(int, elements[2].split()))
 
     return queries, approaches, dataSize
 

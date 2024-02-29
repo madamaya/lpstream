@@ -28,22 +28,23 @@ def logDump(query, approach, meanList, stdList, startTime, flag, size, lat_idx):
         w.write("STD: {}\n".format(npMeansArray.std()))
         w.write("\n")
 
-def logDumpWelch(query, approaches, startTime, flag, allValidList, size, lat_idx):
+def logDumpWelch(query, approaches, startTime, flag, allValidList, size, lat_idx, maxCount):
     bonferroniCoef = (len(approaches) * (len(approaches) - 1)) // 2
     with open("./results/latency.{}.info.{}.{}.{}.log".format(flag, round(startTime), size, lat_idx), "a") as w:
         w.write("===== Welch results ({}) =====\n".format(query))
         for pair in itertools.combinations(approaches, 2):
-            for i in range(len(allValidList[approaches[0]])):
-                ret = stats.ttest_ind(allValidList[pair[0]][i], allValidList[pair[1]][i], equal_var=False)
-                fixedPvalue = ret.pvalue * bonferroniCoef
-                if fixedPvalue <= 0.01:
-                    resultFlag = "diff (0.01)"
-                elif 0.01 < fixedPvalue and fixedPvalue <= 0.05:
-                    resultFlag = "diff (0.05)"
-                else:
-                    resultFlag = "nodiff"
+            for i in range(maxCount):
+                if len(allValidList[pair[0]]) > i and len(allValidList[pair[1]]) > i:
+                    ret = stats.ttest_ind(allValidList[pair[0]][i], allValidList[pair[1]][i], equal_var=False)
+                    fixedPvalue = ret.pvalue * bonferroniCoef
+                    if fixedPvalue <= 0.01:
+                        resultFlag = "diff (0.01)"
+                    elif 0.01 < fixedPvalue and fixedPvalue <= 0.05:
+                        resultFlag = "diff (0.05)"
+                    else:
+                        resultFlag = "nodiff"
 
-                w.write("{}-{}:{}:{}: {} ({})\n".format(pair[0], pair[1], i, resultFlag, str(ret), bonferroniCoef))
+                    w.write("{}-{}:{}:{}: {} ({})\n".format(pair[0], pair[1], i, resultFlag, str(ret), bonferroniCoef))
         w.write("=================================\n")
         w.write("\n")
 
@@ -58,7 +59,9 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
             meanList = []
             medianList = []
             stdList = []
-            for idx in range(len(glob.glob("{}/{}/*_{}.log".format(query, approach, size)))):
+            files = glob.glob("{}/{}/*_{}.log".format(query, approach, size))
+            maxCount = max(0, len(files))
+            for idx in range(len(files)):
                 l = "{}/{}/{}_{}.log".format(query, approach, str(idx+1), size)
                 # read log data
                 print("*** Read log data ({}) ***".format(l))
@@ -106,7 +109,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                     allValidList[query][approach] = []
                 allValidList[query][approach].append(validarray)
 
-            if plotLatency:
+            if plotLatency and (query in allValidList and approach in allValidList[query]):
                 for validList in allValidList[query][approach]:
                     plt.plot(range(validList.size), validList, linewidth=0.1)
                 print("*** Save fig ***")
@@ -168,9 +171,10 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
 
         if plotLatencyCmp:
             print("*** Save fig for comparison ***")
-            for i in range(len(allValidList[query][approaches[0]])):
+            for i in range(maxCount):
                 for approach in approaches:
-                    plt.plot(range(allValidList[query][approach][i].size), allValidList[query][approach][i], linewidth=0.1)
+                    if len(allValidList[query][approach]) > i:
+                        plt.plot(range(allValidList[query][approach][i].size), allValidList[query][approach][i], linewidth=0.1)
                 if lat_idx == 1:
                     plt.title("{}-{}-{}-s2s-comparison".format(query, i, size))
                 elif lat_idx == 2:
@@ -193,7 +197,8 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                 plt.close()
 
                 for approach in approaches:
-                    plt.plot(range(allValidList[query][approach][i].size), allValidList[query][approach][i], linestyle="None", marker=".", markersize=markerSize(allValidList[query][approach][i].size))
+                    if len(allValidList[query][approach]) > i:
+                        plt.plot(range(allValidList[query][approach][i].size), allValidList[query][approach][i], linestyle="None", marker=".", markersize=markerSize(allValidList[query][approach][i].size))
                 if lat_idx == 1:
                     plt.title("{}-{}-{}-s2s-comparison".format(query, i, size))
                 elif lat_idx == 2:
@@ -216,13 +221,13 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
                 plt.close()
 
         print("*** Welch test ***")
-        logDumpWelch(query, approaches, startTime, flag, allValidList[query], size, lat_idx)
+        logDumpWelch(query, approaches, startTime, flag, allValidList[query], size, lat_idx, maxCount)
 
     if violinPlot == True:
         print("*** Violin plot ***")
         for query in queries:
-            for idx in range(len(allValidList[query][approaches[0]])):
-                validListsIdx = [allValidList[query][approach][idx] for approach in approaches]
+            for idx in range(maxCount):
+                validListsIdx = [allValidList[query][approach][idx] if len(allValidList[query][approach]) > idx else np.nan for approach in approaches]
                 v_fig = plt.violinplot(validListsIdx, showmeans=True, showmedians=True)
                 v_fig['cmedians'].set_color('C1')
                 plt.xticks(range(1, len(approaches)+1), [approach for approach in approaches])
@@ -247,11 +252,11 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
     else:
         print("*** No violin plot ***")
 
-    return results
+    return results, maxCount
 
-def resultFigsGen(results, queries, approaches, flag, size, lat_idx):
+def resultFigsGen(results, queries, approaches, flag, size, lat_idx, maxCount):
     for query in queries:
-        resultsList = [results[query][approach][0] for approach in approaches]
+        resultsList = [results[query][approach][0] if (query in results and approach in results[query]) else np.nan for approach in approaches]
         colorList = []
         for approach in approaches:
             if approach == "baseline":
@@ -283,8 +288,8 @@ def resultFigsGen(results, queries, approaches, flag, size, lat_idx):
             plt.savefig("./results/{}-{}-mean.traverse.pdf".format(query, size))
         plt.close()
 
-        for idx in range(results[query][approaches[0]][2]):
-            resultsList = [results[query][approach][3][idx] for approach in approaches]
+        for idx in range(maxCount):
+            resultsList = [results[query][approach][3][idx] if (query in results and approach in results[query]) else np.nan for approach in approaches]
             plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
             if lat_idx == 1:
                 plt.title("*{}* result (Latency, {}, {}, {}, s2s)".format(query, flag, idx, size))
@@ -305,8 +310,8 @@ def resultFigsGen(results, queries, approaches, flag, size, lat_idx):
                 plt.savefig("./results/{}-{}-{}-mean.traverse.pdf".format(query, idx, size))
             plt.close()
 
-        for idx in range(results[query][approaches[0]][2]):
-            resultsList = [results[query][approach][4][idx] for approach in approaches]
+        for idx in range(maxCount):
+            resultsList = [results[query][approach][4][idx] if (query in results and approach in results[query]) else np.nan for approach in approaches]
             plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
             if lat_idx == 1:
                 plt.title("*{}* result (Latency, {}, {}, {}, s2s)".format(query, flag, idx, size))
@@ -327,7 +332,7 @@ def resultFigsGen(results, queries, approaches, flag, size, lat_idx):
                 plt.savefig("./results/{}-{}-{}-median.traverse.pdf".format(query, idx, size))
             plt.close()
 
-def writeResults(results, queries, approaches, startTime, flag, size, lat_idx):
+def writeResults(results, queries, approaches, startTime, flag, size, lat_idx, maxCount):
     with open("./results/latency.{}.result.{}.{}.{}.txt".format(flag, startTime, size, lat_idx), "w") as w:
         # Write mean
         w.write("MEAN,{}\n".format(",".join(approaches)))
@@ -336,7 +341,7 @@ def writeResults(results, queries, approaches, startTime, flag, size, lat_idx):
 
             means = []
             for approach in approaches:
-                means.append(str(results[query][approach][0]))
+                means.append(str(results[query][approach][0] if (query in results and approach in results[query]) else np.nan))
             w.write("{}\n".format(",".join(means)))
 
         w.write("\n")
@@ -348,7 +353,7 @@ def writeResults(results, queries, approaches, startTime, flag, size, lat_idx):
 
             stds = []
             for approach in approaches:
-                stds.append(str(results[query][approach][1]))
+                stds.append(str(results[query][approach][1] if (query in results and approach in results[query]) else np.nan))
             w.write("{}\n".format(",".join(stds)))
 
         w.write("\n")
@@ -358,11 +363,11 @@ def writeResults(results, queries, approaches, startTime, flag, size, lat_idx):
         for query in queries:
             w.write("{},".format(query))
 
-            for idx in range(results[query][approaches[0]][2]):
+            for idx in range(maxCount):
                 median = []
                 w.write("idx={}\n".format(idx))
                 for approach in approaches:
-                    median.append(str(results[query][approach][4][idx]))
+                    median.append(str(results[query][approach][4][idx] if (query in results and approach in results[query]) else np.nan))
                 w.write("{}\n".format(",".join(median)))
 
         w.write("\n")
@@ -374,5 +379,5 @@ def writeResults(results, queries, approaches, startTime, flag, size, lat_idx):
 
             stds = []
             for approach in approaches:
-                stds.append(str(results[query][approach][2]))
+                stds.append(str(results[query][approach][2] if (query in results and approach in results[query]) else 0))
             w.write("{}\n".format(",".join(stds)))

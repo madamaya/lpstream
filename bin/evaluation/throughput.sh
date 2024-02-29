@@ -11,14 +11,11 @@ source ../utils/cpuMemoryLoadLogger.sh
 source ./thUtils/thUtils.sh
 
 granularityTemp=100
-#queries=(Syn1 Syn2 Syn3 LR NYC Nexmark YSB NYC2 Nexmark2 YSB2)
-queries=(Syn1 Syn2 Syn3 LR NYC Nexmark2 YSB2)
+queries=(Syn1 Syn2 Syn3)
 approaches=(baseline genealog l3stream l3streamlin)
-sizes=(-1 10)
-#sleepTime=360
-sleepTime=10
-#inputRates=(100000 500000 1000000 1500000 2000000)
-inputRates=(50000)
+sizes=(10 100 400)
+sleepTime=180
+inputRates=(5000)
 homedir=`pwd`
 loop=1
 
@@ -186,6 +183,22 @@ do
         else
           ssh ${ingestNode} /bin/zsh ${L3_HOME}/bin/dataingest/stopIngestion.sh
         fi
+
+        # Start latency calc
+        echo "*** Latency calculation on Flink ***"
+        ## Start flink program
+        echo "(./latencyCalc.sh ${JAR_PATH} ${parallelism} ${query} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}.log)"
+        ./latencyCalc.sh ${JAR_PATH} ${parallelism} ${query} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}.log
+        echo "(sleep 30)"
+        sleep 30
+        ## notify program end
+        for idx in `seq 0 ${parallelism}`
+        do
+          echo "(notifyEnd ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}_${idx}.log)"
+          notifyEnd ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}_${idx}.log
+        done
+        echo "(cancelFlinkJobs)"
+        cancelFlinkJobs
 
         # Read output
         echo "*** Read all outputs ***"

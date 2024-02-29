@@ -7,12 +7,12 @@ function isValid() {
   i_query=${1}
   i_approach=${2}
   i_inputSize=${3}
+  num=`cat finishedComb.csv | grep "unstable,${i_query},${i_approach},${i_inputSize}," | wc -l | awk '{print $1}'`
+
   echo "=================================================="
   echo "isValid:"
-  echo "    query:" ${i_query} ", approach:" ${i_approach} ", inputSize:" ${i_inputSize}
+  echo "    query:" ${i_query} ", approach:" ${i_approach} ", inputSize:" ${i_inputSize} ", num:" ${num}
   echo "=================================================="
-
-  num=`cat finishedComb.csv | grep "unstable,${i_query},${i_approach}" | wc -l | awk '{print $1}'`
   return $num
 }
 
