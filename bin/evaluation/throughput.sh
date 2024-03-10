@@ -19,9 +19,11 @@ inputRates=(5000)
 homedir=`pwd`
 loop=1
 
-echo "" > finishedComb.csv
+rm finishedComb.csv
+touch finishedComb.csv
 
-for inputRate in ${inputRates[@]}
+#for inputRate in ${inputRates[@]}
+for inputRateIdx in `seq 0 5`
 do
   for size in ${sizes[@]}
   do
@@ -30,6 +32,14 @@ do
       for query in ${queries[@]}
       do
         cd ${homedir}
+
+        # Define inputRate
+        line=`cat ./thConf/config.csv | grep "${query},${approach},${size},"`
+        start_value=`echo ${line} | awk -F, '{print $4}'`
+        increment_value=`echo ${line} | awk -F, '{print $6}'`
+        inputRate=$((start_value + increment_value * inputRateIdx))
+
+        # Skip invalid cases
         if [[ ${query} == *Syn* ]]; then
           if [ ${size} -eq -1 ]; then
             continue
@@ -40,6 +50,7 @@ do
           fi
         fi
 
+        # Skip unstable cases
         echo "isValid" ${query} ${approach} ${size}
         isValid ${query} ${approach} ${size}
         if [[ $? -ne 0 ]]; then
@@ -202,9 +213,9 @@ do
         cancelFlinkJobs
 
         # Read output
-        echo "*** Read all outputs ***"
-        echo "(readOutputFromEarliest ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}.log ${outputTopicName})"
-        readOutputFromEarliest ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}.log ${outputTopicName}
+        #echo "*** Read all outputs ***"
+        #echo "(readOutputFromEarliest ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}.log ${outputTopicName})"
+        #readOutputFromEarliest ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}.log ${outputTopicName}
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"
@@ -246,3 +257,6 @@ do
   mv results thEval/results${inputRate}
   ./flesh.sh fleshAll
 done
+
+cd ${L3_HOME}/bin/evaluation
+mv finishedComb.csv finishedComb.csv.`date -Iseconds`
