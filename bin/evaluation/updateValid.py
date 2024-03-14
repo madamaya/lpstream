@@ -182,14 +182,24 @@ def isStable24(query, approach, dataSize, throughput_values, cpu_values, mem_val
 
     if (containValue(cpu_values, query, approach, dataSize) and
         containValue(throughput_values, query, approach, dataSize)):
+        line = ""
         # c2
         c2_result = cpu_values[dataSize][query][approach] < 80
 
         # c4
         c4_result = throughput_values[dataSize][query][approach] > inputRate * 0.8
-        return c2_result and c4_result
+
+        if (np.isnan(cpu_values[dataSize][query][approach]) or
+                np.isnan(throughput_values[dataSize][query][approach])):
+            line += "nan"
+        else:
+            if c2_result == False:
+                line += "c2"
+            if c4_result == False:
+                line += "c4"
+        return line
     else:
-        return False
+        return "c0"
 
 def isStable(query, approach, dataSize, latency_values, latency_values_all, throughput_values, cpu_values, mem_values, inputRate) -> bool:
     # stable:
@@ -202,6 +212,7 @@ def isStable(query, approach, dataSize, latency_values, latency_values_all, thro
         containValue(cpu_values, query, approach, dataSize) and
         containValue(latency_values, query, approach, dataSize) and
         containValue(throughput_values, query, approach, dataSize)):
+        line = ""
         # c1
         c1_result = isNotIncreasing(latency_values_all[dataSize][query][approach])
 
@@ -214,9 +225,23 @@ def isStable(query, approach, dataSize, latency_values, latency_values_all, thro
         # c4
         c4_result = throughput_values[dataSize][query][approach] > inputRate * 0.8
 
-        return c1_result and c2_result and c3_result and c4_result
+        if (np.isnan(latency_values_all[dataSize][query][approach]) or
+                np.isnan(cpu_values[dataSize][query][approach]) or
+                np.isnan(latency_values[dataSize][query][approach]) or
+                np.isnan(throughput_values[dataSize][query][approach])):
+            line += "nan"
+        else:
+            if c1_result == False:
+                line += "c1"
+            if c2_result == False:
+                line += "c2"
+            if c3_result == False:
+                line += "c3"
+            if c4_result == False:
+                line += "c4"
+        return line
     else:
-        return False
+        return "c0"
 
 if __name__ == "__main__":
     if len(sys.argv) != 6:
@@ -259,7 +284,7 @@ if __name__ == "__main__":
 
                 # the result means that Flink was unstable
                 with open("./finishedComb.csv", "a") as w:
-                    if result == False:
-                        w.write("unstable,{},{},{},{}\n".format(query, approach, dataSize, inputRate))
+                    if len(result) > 0:
+                        w.write("unstable,{},{},{},{},{}\n".format(query, approach, dataSize, inputRate, result))
                     else:
                         w.write("stable,{},{},{},{}\n".format(query, approach, dataSize, inputRate))
