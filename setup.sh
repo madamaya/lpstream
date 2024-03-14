@@ -2,10 +2,14 @@
 
 source ./bin/config.sh
 LRScaleFactor=1
+#LRScaleFactor=10
 NexmarkTupleNum=1000000
+#NexmarkTupleNum=275000000
 NYCstartYear=2022
+#NYCstartYear=2017
 NYCendYear=2023
 YSBTupleNum=60933230
+#YSBTupleNum=360000000
 
 if [ $# -ne 1 ]; then
   echo "Illegal Arguments."
@@ -16,14 +20,14 @@ if [ $1 = "downloads" ]; then
   # download flink
   echo "*** Download flink ***"
   wget https://dlcdn.apache.org/flink/flink-1.17.2/flink-1.17.2-bin-scala_2.12.tgz
-  tar xzf flink-1.17.1-bin-scala_2.12.tgz
-  mv flink-1.17.1 flink
+  tar xzf flink-1.17.2-bin-scala_2.12.tgz
+  mv flink-1.17.2 flink
   cp flink-conf.yaml flink/conf/flink-conf.yaml
-  rm flink-1.17.1-bin-scala_2.12.tgz
+  rm flink-1.17.2-bin-scala_2.12.tgz
 
   # download kafka
   echo "*** Download kafka ***"
-  wget https://downloads.apache.org/kafka/3.5.1/kafka_2.12-3.5.1.tgz
+  wget https://archive.apache.org/dist/kafka/3.5.1/kafka_2.12-3.5.1.tgz
   tar zxf kafka_2.12-3.5.1.tgz
   mv kafka_2.12-3.5.1 kafka
   rm kafka_2.12-3.5.1.tgz
@@ -90,9 +94,9 @@ elif [ $1 = "mainData" ]; then
   dataList=(nyc.csv nyc2.csv nexmark.json nexmark2.json ysb.json ysb2.json)
   for file in ${dataList[@]}
   do
-    echo "START: python distribute.py ${files} ${parallelism}" >> ../dataGen.log
-    python distribute.py ${files} ${parallelism}
-    echo "END: python distribute.py ${files} ${parallelism}" >> ../dataGen.log
+    echo "START: python distribute.py ${file} ${parallelism}" >> ../dataGen.log
+    python distribute.py ./data/${file} ${parallelism}
+    echo "END: python distribute.py ${file} ${parallelism}" >> ../dataGen.log
   done
 
   echo "*** END ***"
