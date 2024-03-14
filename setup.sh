@@ -1,5 +1,6 @@
 #!/bin/zsh
 
+source ./bin/config.sh
 LRScaleFactor=1
 NexmarkTupleNum=1000000
 NYCstartYear=2022
@@ -14,7 +15,7 @@ fi
 if [ $1 = "downloads" ]; then
   # download flink
   echo "*** Download flink ***"
-  wget https://dlcdn.apache.org/flink/flink-1.17.1/flink-1.17.1-bin-scala_2.12.tgz
+  wget https://dlcdn.apache.org/flink/flink-1.17.2/flink-1.17.2-bin-scala_2.12.tgz
   tar xzf flink-1.17.1-bin-scala_2.12.tgz
   mv flink-1.17.1 flink
   cp flink-conf.yaml flink/conf/flink-conf.yaml
@@ -71,6 +72,28 @@ elif [ $1 = "mainData" ]; then
   ./ysbGen.sh ${YSBTupleNum}
   echo "END: ./ysbGen.sh ${YSBTupleNum}" >> ../dataGen.log
   date >> ../dataGen.log
+
+  ## Generate data for Syn
+  cd ../Syn
+  echo "START: python dataGen.py ${parallelism}" >> ../dataGen.log
+  python dataGen.py ${parallelism}
+  echo "END: python dataGen.py ${parallelism}" >> ../dataGen.log
+  for i in 10 100 400
+  do
+    echo "START: ./copy.sh ${parallelism} ${i}"
+    ./copy.sh ${parallelism} ${i}
+    echo "END: ./copy.sh ${parallelism} ${i}"
+  done
+
+  ## Distribute benchmark data
+  cd ..
+  dataList=(nyc.csv nyc2.csv nexmark.json nexmark2.json ysb.json ysb2.json)
+  for file in ${dataList[@]}
+  do
+    echo "START: python distribute.py ${files} ${parallelism}" >> ../dataGen.log
+    python distribute.py ${files} ${parallelism}
+    echo "END: python distribute.py ${files} ${parallelism}" >> ../dataGen.log
+  done
 
   echo "*** END ***"
 elif [ $1 = "testData" ]; then

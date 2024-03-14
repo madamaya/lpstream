@@ -2,7 +2,7 @@
 
 source $(dirname $0)/../../../bin/config.sh
 
-numTuples=1000000
+numTuples=27500000
 if [ $# -eq 1 ]; then
   numTuples=$1
 fi
@@ -99,5 +99,8 @@ ${KAFKA_HOME}/bin/kafka-server-stop.sh
 sleep 30
 echo "*** Stop zookeeper ***"
 ${KAFKA_HOME}/bin/zookeeper-server-stop.sh
+
+echo "cp ../data/nexmark.json ../data/nexmark2.json"
+cp ../data/nexmark.json ../data/nexmark2.json
 
 echo "=*=*=*=*= End Nexmark data generation =*=*=*=*="

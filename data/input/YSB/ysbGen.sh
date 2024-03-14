@@ -3,7 +3,7 @@
 source $(dirname $0)/../../../bin/config.sh
 
 YSB_HOME=`pwd`
-numTuples=1000000
+numTuples=36000000
 
 if [ $# -eq 1 ]; then
   numTuples=$1
@@ -68,5 +68,8 @@ ${KAFKA_HOME}/bin/zookeeper-server-stop.sh
 #echo "*** Join data ***"
 #echo "(python joinData.py)"
 #python joinData.py
+
+echo "cp ../data/ysb.json ../data/ysb2.json"
+cp ../data/ysb.json ../data/ysb2.json
 
 echo "=*=*=*=*= End YSB data generation =*=*=*=*="
