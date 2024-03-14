@@ -3,18 +3,23 @@
 source $(dirname $0)/../config.sh
 
 # Start Flink Server
-#echo "*** Start flink cluster ***"
-#${FLINK_HOME}/bin/start-cluster.sh
+if [[ ${flinkIP} == "localhost" ]]; then
+  echo "*** Start flink cluster ***"
+  ${FLINK_HOME}/bin/start-cluster.sh
+fi
 
-# Start zookeeper server
-#echo "*** Start zookeeper ***"
-#${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
-#sleep 10
+# Start kafka cluster
+if [[ ${bootstrapServers} == *localhost* ]]; then
+  # Start zookeeper server
+  echo "*** Start zookeeper ***"
+  ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
+  sleep 10
 
-# Start kafka server
-#echo "*** Start kafka cluster ***"
-#${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties
-#sleep 10
+  # Start kafka server
+  echo "*** Start kafka cluster ***"
+  ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties
+  sleep 10
+fi
 
 # Create topics
 for i in LR LR2 NYC NYC2 YSB YSB2 Nexmark Nexmark2 Syn1 Syn2 Syn3 Syn4 Syn5 Syn6 Test
