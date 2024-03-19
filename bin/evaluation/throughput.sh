@@ -250,7 +250,7 @@ do
   python metrics1.py "${queries}" "${approaches}" "${sizes}"
 
   cd ${homedir}
-  updateValid "${query}" "${approach}" "${size}"
+  updateValid "${queries}" "${approaches}" "${sizes}"
 
   cd ${L3_HOME}/data/output
   ./getResult.sh
