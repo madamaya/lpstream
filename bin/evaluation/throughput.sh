@@ -24,6 +24,8 @@ rm finishedComb.csv
 touch finishedComb.csv
 
 #for inputRate in ${inputRates[@]}
+#do
+#  inputRateIdx=${inputRate}
 for inputRateIdx in `seq 0 5`
 do
   for size in ${sizes[@]}
@@ -33,13 +35,6 @@ do
       for query in ${queries[@]}
       do
         cd ${homedir}
-
-        # Define inputRate
-        line=`cat ./thConf/config.csv | grep "${query},${approach},${size},"`
-        start_value=`echo ${line} | awk -F, '{print $4}'`
-        increment_value=`echo ${line} | awk -F, '{print $6}'`
-        inputRate=$((start_value + increment_value * inputRateIdx))
-
         # Skip invalid cases
         if [[ ${query} == *Syn* ]]; then
           if [ ${size} -eq -1 ]; then
@@ -57,6 +52,12 @@ do
         if [[ $? -ne 0 ]]; then
           continue
         fi
+
+        # Define inputRate
+        line=`cat ./thConf/config.csv | grep "${query},${approach},${size},"`
+        start_value=`echo ${line} | awk -F, '{print $4}'`
+        increment_value=`echo ${line} | awk -F, '{print $6}'`
+        inputRate=$((start_value + increment_value * inputRateIdx))
 
         cd ../templates
         # Stop cluster (Flink, Kafka, Redis)
@@ -235,6 +236,9 @@ do
         ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
         echo "(sleep 10)"
         sleep 10
+
+        cd ${homedir}
+        updateValid "${queries}" "${approaches}" "${sizes}" "${inputRate}"
       done
     done
   done
@@ -246,16 +250,13 @@ do
   cd ${L3_HOME}/data/output/throughput/metrics1
   python metrics1.py "${queries}" "${approaches}" "${sizes}"
 
-  cd ${homedir}
-  updateValid "${queries}" "${approaches}" "${sizes}" "${inputRate}"
-
   cd ${L3_HOME}/data/output
   ./getResult.sh
   mkdir -p thEval
-  cp -r latency thEval/latency${inputRate}
-  cp -r throughput thEval/throughput${inputRate}
-  cp -r cpu-memory thEval/cpu-memory${inputRate}
-  mv results thEval/results${inputRate}
+  cp -r latency thEval/latency${inputRateIdx}
+  cp -r throughput thEval/throughput${inputRateIdx}
+  cp -r cpu-memory thEval/cpu-memory${inputRateIdx}
+  mv results thEval/results${inputRateIdx}
   ./flesh.sh fleshAll
 done
 

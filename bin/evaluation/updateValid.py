@@ -94,7 +94,8 @@ def getCpuMemValues(queries, approaches, dataSizes, dataPath):
         # obtain file name
         print(dataPath + "/cpu-memory/results/cpumem.result.*.{}.txt".format(dataSize))
         file_cand = glob.glob(dataPath + "/cpu-memory/results/cpumem.result.*.{}.txt".format(dataSize))
-        assert len(file_cand) == 1, print(file_cand)
+        if len(file_cand) != 1:
+            continue
         filename = file_cand[0]
 
         # open cpu/mem result file and update return_cpu(mem)_map
@@ -141,7 +142,8 @@ def getThroughputValues(queries, approaches, dataSizes, dataPath):
         # obtain file name
         print(dataPath + "/throughput/metrics1/results/throughput.metrics1.result.*.{}.txt".format(dataSize))
         file_cand = glob.glob(dataPath + "/throughput/metrics1/results/throughput.metrics1.result.*.{}.txt".format(dataSize))
-        assert len(file_cand) == 1, print(file_cand)
+        if len(file_cand) != 1:
+            continue
         filename = file_cand[0]
 
         # open throughput result file and update return_map
