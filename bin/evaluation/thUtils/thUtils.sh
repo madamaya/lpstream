@@ -17,19 +17,17 @@ function isValid() {
 }
 
 function updateValid() {
-    # $1: queries, $2: approaches, $3: inputSizes, $4: inputRate
+    # $1: queries, $2: approaches, $3: inputSizes
     i_queries=${1}
     i_approaches=${2}
     i_inputSizes=${3}
-    i_inputRate=${4}
     echo "=================================================="
     echo "updateValid"
     echo "    queries:" ${i_queries}
     echo "    approaches:" ${i_approaches}
     echo "    inputSizes:" ${i_inputSizes}
-    echo "    inputRate:" ${i_inputRate}
     echo "=================================================="
 
-    echo "python updateValid.py "${i_queries}" "${i_approaches}" "${i_inputSizes}" ${i_inputRate} ${L3_HOME}/data/output"
-    python updateValid.py "${i_queries}" "${i_approaches}" "${i_inputSizes}" ${i_inputRate} ${L3_HOME}/data/output
+    echo "python updateValid.py "${i_queries}" "${i_approaches}" "${i_inputSizes}" ${L3_HOME}/data/output"
+    python updateValid.py "${i_queries}" "${i_approaches}" "${i_inputSizes}" ${L3_HOME}/data/output
 }

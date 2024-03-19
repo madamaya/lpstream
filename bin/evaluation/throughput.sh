@@ -20,8 +20,8 @@ sleepTime=180
 homedir=`pwd`
 loop=1
 
-rm finishedComb.csv
-touch finishedComb.csv
+rm finishedComb.csv ./thLog/parameters.log
+touch finishedComb.csv ./thLog/parameters.log
 
 #for inputRate in ${inputRates[@]}
 #do
@@ -58,6 +58,8 @@ do
         start_value=`echo ${line} | awk -F, '{print $4}'`
         increment_value=`echo ${line} | awk -F, '{print $6}'`
         inputRate=$((start_value + increment_value * inputRateIdx))
+
+        echo "${query},${approach},${size},${inputRate}" >> ./thLog/parameters.log
 
         cd ../templates
         # Stop cluster (Flink, Kafka, Redis)
@@ -236,9 +238,6 @@ do
         ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
         echo "(sleep 10)"
         sleep 10
-
-        cd ${homedir}
-        updateValid "${queries}" "${approaches}" "${sizes}" "${inputRate}"
       done
     done
   done
@@ -249,6 +248,9 @@ do
   #python metrics1.py latency True True True "${queries}" "${approaches}" "${sizes}"
   cd ${L3_HOME}/data/output/throughput/metrics1
   python metrics1.py "${queries}" "${approaches}" "${sizes}"
+
+  cd ${homedir}
+  updateValid "${query}" "${approach}" "${size}"
 
   cd ${L3_HOME}/data/output
   ./getResult.sh

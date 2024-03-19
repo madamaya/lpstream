@@ -22,9 +22,8 @@ def arg_parser(elements):
     queries = elements[0].split()
     approaches = elements[1].split()
     dataSizes = list(map(int, elements[2].split()))
-    inputRate = int(elements[3])
-    dataPath = elements[4]
-    return queries, approaches, dataSizes, inputRate, dataPath
+    dataPath = elements[3]
+    return queries, approaches, dataSizes, dataPath
 
 def calcLatency(filename, filterRate = 0.1):
     latency_all = []
@@ -95,7 +94,7 @@ def getCpuMemValues(queries, approaches, dataSizes, dataPath):
         print(dataPath + "/cpu-memory/results/cpumem.result.*.{}.txt".format(dataSize))
         file_cand = glob.glob(dataPath + "/cpu-memory/results/cpumem.result.*.{}.txt".format(dataSize))
         if len(file_cand) != 1:
-            continue
+            raise Exception
         filename = file_cand[0]
 
         # open cpu/mem result file and update return_cpu(mem)_map
@@ -143,7 +142,7 @@ def getThroughputValues(queries, approaches, dataSizes, dataPath):
         print(dataPath + "/throughput/metrics1/results/throughput.metrics1.result.*.{}.txt".format(dataSize))
         file_cand = glob.glob(dataPath + "/throughput/metrics1/results/throughput.metrics1.result.*.{}.txt".format(dataSize))
         if len(file_cand) != 1:
-            continue
+            raise Exception
         filename = file_cand[0]
 
         # open throughput result file and update return_map
@@ -245,17 +244,34 @@ def isStable(query, approach, dataSize, latency_values, latency_values_all, thro
     else:
         return "c0"
 
+def getInputRate(query, approach, dataSize):
+    inputRate = -1
+    with open("./thLog/parameters.log") as f:
+        while True:
+            line = f.readline()
+            if line == "":
+                break
+            elements = line.split(",")
+            current_query = elements[0]
+            current_approach = elements[1]
+            current_size = int(elements[2])
+
+            if (current_query == query and
+                    current_approach == approach and
+                    current_size == dataSize):
+                inputRate = int(elements[3])
+    return inputRate
+
 if __name__ == "__main__":
-    if len(sys.argv) != 6:
+    if len(sys.argv) != 5:
         print("IllegalArguments: len(sys.argv) = {}".format(len(sys.argv)))
         exit(1)
 
-    # argv[1]: queries, argv[2]: approaches, argv[3]: dataSize, argv[4]: inputRate, argv[5]: dataPath
-    queries, approaches, dataSizes, inputRate, dataPath = arg_parser(sys.argv[1:])
+    # argv[1]: queries, argv[2]: approaches, argv[3]: dataSize, argv[4]: dataPath
+    queries, approaches, dataSizes, dataPath = arg_parser(sys.argv[1:])
     print("queries = {}, type = {}".format(queries, type(queries)))
     print("approaches = {}, type = {}".format(approaches, type(approaches)))
     print("dataSizes = {}, type = {}".format(dataSizes, type(dataSizes)))
-    print("inputRate = {}, type = {}".format(inputRate, type(inputRate)))
     print("dataPath = {}, type = {}".format(dataPath, type(dataPath)))
 
     # Return a dictionary object (dict), consisting of each latency values
@@ -279,6 +295,10 @@ if __name__ == "__main__":
                     continue
                 if dataSize != -1 and "Syn" not in query:
                     continue
+
+                inputRate = getInputRate(query, approach, dataSize)
+                if inputRate == -1:
+                    raise Exception
 
                 #result = isStable(query, approach, dataSize, latency_values, latency_values_all, throughput_values, cpu_values, mem_values, inputRate)
                 result = isStable24(query, approach, dataSize, throughput_values, cpu_values, mem_values, inputRate)
