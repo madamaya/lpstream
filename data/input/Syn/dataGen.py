@@ -15,13 +15,14 @@ if __name__ == "__main__":
         raise Exception
 
     cases = [
-        [10, 0.01],
-        [100, 0.001],
-        [400, 0.001]
+        [10, 0.1],
+        [100, 0.4],
+        [400, 1.4]
     ]
     for case in cases:
         # Parameters
-        sensor_num = 500
+        #sensor_num = 500 2024/03/28
+        sensor_num = 100
         machine_num = 10
         temp_range = [100, 200]
         power_range = [1000, 2000]

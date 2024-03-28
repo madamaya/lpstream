@@ -17,9 +17,9 @@ granularityTemp=100
 queries=(Syn1 Syn2 Syn3 LR NYC Nexmark YSB NYC2 Nexmark2 YSB2)
 #queries=(Nexmark NYC Nexmark2 YSB)
 approaches=(baseline genealog l3stream l3streamlin)
-sizes=(-1 10)
+sizes=(-1 10 100 400)
 #approaches=(baseline)
-sleepTime=180
+sleepTime=900
 
 cd ../templates
 
