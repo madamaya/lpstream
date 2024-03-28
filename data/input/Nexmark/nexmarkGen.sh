@@ -34,9 +34,9 @@ mv nexmark-flink nexmark
 
 # Install additional flink library
 echo "*** Install additional libraries for flink ***"
-cp nexmark/lib/nexmark-flink-0.2-SNAPSHOT.jar ${FLINK_HOME}/lib
+cp nexmark/lib/nexmark-flink-0.2-SNAPSHOT.jar ${L3_HOME}/flink/lib
 wget https://repo.maven.apache.org/maven2/org/apache/flink/flink-sql-connector-kafka/1.17.1/flink-sql-connector-kafka-1.17.1.jar
-mv flink-sql-connector-kafka-1.17.1.jar ${FLINK_HOME}/lib
+mv flink-sql-connector-kafka-1.17.1.jar ${L3_HOME}/flink/lib
 
 # replace variables & generate datagen query
 echo "*** Generate queries for data generation ***"
@@ -58,24 +58,24 @@ echo "" >> ./queries.sql
 
 # start flink cluster
 echo "*** Start flink cluster ***"
-${FLINK_HOME}/bin/start-cluster.sh
+${L3_HOME}/flink/bin/start-cluster.sh
 
 # start kafka cluster
 echo "*** Start zookeeper for kafka ***"
-echo "(${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties)"
-${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
+echo "(${L3_HOME}/kafka/bin/zookeeper-server-start.sh -daemon ${L3_HOME}/kafka/config/zookeeper.properties)"
+${L3_HOME}/kafka/bin/zookeeper-server-start.sh -daemon ${L3_HOME}/kafka/config/zookeeper.properties
 sleep 10
 echo "*** Start kafka server ***"
-echo "(${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties)"
-${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties
+echo "(${L3_HOME}/kafka/bin/kafka-server-start.sh -daemon ${L3_HOME}/kafka/config/server.properties)"
+${L3_HOME}/kafka/bin/kafka-server-start.sh -daemon ${L3_HOME}/kafka/config/server.properties
 sleep 10
 echo "*** Create kafka topic (nexmark) ***"
-echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic nexmark --bootstrap-server localhost:9092)"
-${KAFKA_HOME}/bin/kafka-topics.sh --create --topic nexmark --bootstrap-server localhost:9092
+echo "(${L3_HOME}/kafka/bin/kafka-topics.sh --create --topic nexmark --bootstrap-server localhost:9092)"
+${L3_HOME}/kafka/bin/kafka-topics.sh --create --topic nexmark --bootstrap-server localhost:9092
 
 # start datagen query
 echo "*** Run dataGen queries ***"
-${FLINK_HOME}/bin/sql-client.sh < queries.sql
+${L3_HOME}/flink/bin/sql-client.sh < queries.sql
 
 # start data logger
 echo "*** Start data logger ***"
@@ -83,22 +83,22 @@ python kafkaLogger.py ${numTuples}
 
 # stop flink cluster
 echo "*** Stop flink cluster ***"
-${FLINK_HOME}/bin/stop-cluster.sh
+${L3_HOME}/flink/bin/stop-cluster.sh
 
 # remove additional flink libraries
 echo "*** Remove additional flink libraries ***"
-rm ${FLINK_HOME}/lib/nexmark-flink-0.2-SNAPSHOT.jar
-rm ${FLINK_HOME}/lib/flink-sql-connector-kafka-1.17.1.jar
+rm ${L3_HOME}/flink/lib/nexmark-flink-0.2-SNAPSHOT.jar
+rm ${L3_HOME}/flink/lib/flink-sql-connector-kafka-1.17.1.jar
 
 # stop kafka cluster
 echo "*** Remove topic ***"
-${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic nexmark --bootstrap-server localhost:9092
+${L3_HOME}/kafka/bin/kafka-topics.sh --delete --topic nexmark --bootstrap-server localhost:9092
 sleep 10
 echo "*** Stop kafka server ***"
-${KAFKA_HOME}/bin/kafka-server-stop.sh
+${L3_HOME}/kafka/bin/kafka-server-stop.sh
 sleep 30
 echo "*** Stop zookeeper ***"
-${KAFKA_HOME}/bin/zookeeper-server-stop.sh
+${L3_HOME}/kafka/bin/zookeeper-server-stop.sh
 
 echo "cp ../data/nexmark.json ../data/nexmark2.json"
 cp ../data/nexmark.json ../data/nexmark2.json
