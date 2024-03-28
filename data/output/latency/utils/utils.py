@@ -51,6 +51,7 @@ def logDumpWelch(query, approaches, startTime, flag, allValidList, size, lat_idx
 def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, violinPlot, startTime, flag, size, lat_idx):
     results = {}
     allValidList = {}
+    maxCount = 0
     for query in queries:
         if violinPlot == False:
             allValidList = {}
@@ -60,7 +61,7 @@ def calcResults(queries, approaches, filterRate, plotLatency, plotLatencyCmp, vi
             medianList = []
             stdList = []
             files = glob.glob("{}/{}/*_{}.log".format(query, approach, size))
-            maxCount = max(0, len(files))
+            maxCount = max(maxCount, len(files))
             for idx in range(len(files)):
                 l = "{}/{}/{}_{}.log".format(query, approach, str(idx+1), size)
                 # read log data
