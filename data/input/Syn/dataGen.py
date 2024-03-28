@@ -22,7 +22,7 @@ if __name__ == "__main__":
     for case in cases:
         # Parameters
         #sensor_num = 500 2024/03/28
-        sensor_num = 100
+        sensor_num = 99
         machine_num = 10
         temp_range = [100, 200]
         power_range = [1000, 2000]
