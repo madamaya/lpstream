@@ -19,18 +19,18 @@ fi
 if [ $1 = "downloads" ]; then
   # download flink
   echo "*** Download flink ***"
-  wget https://dlcdn.apache.org/flink/flink-1.17.2/flink-1.17.2-bin-scala_2.12.tgz
-  tar xzf flink-1.17.2-bin-scala_2.12.tgz
-  mv flink-1.17.2 flink
+  wget https://archive.apache.org/dist/flink/flink-1.17.1/flink-1.17.1-bin-scala_2.12.tgz
+  tar xzf flink-1.17.1-bin-scala_2.12.tgz
+  mv flink-1.17.1 flink
   cp flink-conf.yaml flink/conf/flink-conf.yaml
-  rm flink-1.17.2-bin-scala_2.12.tgz
+  rm flink-1.17.1-bin-scala_2.12.tgz
 
   # download kafka
   echo "*** Download kafka ***"
-  wget https://archive.apache.org/dist/kafka/3.5.1/kafka_2.12-3.5.1.tgz
-  tar zxf kafka_2.12-3.5.1.tgz
-  mv kafka_2.12-3.5.1 kafka
-  rm kafka_2.12-3.5.1.tgz
+  wget https://archive.apache.org/dist/kafka/3.6.0/kafka_2.12-3.6.0.tgz
+  tar zxf kafka_2.12-3.6.0.tgz
+  mv kafka_2.12-3.6.0 kafka
+  rm kafka_2.12-3.6.0.tgz
 
   echo "*** END ***"
 elif [ $1 = "compile" ]; then
