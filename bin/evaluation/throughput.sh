@@ -12,10 +12,13 @@ source ../utils/notifyEnd.sh
 source ./thUtils/thUtils.sh
 
 granularityTemp=100
-queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
-approaches=(baseline genealog l3stream l3streamlin)
-sizes=(-1 10 100 400)
-sleepTime=180
+#queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
+queries=(Syn1)
+#approaches=(baseline genealog l3stream l3streamlin)
+approaches=(baseline)
+#sizes=(-1 10 100 400)
+sizes=(10)
+sleepTime=600
 #inputRates=(5000)
 homedir=`pwd`
 loop=1
@@ -26,7 +29,7 @@ touch finishedComb.csv ./thLog/parameters.log
 #for inputRate in ${inputRates[@]}
 #do
 #  inputRateIdx=${inputRate}
-for inputRateIdx in `seq 0 5`
+for inputRateIdx in `seq 0 0`
 do
   for size in ${sizes[@]}
   do
@@ -199,6 +202,7 @@ do
           ssh ${ingestNode} /bin/zsh ${L3_HOME}/bin/dataingest/stopIngestion.sh
         fi
 
+<<OUT
         # Start latency calc
         echo "*** Latency calculation on Flink ***"
         mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}
@@ -215,11 +219,12 @@ do
         done
         echo "(cancelFlinkJobs)"
         cancelFlinkJobs
+OUT
 
         # Read output
-        #echo "*** Read all outputs ***"
-        #echo "(readOutputFromEarliest ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}.log ${outputTopicName})"
-        #readOutputFromEarliest ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}.log ${outputTopicName}
+        echo "*** Read all outputs ***"
+        echo "(readOutputFromEarliestOnlyRead ${outputTopicName})"
+        readOutputFromEarliestOnlyRead ${outputTopicName}
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"

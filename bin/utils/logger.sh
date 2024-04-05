@@ -11,6 +11,13 @@ function readOutputFromEarliest () {
   java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism}
 }
 
+function readOutputFromEarliestOnlyRead () {
+  outputTopicName=$1
+
+  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliestOnlyRead ${outputTopicName} ${parallelism})"
+  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliestOnlyRead ${outputTopicName} ${parallelism}
+}
+
 function startKafkaLogger () {
   logDir=$1
   logFile=$2

@@ -13,24 +13,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class L3DataReaderFromEarliestOnlyRead {
     public static void main(String[] args) throws Exception {
-        assert args.length == 3;
+        assert args.length == 2;
 
         for (int i = 0; i < args.length; i++)
             System.out.println(args[i]);
         String topicName = args[0];
-        String outputFilePath = args[1];
-        int parallelism = Integer.parseInt(args[2]);
-
-        Path path = Paths.get(outputFilePath);
-        if (Files.notExists(path.getParent())) {
-            Files.createDirectories(path.getParent());
-        }
+        int parallelism = Integer.parseInt(args[1]);
 
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, L3Config.BOOTSTRAP_IP_PORT);
@@ -53,6 +45,7 @@ public class L3DataReaderFromEarliestOnlyRead {
         long prevTime = startTime;
         final long checkInterval = 30000;
 
+        Map<Integer, Long> map = new HashMap<>();
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(checkInterval));
             if (System.currentTimeMillis() - prevTime > checkInterval) {
@@ -69,11 +62,14 @@ public class L3DataReaderFromEarliestOnlyRead {
             for (ConsumerRecord record : records) {
                 String recordValue = (String) record.value();
                 long ts = record.timestamp();
+                int partition = record.partition();
                 if (++count % 100 == 0) {
                     System.out.print("\r" + count + " tuple(s) have been read.");
                 }
+                map.put(partition, map.getOrDefault(partition, 0L) + 1);
             }
         }
         System.out.println("\r" + count + " tuple(s) have been read. [end]");
+        System.out.println("map = " + map);
     }
 }
