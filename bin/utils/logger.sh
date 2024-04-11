@@ -18,6 +18,14 @@ function latencyCalcFromKafka () {
   java -Xmx50G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafka ${outputTopicName} ${parallelism} ${outputFilePath}
 }
 
+function latencyCalcFromKafkaDisk () {
+  outputTopicName=$1
+  outputFileDir=$2
+  key=$3
+  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafkaDisk ${outputTopicName} ${parallelism} ${outputFileDir} ${key})"
+  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafkaDisk ${outputTopicName} ${parallelism} ${outputFileDir} ${key}
+}
+
 function startKafkaLogger () {
   logDir=$1
   logFile=$2
