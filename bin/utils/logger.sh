@@ -11,11 +11,11 @@ function readOutputFromEarliest () {
   java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism}
 }
 
-function readOutputFromEarliestOnlyRead () {
+function latencyCalcFromKafka () {
   outputTopicName=$1
-
-  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliestOnlyRead ${outputTopicName} ${parallelism})"
-  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliestOnlyRead ${outputTopicName} ${parallelism}
+  outputFilePath=$2
+  echo "(java -Xmx50G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafka ${outputTopicName} ${parallelism} ${outputFilePath})"
+  java -Xmx50G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafka ${outputTopicName} ${parallelism} ${outputFilePath}
 }
 
 function startKafkaLogger () {

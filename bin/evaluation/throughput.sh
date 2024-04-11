@@ -222,9 +222,14 @@ do
 OUT
 
         # Read output
-        echo "*** Read all outputs ***"
-        echo "(readOutputFromEarliestOnlyRead ${outputTopicName})"
-        readOutputFromEarliestOnlyRead ${outputTopicName}
+        #echo "*** Read all outputs ***"
+        #echo "(readOutputFromEarliestOnlyRead ${outputTopicName})"
+        #readOutputFromEarliestOnlyRead ${outputTopicName}
+        # latencyCalcFromKafka
+
+        echo "*** latency calc ***"
+        echo "(latencyCalcFromKafka ${outputTopicName} `date -Iseconds`)"
+        latencyCalcFromKafka ${outputTopicName} `date -Iseconds`
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"
