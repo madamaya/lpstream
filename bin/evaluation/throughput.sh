@@ -228,6 +228,8 @@ OUT
         # latencyCalcFromKafka
 
         echo "*** latency calc ***"
+        echo "mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}"
+        mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}
         echo "(latencyCalcFromKafka ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size})"
         latencyCalcFromKafka ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}
 
