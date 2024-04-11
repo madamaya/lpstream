@@ -228,8 +228,8 @@ OUT
         # latencyCalcFromKafka
 
         echo "*** latency calc ***"
-        echo "(latencyCalcFromKafka ${outputTopicName} `date -Iseconds`)"
-        latencyCalcFromKafka ${outputTopicName} `date -Iseconds`
+        echo "(latencyCalcFromKafka ${outputTopicName} ${L3_HOME}/latencyCalcFromKafka_`date -Iseconds`.log)"
+        latencyCalcFromKafka ${outputTopicName} ${L3_HOME}/latencyCalcFromKafka_`date -Iseconds`.log
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"

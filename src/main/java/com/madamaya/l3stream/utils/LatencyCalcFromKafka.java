@@ -46,7 +46,7 @@ public class LatencyCalcFromKafka {
         long prevCount = 0;
         long startTime = System.currentTimeMillis();
         long prevTime = startTime;
-        final long checkInterval = 5000;
+        final long checkInterval = 30000;
 
         Map<Integer, Long> map = new HashMap<>();
         Map<Integer, List<Tuple2<Long, Long>>> latencies = new HashMap<>();
