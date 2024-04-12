@@ -14,16 +14,16 @@ function readOutputFromEarliest () {
 function latencyCalcFromKafka () {
   outputTopicName=$1
   outputFilePath=$2
-  echo "(java -Xmx50G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafka ${outputTopicName} ${parallelism} ${outputFilePath})"
-  java -Xmx50G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafka ${outputTopicName} ${parallelism} ${outputFilePath}
+  echo "(java -Xmx110G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafka ${outputTopicName} ${parallelism} ${outputFilePath})"
+  java -Xmx110G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafka ${outputTopicName} ${parallelism} ${outputFilePath}
 }
 
 function latencyCalcFromKafkaDisk () {
   outputTopicName=$1
   outputFileDir=$2
   key=$3
-  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafkaDisk ${outputTopicName} ${parallelism} ${outputFileDir} ${key})"
-  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafkaDisk ${outputTopicName} ${parallelism} ${outputFileDir} ${key}
+  echo "(java -Xmx110G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafkaDisk ${outputTopicName} ${parallelism} ${outputFileDir} ${key})"
+  java -cp -Xmx110G ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafkaDisk ${outputTopicName} ${parallelism} ${outputFileDir} ${key}
 }
 
 function startKafkaLogger () {
