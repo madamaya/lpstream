@@ -50,9 +50,7 @@ public class LatencyCalcFromKafkaDisk {
             PriorityQueue<Tuple3<Integer, Long, Long>> pq = new PriorityQueue<>(new Comparator<Tuple3<Integer, Long, Long>>() {
                 @Override
                 public int compare(Tuple3<Integer, Long, Long> o1, Tuple3<Integer, Long, Long> o2) {
-                    if (o1.f1 > o2.f1) return 1;
-                    else if (o1.f1 == o2.f1) return 0;
-                    else return -1;
+                    return o1.f1.compareTo(o2.f1);
                 }
             });
             List<BufferedReader> brList = new ArrayList<>();
@@ -129,9 +127,7 @@ public class LatencyCalcFromKafkaDisk {
             latencyListForDebug.sort(new Comparator<Tuple2<Long, Long>>() {
                 @Override
                 public int compare(Tuple2<Long, Long> o1, Tuple2<Long, Long> o2) {
-                    if (o1.f1 > o2.f1) return 1;
-                    else if (o1.f1 == o2.f1) return 0;
-                    else return -1;
+                    return o1.f1.compareTo(o2.f1);
                 }
             });
             double medianAllLatencyDebug = -1;
@@ -169,9 +165,7 @@ public class LatencyCalcFromKafkaDisk {
         latencyValueList.sort(new Comparator<Long>() {
             @Override
             public int compare(Long o1, Long o2) {
-                if (o1 > o2) return 1;
-                else if (o1 == o2) return 0;
-                else return -1;
+                return o1.compareTo(o2);
             }
         });
 
