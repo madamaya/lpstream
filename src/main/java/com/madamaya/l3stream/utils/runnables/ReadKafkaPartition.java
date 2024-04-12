@@ -61,7 +61,7 @@ public class ReadKafkaPartition implements Runnable {
                     String recordValue = (String) record.value();
                     long ts = record.timestamp();
                     int partition = record.partition();
-                    long latency = Long.parseLong(recordValue.split(",")[1]);
+                    long latency = Long.parseLong(recordValue.split(",")[0]);
                     if (readPartition != partition) {
                         throw new IllegalStateException();
                     }
