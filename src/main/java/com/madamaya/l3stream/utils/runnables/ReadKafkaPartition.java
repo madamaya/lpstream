@@ -65,7 +65,7 @@ public class ReadKafkaPartition implements Runnable {
                     if (readPartition != partition) {
                         throw new IllegalStateException();
                     }
-                    bw.write(ts + "," + latency + "\n");
+                    bw.write(partition + "," + ts + "," + latency + "\n");
 
                     if (++count % 100000 == 0) {
                         System.out.print("\r" + count + " tuple(s) have been read.");

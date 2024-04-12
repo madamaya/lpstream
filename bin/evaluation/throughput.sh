@@ -230,8 +230,8 @@ OUT
         echo "*** latency calc ***"
         echo "mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}"
         mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}
-        echo "(latencyCalcFromKafka ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size})"
-        latencyCalcFromKafka ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}
+        echo "(latencyCalcFromKafkaDisk ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size})"
+        latencyCalcFromKafkaDisk ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"
