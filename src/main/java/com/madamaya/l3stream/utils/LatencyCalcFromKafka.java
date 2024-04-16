@@ -64,7 +64,7 @@ public class LatencyCalcFromKafka {
                 String recordValue = (String) record.value();
                 long ts = record.timestamp();
                 int partition = record.partition();
-                long latency = Long.parseLong(recordValue.split(",")[1]);
+                long latency = Long.parseLong(recordValue.split(",")[0]);
 
                 map.put(partition, map.getOrDefault(partition, 0L) + 1);
                 if (!latencies.containsKey(partition)) {
