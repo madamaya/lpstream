@@ -125,7 +125,16 @@ public class LatencyCalcFromKafkaDisk {
                     brList.get(partition).close();
                 }
             }
-            // Calc latency DEBUG
+            // Calc median latency for all data
+            double medianAllLatency = mpq.getMedian();
+            long endTime = System.currentTimeMillis();
+
+            /* Get mean & std */
+            Tuple2<Double, Double> tuple = calcMeanStd(latencyListForDebug, t -> t.f1, 0.3);
+            double mean = tuple.f0;
+            double std = tuple.f1;
+
+            // Calc median latency (DEBUG)
             latencyListForDebug.sort(new Comparator<Tuple2<Long, Long>>() {
                 @Override
                 public int compare(Tuple2<Long, Long> o1, Tuple2<Long, Long> o2) {
@@ -139,15 +148,6 @@ public class LatencyCalcFromKafkaDisk {
                 medianAllLatencyDebug = latencyListForDebug.get(latencyListForDebug.size()/2).f1;
             }
             resultWriter.write("DEBUG," + medianAllLatencyDebug + "\n");
-
-            // Calc median latency for all data
-            double medianAllLatency = mpq.getMedian();
-            long endTime = System.currentTimeMillis();
-
-            /* Get mean & std */
-            Tuple2<Double, Double> tuple = calcMeanStd(latencyListForDebug, t -> t.f1);
-            double mean = tuple.f0;
-            double std = tuple.f1;
 
             // Log
             resultWriter.write("ALL," + medianAllLatency + "," + mean + "," + std + "\n");
@@ -196,11 +196,17 @@ public class LatencyCalcFromKafkaDisk {
     }
 
     public static <T> Tuple2<Double, Double> calcMeanStd(Collection<T> collection, Function<T, Long> func) {
+        return calcMeanStd(collection, func, 0);
+    }
+
+    public static <T> Tuple2<Double, Double> calcMeanStd(Collection<T> collection, Function<T, Long> func, double filterRate) {
         long count = 0;
         long sum = 0;
 
         /* Calc mean */
+        int idx = 0;
         for (T tuple : collection) {
+            if (++idx < collection.size() * filterRate) continue;
             long val = func.apply(tuple);
             sum += val;
             count += 1;
@@ -209,7 +215,9 @@ public class LatencyCalcFromKafkaDisk {
 
         /* Calc std */
         double stdSum = 0;
+        idx = 0;
         for (T tuple : collection) {
+            if (++idx < collection.size() * filterRate) continue;
             long val = func.apply(tuple);
             stdSum += (val - mean) * (val - mean);
         }
