@@ -185,6 +185,6 @@ public class LatencyCalcFromKafkaDisk {
         /* Std */
         double std = oneSecMPQ.getStd(mean);
 
-        return Tuple3.of(mean, median, std);
+        return Tuple3.of(median, mean, std);
     }
 }
