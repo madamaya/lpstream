@@ -12,12 +12,12 @@ source ../utils/notifyEnd.sh
 source ./thUtils/thUtils.sh
 
 granularityTemp=100
-#queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
-queries=(Syn1)
-#approaches=(baseline genealog l3stream l3streamlin)
-approaches=(baseline)
-#sizes=(-1 10 100 400)
-sizes=(10)
+queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
+#queries=(Syn1)
+approaches=(baseline genealog l3stream l3streamlin)
+#approaches=(baseline)
+sizes=(-1 10 100 400)
+#sizes=(10)
 sleepTime=600
 #inputRates=(5000)
 homedir=`pwd`
