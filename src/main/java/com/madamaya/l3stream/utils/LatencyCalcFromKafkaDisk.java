@@ -6,19 +6,14 @@ import org.apache.flink.api.java.tuple.Tuple3;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.Function;
 
 public class LatencyCalcFromKafkaDisk {
     public static void main(String[] args) throws Exception {
         assert args.length == 3 || args.length == 4;
         String topicName = args[0];
-        //String topicName = "test";
         int parallelism = Integer.parseInt(args[1]);
-        //int parallelism = 10;
         String outputFileDir = args[2];
-        //String outputFileDir = ""
         String key = (args.length == 4) ? args[3] : "";
-        //String key = "HO";
 
         System.out.println("==== ARGS ====");
         System.out.println("\ttopicName = " + topicName);
@@ -69,13 +64,13 @@ public class LatencyCalcFromKafkaDisk {
             }
 
             // Read all data and calculate latency (1sec median, avg, std)
-            // ''Assume that all latency values can be on memory.''
-            // ''If not so, another implementation is needed.''
             long currentWindowTime = pq.peek().f1 / 1000;
             List<Tuple2<Long, Long>> latencyListForOneSec = new ArrayList<>(); // Store timestamp ordered data
-            List<Tuple2<Long, Long>> latencyListForDebug = new ArrayList<>();
-            MedianCalcWithPQForTuple2 mpq = new MedianCalcWithPQForTuple2();
+            MedianCalcWithPQ<Tuple2<Long, Long>> mpq = new MedianCalcWithPQ<>();
             BufferedWriter resultWriter = new BufferedWriter(new FileWriter(outputFileDir + "/" + key + ".csv"));
+            long sum = 0;
+            long count = 0;
+            List<Long> sumList = new ArrayList<>();
             while (true) {
                 if (pq.isEmpty()) {
                     // Calc 1sec latency (Median)
@@ -83,12 +78,11 @@ public class LatencyCalcFromKafkaDisk {
                     // Write the result to file
                     resultWriter.write(currentWindowTime + "," + calcResult.f0 + "," + calcResult.f1 + "," + calcResult.f2 + "," + latencyListForOneSec.size() + "\n");
                     // Send all data in 'latencyListForOneSec' to 'latencyListForAll'
-                    mpq.appendAll(latencyListForOneSec);
-
-                    latencyListForDebug.addAll(latencyListForOneSec);
-
+                    mpq.appendAll(latencyListForOneSec, t -> t.f1);
                     // Delete all data in 'latencyListForOneSec'
                     latencyListForOneSec.clear();
+
+                    sumList.add(sum);
                     break;
                 }
 
@@ -96,6 +90,14 @@ public class LatencyCalcFromKafkaDisk {
                 int partition = tuple.f0;
                 long ts = tuple.f1;
                 long latency = tuple.f2;
+
+                // For whole mean calculation
+                if (Long.MAX_VALUE - latency <= sum) {
+                    sumList.add(sum);
+                    sum = 0;
+                }
+                sum += latency;
+                count += 1;
 
                 /* if latency calc should be fired */
                 if (ts / 1000 != currentWindowTime) {
@@ -106,16 +108,14 @@ public class LatencyCalcFromKafkaDisk {
                     // Update currentWindowTime
                     currentWindowTime = ts / 1000;
                     // Send all data in 'latencyListForOneSec' to 'latencyListForAll'
-                    mpq.appendAll(latencyListForOneSec);
-
-                    latencyListForDebug.addAll(latencyListForOneSec);
-
+                    mpq.appendAll(latencyListForOneSec, t -> t.f1);
                     // Delete all data in 'latencyListForOneSec'
                     latencyListForOneSec.clear();
                 }
 
-                // add latest data to 'latencyListForOneSec' and read a new data from the partition
+                // Add latest data to 'latencyListForOneSec'
                 latencyListForOneSec.add(Tuple2.of(ts, latency));
+                // Read a new data from the partition
                 String line = brList.get(partition).readLine();
                 if (line != null) {
                     String[] elements = line.split(",");
@@ -125,32 +125,26 @@ public class LatencyCalcFromKafkaDisk {
                     brList.get(partition).close();
                 }
             }
-            // Calc median latency for all data
+            // Calc mean
+            double mean;
+            if (sumList.size() == 1) {
+                mean = sumList.get(0) / (double) count;
+            } else {
+                double whole_sum = 0;
+                for (long tmpsum : sumList) {
+                    whole_sum += tmpsum;
+                }
+                mean = whole_sum / count;
+            }
+
+            // Calc median latency and std for all data
             double medianAllLatency = mpq.getMedian();
+            double std = mpq.getStd(mean);
+
             long endTime = System.currentTimeMillis();
 
-            /* Get mean & std */
-            Tuple2<Double, Double> tuple = calcMeanStd(latencyListForDebug, t -> t.f1, 0.3);
-            double mean = tuple.f0;
-            double std = tuple.f1;
-
-            // Calc median latency (DEBUG)
-            latencyListForDebug.sort(new Comparator<Tuple2<Long, Long>>() {
-                @Override
-                public int compare(Tuple2<Long, Long> o1, Tuple2<Long, Long> o2) {
-                    return o1.f1.compareTo(o2.f1);
-                }
-            });
-            double medianAllLatencyDebug = -1;
-            if (latencyListForDebug.size()%2 == 0) {
-                medianAllLatencyDebug = (latencyListForDebug.get(latencyListForDebug.size()/2-1).f1 + latencyListForDebug.get(latencyListForDebug.size()/2).f1) / 2.0;
-            } else {
-                medianAllLatencyDebug = latencyListForDebug.get(latencyListForDebug.size()/2).f1;
-            }
-            resultWriter.write("DEBUG," + medianAllLatencyDebug + "\n");
-
             // Log
-            resultWriter.write("ALL," + medianAllLatency + "," + mean + "," + std + "\n");
+            resultWriter.write("ALL," + medianAllLatency + "," + String.format("%.15f", mean) + "," + String.format("%.15f", std) + "\n");
             resultWriter.close();
 
             System.out.println("Time duration (READ): " + (endTime-writeEndTime) + "[ms]");
@@ -161,69 +155,36 @@ public class LatencyCalcFromKafkaDisk {
             logWriter.close();
         } catch (IOException e) {
             System.err.println(e);
+        } catch (OutOfMemoryError e) {
+            System.err.println(e);
         }
     }
 
     public static Tuple3<Double, Double, Double> calcMedianMeanStd(List<Tuple2<Long, Long>> latencyListForOneSec) {
-        long count = 0;
         long sum = 0;
-        List<Long> latencyValueList = new ArrayList<>();
+        long count = 0;
+        MedianCalcWithPQ<Tuple2<Long, Long>> oneSecMPQ = new MedianCalcWithPQ<>();
         for (int i = 0; i < latencyListForOneSec.size(); i++) {
-            long val = latencyListForOneSec.get(i).f1;
-            latencyValueList.add(val);
-            sum += val;
-            count += 1;
-        }
-        latencyValueList.sort(new Comparator<Long>() {
-            @Override
-            public int compare(Long o1, Long o2) {
-                return o1.compareTo(o2);
+            long latency = latencyListForOneSec.get(i).f1;
+            oneSecMPQ.append(latency);
+
+            if (Long.MAX_VALUE - latency > sum) {
+                sum += latency;
+            } else {
+                throw new ArithmeticException();
             }
-        });
-
-        /* Median calc */
-        double median;
-        int listSize = latencyValueList.size();
-        if (listSize/2 == 0) {
-            median = (latencyValueList.get(listSize/2-1) + latencyValueList.get(listSize/2)) / 2.0;
-        } else {
-            median = (double) latencyValueList.get(listSize/2);
-        }
-
-        /* Get mean & std */
-        Tuple2<Double, Double> tuple = calcMeanStd(latencyValueList, t -> t);
-        return Tuple3.of(median, tuple.f0, tuple.f1);
-    }
-
-    public static <T> Tuple2<Double, Double> calcMeanStd(Collection<T> collection, Function<T, Long> func) {
-        return calcMeanStd(collection, func, 0);
-    }
-
-    public static <T> Tuple2<Double, Double> calcMeanStd(Collection<T> collection, Function<T, Long> func, double filterRate) {
-        long count = 0;
-        long sum = 0;
-
-        /* Calc mean */
-        int idx = 0;
-        for (T tuple : collection) {
-            if (++idx < collection.size() * filterRate) continue;
-            long val = func.apply(tuple);
-            sum += val;
             count += 1;
         }
+
+        /* Mean */
         double mean = sum / (double) count;
 
-        /* Calc std */
-        double stdSum = 0;
-        idx = 0;
-        for (T tuple : collection) {
-            if (++idx < collection.size() * filterRate) continue;
-            long val = func.apply(tuple);
-            stdSum += (val - mean) * (val - mean);
-        }
-        double var = stdSum / count;
-        double std = Math.sqrt(var);
+        /* Median */
+        double median = oneSecMPQ.getMedian();
 
-        return Tuple2.of(mean, std);
+        /* Std */
+        double std = oneSecMPQ.getStd(mean);
+
+        return Tuple3.of(mean, median, std);
     }
 }

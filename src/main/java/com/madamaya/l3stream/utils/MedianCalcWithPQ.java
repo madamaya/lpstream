@@ -1,30 +1,32 @@
 package com.madamaya.l3stream.utils;
 
-import org.apache.flink.api.java.tuple.Tuple2;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import java.util.function.Function;
 
-public class MedianCalcWithPQForTuple2 {
+public class MedianCalcWithPQ<T> {
     private PriorityQueue<Long> leftHeap;
     private PriorityQueue<Long> rightHeap;
     private long dataNum;
 
-    public MedianCalcWithPQForTuple2() {
+    public MedianCalcWithPQ() {
         this.leftHeap = new PriorityQueue<>(Comparator.reverseOrder());
         this.rightHeap = new PriorityQueue<>(Comparator.naturalOrder());
         this.dataNum = 0;
     }
 
-    public void appendAll(Collection<Tuple2<Long, Long>> tuples) {
-        for (Tuple2<Long, Long> tuple : tuples) {
-            this.append(tuple);
+    public void appendAll(Collection<T> tuples, Function<T, Long> f) {
+        for (T tuple : tuples) {
+            this.append(f.apply(tuple));
         }
     }
 
-    public void append(Tuple2<Long, Long> tuple) {
-        long val = tuple.f1;
+    public void append(T val, Function<T, Long> f) {
+        this.append(f.apply(val));
+    }
+
+    public void append(long val) {
         /* Corner case (dataNum == 0) */
         if (dataNum == 0) {
             this.leftHeap.add(val);
@@ -92,13 +94,8 @@ public class MedianCalcWithPQForTuple2 {
     }
 
     public double getMedian() {
-        /* Error cases */
-        if (dataNum == 0) {
-            throw new IllegalStateException("dataNum == 0");
-        }
-        if (Math.abs(leftHeap.size() - rightHeap.size()) >= 2) {
-            throw new IllegalStateException("abs(leftHeap.size - rightHeap.size) >= 2");
-        }
+        /* Error check */
+        validation();
 
         /* Return result */
         if (dataNum % 2 == 0) {
@@ -109,6 +106,46 @@ public class MedianCalcWithPQForTuple2 {
             } else {
                 return rightHeap.peek();
             }
+        }
+    }
+
+    public double getStd(double mean) {
+        /* Error check */
+        validation();
+
+        /* Return result */
+        double sum = 0;
+        long count = 0;
+        while (true) {
+            Long latency = rightHeap.poll();
+            if (latency == null) break;
+            dataNum -= 1;
+
+            sum += (mean - latency) * (mean - latency);
+            count += 1;
+        }
+
+        while (true) {
+            Long latency = leftHeap.poll();
+            if (latency == null) break;
+            dataNum -= 1;
+
+            sum += (mean - latency) * (mean - latency);
+            count += 1;
+        }
+
+        double var = sum / count;
+        double std = Math.sqrt(var);
+        return std;
+    }
+
+    public void validation() {
+        /* Error cases */
+        if (dataNum == 0) {
+            throw new IllegalStateException("dataNum == 0");
+        }
+        if (Math.abs(leftHeap.size() - rightHeap.size()) >= 2) {
+            throw new IllegalStateException("abs(leftHeap.size - rightHeap.size) >= 2");
         }
     }
 
