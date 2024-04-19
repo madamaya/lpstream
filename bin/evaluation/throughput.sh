@@ -185,13 +185,6 @@ do
         echo "(cancelFlinkJobs)"
         cancelFlinkJobs
 
-        #if [ ${approach} = "l3stream" ]; then
-          # Stop CpMServer
-          #echo "*** Stop CpMServer ***"
-          #echo "(stopCpMServer)"
-          #stopCpMServer
-        #fi
-
         # Stop data ingestion
         ## localhost
         echo "Stop data ingestion"
@@ -202,36 +195,15 @@ do
           ssh ${ingestNode} /bin/zsh ${L3_HOME}/bin/dataingest/stopIngestion.sh
         fi
 
-<<OUT
-        # Start latency calc
-        echo "*** Latency calculation on Flink ***"
-        mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}
-        ## Start flink program
-        echo "(./latencyCalc.sh ${JAR_PATH} ${parallelism} ${query} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}.log)"
-        ./latencyCalc.sh ${JAR_PATH} ${parallelism} ${query} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}.log
-        echo "(sleep 30)"
-        sleep 30
-        ## notify program end
-        for idx in `seq 0 $((parallelism-1))`
-        do
-          echo "(notifyEnd ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}_${idx}.log)"
-          notifyEnd ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}/${loop}_${size}_${idx}.log
-        done
-        echo "(cancelFlinkJobs)"
-        cancelFlinkJobs
-OUT
-
-        # Read output
-        #echo "*** Read all outputs ***"
-        #echo "(readOutputFromEarliestOnlyRead ${outputTopicName})"
-        #readOutputFromEarliestOnlyRead ${outputTopicName}
-        # latencyCalcFromKafka
-
+        # Latency calculation
+        cd ${L3_HOME}/data/output
         echo "*** latency calc ***"
         echo "mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}"
         mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}
-        echo "(latencyCalcFromKafkaDisk ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size})"
-        latencyCalcFromKafkaDisk ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}
+        echo "(readOutputLatest ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size})"
+        readOutputLatest ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}
+        echo "(python calcLatency.py ${parallelism} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size})"
+        python calcLatency.py ${parallelism} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"
@@ -256,8 +228,6 @@ OUT
 
   cd ${L3_HOME}/data/output/cpu-memory
   python cpu-memory.py "${queries}" "${approaches}" "${sizes}"
-  #cd ${L3_HOME}/data/output/latency/metrics1
-  #python metrics1.py latency True True True "${queries}" "${approaches}" "${sizes}"
   cd ${L3_HOME}/data/output/throughput/metrics1
   python metrics1.py "${queries}" "${approaches}" "${sizes}"
 

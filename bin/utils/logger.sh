@@ -3,12 +3,21 @@
 source $(dirname $0)/../config.sh
 
 function readOutputFromEarliest () {
+  exit 1
   logDir=$1
   logFile=$2
   outputTopicName=$3
 
   echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism})"
   java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism}
+}
+
+function readOutputLatest () {
+  outputTopicName=$1
+  outputFileDir=$2
+  key=$3
+  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeLoaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${key})"
+  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeLoaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${key}
 }
 
 function latencyCalcFromKafka () {
