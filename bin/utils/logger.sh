@@ -12,12 +12,12 @@ function readOutputFromEarliest () {
   java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism}
 }
 
-function readOutputLatest () {
+function readOutput () {
   outputTopicName=$1
   outputFileDir=$2
   key=$3
-  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeLoaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${key})"
-  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeLoaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${key}
+  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeReaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${key})"
+  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeReaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${key}
 }
 
 function latencyCalcFromKafka () {

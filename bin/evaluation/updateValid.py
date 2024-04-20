@@ -50,6 +50,8 @@ def calcLatency(filename, filterRate = 0.1):
     return latency, np_latency_all
 
 def getLatencyValues(queries, approaches, dataSizes, dataPath):
+    pass
+    """
     return_latency_map = {}
     return_latency_all_map = {}
     for dataSize in dataSizes:
@@ -66,8 +68,8 @@ def getLatencyValues(queries, approaches, dataSizes, dataPath):
             return_latency_all_map[dataSize][query] = {}
             for approach in approaches:
                 # obtain file name
-                print(dataPath + "/latency/metrics1/{}/{}/1_{}.log".format(query, approach, dataSize))
-                file_cand = glob.glob(dataPath + "/latency/metrics1/{}/{}/1_{}.log".format(query, approach, dataSize))
+                print(dataPath + "/latency/{}/{}/1_{}.log".format(query, approach, dataSize))
+                file_cand = glob.glob(dataPath + "/latency/{}/{}/1_{}.log".format(query, approach, dataSize))
                 assert len(file_cand) <= 1, print(file_cand)
 
                 if len(file_cand) == 1:
@@ -81,6 +83,7 @@ def getLatencyValues(queries, approaches, dataSizes, dataPath):
                     pass
 
     return return_latency_map, return_latency_all_map
+    """
 
 def getCpuMemValues(queries, approaches, dataSizes, dataPath):
     return_cpu_map = {}
@@ -139,8 +142,8 @@ def getThroughputValues(queries, approaches, dataSizes, dataPath):
         return_map[dataSize] = {}
 
         # obtain file name
-        print(dataPath + "/throughput/metrics1/results/throughput.metrics1.result.*.{}.txt".format(dataSize))
-        file_cand = glob.glob(dataPath + "/throughput/metrics1/results/throughput.metrics1.result.*.{}.txt".format(dataSize))
+        print(dataPath + "/throughput/results/throughput.result.*.{}.txt".format(dataSize))
+        file_cand = glob.glob(dataPath + "/throughput/results/throughput.result.*.{}.txt".format(dataSize))
         if len(file_cand) != 1:
             raise Exception
         filename = file_cand[0]

@@ -1,22 +1,19 @@
 package com.madamaya.l3stream.utils;
 
 import com.madamaya.l3stream.utils.runnables.ReadKafkaPartition;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
 
-public class L3RealtimeLoaderV2 {
+public class L3RealtimeReaderV2 {
     public static void main(String[] args) throws Exception {
-        assert args.length == 3 || args.length == 4;
+        assert args.length == 5;
         String topicName = args[0];
         int parallelism = Integer.parseInt(args[1]);
         String outputFileDir = args[2];
-        String key = (args.length == 4) ? args[3] : "";
+        String key = args[3];
+        boolean withLineage = Boolean.parseBoolean(args[4]);
 
         System.out.println("==== ARGS ====");
         System.out.println("\ttopicName = " + topicName);
@@ -31,7 +28,7 @@ public class L3RealtimeLoaderV2 {
             List<Thread> threadList = new ArrayList<>();
             for (int idx = 0; idx < parallelism; idx++) {
                 System.out.println("ADD: " + idx);
-                threadList.add(new Thread(new ReadKafkaPartition(topicName, idx, outputFileDir, key)));
+                threadList.add(new Thread(new ReadKafkaPartition(topicName, idx, outputFileDir, key, withLineage)));
             }
             for (int idx = 0; idx < parallelism; idx++) {
                 System.out.println("START: " + idx);

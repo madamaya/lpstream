@@ -8,7 +8,6 @@ source ../utils/redisUtils.sh
 source ../utils/cleanCache.sh
 source ../utils/logger.sh
 source ../utils/cpuMemoryLoadLogger.sh
-source ../utils/notifyEnd.sh
 source ./thUtils/thUtils.sh
 
 granularityTemp=100
@@ -26,10 +25,7 @@ loop=1
 rm finishedComb.csv ./thLog/parameters.log
 touch finishedComb.csv ./thLog/parameters.log
 
-#for inputRate in ${inputRates[@]}
-#do
-#  inputRateIdx=${inputRate}
-for inputRateIdx in `seq 0 0`
+for inputRateIdx in `seq 0 5`
 do
   for size in ${sizes[@]}
   do
@@ -127,26 +123,26 @@ do
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
           # Run
           echo "*** Run ***"
-          echo "(./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${size})"
-          ./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${size}
+          echo "(./original.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size})"
+          ./original.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size}
         elif [ ${approach} = "genealog" ]; then
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.GL${query}"
           # Run
           echo "*** Run ***"
-          echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${aggregateStrategy} ${size})"
-          ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${aggregateStrategy} ${size}
+          echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${aggregateStrategy} ${size})"
+          ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${aggregateStrategy} ${size}
         elif [ ${approach} = "l3stream" ]; then
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
           # Run
           echo "*** Run ***"
-          echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${size})"
-          ./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${size}
+          echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size})"
+          ./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size}
         elif [ ${approach} = "l3streamlin" ]; then
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
           # Run
           echo "*** Run ***"
-          echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size})"
-          ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size}
+          echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size})"
+          ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size}
         fi
 
         # Start data ingestion
@@ -198,12 +194,12 @@ do
         # Latency calculation
         cd ${L3_HOME}/data/output
         echo "*** latency calc ***"
-        echo "mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}"
-        mkdir -p ${L3_HOME}/data/output/latency/metrics1/${query}/${approach}
-        echo "(readOutputLatest ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size})"
-        readOutputLatest ${outputTopicName} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}
-        echo "(python calcLatency.py ${parallelism} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size})"
-        python calcLatency.py ${parallelism} ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}
+        echo "mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}"
+        mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
+        echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size})"
+        readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size}
+        echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} throughput)"
+        python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} throughput
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"
@@ -228,7 +224,9 @@ do
 
   cd ${L3_HOME}/data/output/cpu-memory
   python cpu-memory.py "${queries}" "${approaches}" "${sizes}"
-  cd ${L3_HOME}/data/output/throughput/metrics1
+  cd ${L3_HOME}/data/output/latency
+  python resultsGen.py "${queries}" "${approaches}" "${sizes}"
+  cd ${L3_HOME}/data/output/throughput
   python metrics1.py "${queries}" "${approaches}" "${sizes}"
 
   cd ${homedir}

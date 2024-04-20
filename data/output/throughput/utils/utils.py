@@ -93,7 +93,7 @@ def calcResults(queries, approaches, startTime, size):
 
     return results
 
-def resultFigsGen(results, queries, approaches, flag, size):
+def resultFigsGen(results, queries, approaches, size):
     for query in queries:
         resultsList = [results[query][approach][0] for approach in approaches]
         colorList = []
@@ -108,13 +108,13 @@ def resultFigsGen(results, queries, approaches, flag, size):
                 colorList.append("m")
 
         plt.bar(range(len(resultsList)), resultsList, tick_label=approaches, color=colorList)
-        plt.title("*{}* result (Throughput, {}, {})".format(query, flag, size))
+        plt.title("*{}* result (Throughput, {})".format(query, size))
         plt.ylabel("Throughput [tuples/s]")
         plt.savefig("./results/{}.{}.pdf".format(query, size))
         plt.close()
 
-def writeResults(results, queries, approaches, startTime, flag, size):
-    with open("./results/throughput.{}.result.{}.{}.txt".format(flag, startTime, size), "w") as w:
+def writeResults(results, queries, approaches, startTime, size):
+    with open("./results/throughput.result.{}.{}.txt".format(startTime, size), "w") as w:
         # Write mean
         w.write("MEAN,{}\n".format(",".join(approaches)))
         for query in queries:

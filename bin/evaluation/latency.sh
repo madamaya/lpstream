@@ -10,16 +10,15 @@ source ../utils/logger.sh
 source ../utils/cpuMemoryLoadLogger.sh
 
 numOfLoop=1
-throughput=${1}
+original_throughput=${1}
 granularityTemp=100
-#queries=(LR2 Nexmark NYC Nexmark2 YSB)
-#queries=(LR2 NYC Nexmark2 YSB)
 queries=(Syn1 Syn2 Syn3 LR NYC Nexmark YSB NYC2 Nexmark2 YSB2)
-#queries=(Nexmark NYC Nexmark2 YSB)
+#queries=(Syn1)
 approaches=(baseline genealog l3stream l3streamlin)
-sizes=(-1 10 100 400)
 #approaches=(baseline)
-sleepTime=900
+sizes=(-1 10 100 400)
+#sizes=(10)
+sleepTime=600
 
 cd ../templates
 
@@ -40,6 +39,13 @@ do
             continue
           fi
         fi
+
+        # In some cases, input rate make smaller than given one to keep flink stable.
+        # This lines can be defined after throughput evaluation.
+        #if [[ ~~~ ]]; then
+        #  throughput=~~~
+        #else
+        throughput=${original_throughput}
 
         # Stop cluster (Flink, Kafka, Redis)
         echo "(stopBroker)"
@@ -85,17 +91,6 @@ do
         echo "(sleep 10)"
         sleep 10
 
-        if [ ${query} = "Nexmark" ]; then
-          #sleepTime=600
-          sleepTime=900
-        elif [ ${query} = "Nexmark2" ]; then
-          #sleepTime=600
-          sleepTime=900
-        else
-          #sleepTime=180
-          sleepTime=900
-        fi
-
         echo "*** Start evaluation (query = ${query}, approach = ${approach}, loop = ${loop}) ***"
 
         # restartTMifNeeded
@@ -114,26 +109,26 @@ do
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
           # Run
           echo "*** Run ***"
-          echo "(./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${size})"
-          ./original.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${size}
+          echo "(./original.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size})"
+          ./original.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size}
         elif [ ${approach} = "genealog" ]; then
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.GL${query}"
           # Run
           echo "*** Run ***"
-          echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${aggregateStrategy} ${size})"
-          ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${aggregateStrategy} ${size}
+          echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${aggregateStrategy} ${size})"
+          ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${aggregateStrategy} ${size}
         elif [ ${approach} = "l3stream" ]; then
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
           # Run
           echo "*** Run ***"
-          echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${size})"
-          ./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${size}
+          echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size})"
+          ./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size}
         elif [ ${approach} = "l3streamlin" ]; then
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
           # Run
           echo "*** Run ***"
-          echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size})"
-          ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} metrics1/${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size}
+          echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size})"
+          ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size}
         fi
 
         # Start data ingestion
@@ -172,13 +167,6 @@ do
         echo "(cancelFlinkJobs)"
         cancelFlinkJobs
 
-        #if [ ${approach} = "l3stream" ]; then
-          # Stop CpMServer
-          #echo "*** Stop CpMServer ***"
-          #echo "(stopCpMServer)"
-          #stopCpMServer
-        #fi
-
         # Stop data ingestion
         ## localhost
         echo "Stop data ingestion"
@@ -189,10 +177,15 @@ do
           ssh ${ingestNode} /bin/zsh ${L3_HOME}/bin/dataingest/stopIngestion.sh
         fi
 
-        # Read output
-        echo "*** Read all outputs ***"
-        echo "(readOutputFromEarliest ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}.log ${outputTopicName})"
-        readOutputFromEarliest ${L3_HOME}/data/output/latency/metrics1/${query}/${approach} ${loop}_${size}.log ${outputTopicName}
+        # Latency calculation
+        cd ${L3_HOME}/data/output
+        echo "*** latency calc ***"
+        echo "mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}"
+        mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
+        echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size})"
+        readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size}
+        echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} latency)"
+        python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} latency
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"
@@ -218,8 +211,8 @@ done
 
 cd ${L3_HOME}/data/output/cpu-memory
 python cpu-memory.py "${queries}" "${approaches}" "${sizes}"
-cd ${L3_HOME}/data/output/latency/metrics1
-python metrics1.py latency True True True "${queries}" "${approaches}" "${sizes}"
+cd ${L3_HOME}/data/output/latency
+python resultsGen.py "${queries}" "${approaches}" "${sizes}"
 cd ${L3_HOME}/data/output/throughput/metrics1
 python metrics1.py "${queries}" "${approaches}" "${sizes}"
 

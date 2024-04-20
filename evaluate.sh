@@ -9,17 +9,14 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
-if [ $1 = "m1" ]; then
+if [ $1 = "latency" ]; then
   cd ./bin/evaluation
-  thList=(10000)
-  for th in ${thList[@]}
-  do
-    ./metrics1.sh ${th} ${size}
-  done
+  throughput=50000
+  ./latency.sh ${throughput} | tee latency.log
   restartFlinkCluster
-elif [ $1 = "m2" ]; then
+elif [ $1 = "throughput" ]; then
   cd ./bin/evaluation
-  ./metrics2.sh
+  ./throughput.sh | tee throughput.log
   restartFlinkCluster
 elif [ $1 = "m34" ]; then
   cd ./bin
@@ -43,14 +40,6 @@ elif [ $1 = "m34" ]; then
 
   #cd ${L3_HOME}/data/output/metrics34
   #python metrics34.py 2
-  #${FLINK_HOME}/bin/stop-cluster.sh
-  #sleep 10
-  #${FLINK_HOME}/bin/start-cluster.sh
-  #sleep 10
-elif [ $1 = "debug" ]; then
-  cd ./bin/evaluation
-
-  echo "*** DEBUG ***"
   #${FLINK_HOME}/bin/stop-cluster.sh
   #sleep 10
   #${FLINK_HOME}/bin/start-cluster.sh

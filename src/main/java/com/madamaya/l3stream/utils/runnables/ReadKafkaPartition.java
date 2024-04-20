@@ -18,12 +18,14 @@ public class ReadKafkaPartition implements Runnable {
     private int readPartition;
     private String outputFileDir;
     private String key;
+    private boolean withLineage;
 
-    public ReadKafkaPartition(String topicName, int readPartition, String outputFileDir, String key) {
+    public ReadKafkaPartition(String topicName, int readPartition, String outputFileDir, String key, boolean withLineage) {
         this.topicName = topicName;
         this.readPartition = readPartition;
         this.outputFileDir = outputFileDir;
         this.key = key;
+        this.withLineage = withLineage;
     }
 
     @Override
@@ -61,11 +63,22 @@ public class ReadKafkaPartition implements Runnable {
                     String recordValue = (String) record.value();
                     long ts = record.timestamp();
                     int partition = record.partition();
-                    long latency = Long.parseLong(recordValue.split(",")[0]);
                     if (readPartition != partition) {
                         throw new IllegalStateException();
                     }
-                    bw.write(partition + "," + ts + "," + latency + "\n");
+                    String[] elements = recordValue.split(",");
+                    if (withLineage) {
+                        long s2sLatency = Long.parseLong(elements[0]);
+                        long k2kLatency = ts - Long.parseLong(elements[1]);
+                        long domLatency = Long.parseLong(elements[2]);
+                        long traverseTime = Long.parseLong(elements[3]);
+                        bw.write(partition + "," + ts + "," + s2sLatency + "," + k2kLatency + "," + domLatency + "," + traverseTime + "\n");
+                    } else {
+                        long s2sLatency = Long.parseLong(elements[0]);
+                        long k2kLatency = ts - Long.parseLong(elements[1]);
+                        long domLatency = Long.parseLong(elements[2]);
+                        bw.write(partition + "," + ts + "," + s2sLatency + "," + k2kLatency + "," + domLatency + "\n");
+                    }
 
                     if (++count % 100000 == 0) {
                         System.out.print("\r" + count + " tuple(s) have been read.");
