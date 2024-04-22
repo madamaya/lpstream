@@ -20,6 +20,7 @@ public class L3RealtimeReaderV2 {
         System.out.println("\tparallelism = " + parallelism);
         System.out.println("\toutputFileDir = " + outputFileDir);
         System.out.println("\tkey = " + key);
+        System.out.println("\nwithLineage = " + withLineage);
         System.out.println("==============");
         try {
             BufferedWriter logWriter = new BufferedWriter(new FileWriter(outputFileDir + "/" + key + "_log.csv"));

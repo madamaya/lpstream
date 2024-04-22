@@ -191,13 +191,20 @@ do
           ssh ${ingestNode} /bin/zsh ${L3_HOME}/bin/dataingest/stopIngestion.sh
         fi
 
+        # Initialize 'withLineage' flag
+        if [[ ${approach} == "genealog" ]] || [[ ${approach} == "l3streamlin" ]]; then
+          withLineage="true"
+        else
+          withLineage="false"
+        fi
+
         # Latency calculation
         cd ${L3_HOME}/data/output/latency
         echo "*** latency calc ***"
         echo "mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}"
         mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
-        echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size})"
-        readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size}
+        echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} ${withLineage})"
+        readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} ${withLineage}
         echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} throughput)"
         python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} throughput
 
