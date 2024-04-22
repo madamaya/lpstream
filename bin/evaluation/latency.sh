@@ -217,9 +217,8 @@ cd ${L3_HOME}/data/output/throughput/metrics1
 python metrics1.py "${queries}" "${approaches}" "${sizes}"
 
 cd ${L3_HOME}/data/output
-./getResult.sh
-cp -r latency latency${throughput}
-cp -r throughput throughput${throughput}
-cp -r cpu-memory cpu-memory${throughput}
-mv results results${throughput}
+mkdir -p latEval
+cp -r latency latEval/latency${throughput}
+cp -r throughput latEval/throughput${throughput}
+cp -r cpu-memory latEval/cpu-memory${throughput}
 ./flesh.sh fleshAll

@@ -192,7 +192,7 @@ do
         fi
 
         # Latency calculation
-        cd ${L3_HOME}/data/output
+        cd ${L3_HOME}/data/output/latency
         echo "*** latency calc ***"
         echo "mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}"
         mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
@@ -233,12 +233,10 @@ do
   updateValid "${queries}" "${approaches}" "${sizes}"
 
   cd ${L3_HOME}/data/output
-  ./getResult.sh
   mkdir -p thEval
   cp -r latency thEval/latency${inputRateIdx}
   cp -r throughput thEval/throughput${inputRateIdx}
   cp -r cpu-memory thEval/cpu-memory${inputRateIdx}
-  mv results thEval/results${inputRateIdx}
   ./flesh.sh fleshAll
 done
 
