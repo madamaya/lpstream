@@ -47,6 +47,7 @@ if __name__ == "__main__":
 
     if not os.path.exists("{}/results".format(outputFileDir)):
         os.makedirs("{}/results".format(outputFileDir))
+    if not os.path.exists("{}/../results/fig".format(outputFileDir)):
         os.makedirs("{}/../results/fig".format(outputFileDir))
 
     start_time = time.time()
@@ -162,7 +163,7 @@ if __name__ == "__main__":
         for index, ifMean in enumerate(increaseFactorWithMean):
             results[idx2name(index)]["ifMean"] = ifMean
 
-    with open("{}/results/{}-result.json".format(outputFileDir, key), "w") as w:
+    with open("{}/results/1_{}-result.json".format(outputFileDir, key), "w") as w:
         json.dump(results, w, indent=2)
 
     """
