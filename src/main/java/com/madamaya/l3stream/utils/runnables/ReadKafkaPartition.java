@@ -17,14 +17,14 @@ public class ReadKafkaPartition implements Runnable {
     private String topicName;
     private int readPartition;
     private String outputFileDir;
-    private String key;
+    private String size;
     private boolean withLineage;
 
-    public ReadKafkaPartition(String topicName, int readPartition, String outputFileDir, String key, boolean withLineage) {
+    public ReadKafkaPartition(String topicName, int readPartition, String outputFileDir, String size, boolean withLineage) {
         this.topicName = topicName;
         this.readPartition = readPartition;
         this.outputFileDir = outputFileDir;
-        this.key = key;
+        this.size = size;
         this.withLineage = withLineage;
     }
 
@@ -50,7 +50,7 @@ public class ReadKafkaPartition implements Runnable {
         long prevTime = startTime;
         final long checkInterval = 30000;
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(outputFileDir + "/" + key + "_" + readPartition + ".csv"));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(outputFileDir + "/" + size + "_" + readPartition + ".csv"));
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(checkInterval));
                 if (System.currentTimeMillis() - prevTime > checkInterval && prevCount == count) {
@@ -72,12 +72,16 @@ public class ReadKafkaPartition implements Runnable {
                         long k2kLatency = ts - Long.parseLong(elements[1]);
                         long domLatency = Long.parseLong(elements[2]);
                         long traverseTime = Long.parseLong(elements[3]);
-                        bw.write(partition + "," + ts + "," + s2sLatency + "," + k2kLatency + "," + domLatency + "," + traverseTime + "\n");
+                        // 4 is the number of ','.
+                        int outputSize = recordValue.length() - elements[0].length() - elements[1].length() - elements[2].length() - elements[3].length() - 4;
+                        bw.write(partition + "," + ts + "," + s2sLatency + "," + k2kLatency + "," + domLatency + "," + traverseTime + "," + outputSize + "\n");
                     } else {
                         long s2sLatency = Long.parseLong(elements[0]);
                         long k2kLatency = ts - Long.parseLong(elements[1]);
                         long domLatency = Long.parseLong(elements[2]);
-                        bw.write(partition + "," + ts + "," + s2sLatency + "," + k2kLatency + "," + domLatency + "\n");
+                        // 3 is the number of ','.
+                        int outputSize = recordValue.length() - elements[0].length() - elements[1].length() - elements[2].length() - 3;
+                        bw.write(partition + "," + ts + "," + s2sLatency + "," + k2kLatency + "," + domLatency + "," + outputSize + "\n");
                     }
 
                     if (++count % 100000 == 0) {
@@ -91,7 +95,7 @@ public class ReadKafkaPartition implements Runnable {
             System.out.println("\r" + count + " tuple(s) have been read. [end]");
             System.out.println("Time duration: " + (endTime-startTime) + "[ms]");
 
-            BufferedWriter bw2 = new BufferedWriter(new FileWriter(outputFileDir + "/" + key + "_" + readPartition + "_log.log"));
+            BufferedWriter bw2 = new BufferedWriter(new FileWriter(outputFileDir + "/" + size + "_" + readPartition + "_log.log"));
             bw2.write("datanum at partition(" + readPartition + "): " + count + "\n");
             bw2.write("Time duration: " + (endTime-startTime) + "[ms]\n");
             bw2.close();

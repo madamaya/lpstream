@@ -20,7 +20,6 @@ sizes=(-1 10 100 400)
 sleepTime=600
 #inputRates=(5000)
 homedir=`pwd`
-loop=1
 
 rm finishedComb.csv ./thLog/parameters.log
 touch finishedComb.csv ./thLog/parameters.log
@@ -105,7 +104,7 @@ do
         echo "(sleep 10)"
         sleep 10
 
-        echo "*** Start evaluation (query = ${query}, approach = ${approach}, loop = ${loop}) ***"
+        echo "*** Start evaluation (query = ${query}, approach = ${approach}) ***"
 
         # restartTMifNeeded
         echo "*** restartTMifNeeded ***"
@@ -166,7 +165,7 @@ do
         fi
 
         # Start CPU/Memory logger
-        startCpuMemoryLogger ${L3_HOME}/data/output/cpu-memory/${query}/${approach} ${loop}_${size}.log &
+        startCpuMemoryLogger ${L3_HOME}/data/output/cpu-memory/${query}/${approach} ${size}.log &
 
         # Sleep
         echo "*** Sleep predefined time (${sleepTime} [s]) ***"
@@ -203,10 +202,10 @@ do
         echo "*** latency calc ***"
         echo "mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}"
         mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
-        echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} ${withLineage})"
-        readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} ${withLineage}
-        echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} throughput)"
-        python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${loop}_${size} throughput
+        echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage})"
+        readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage}
+        echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} throughput)"
+        python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} throughput
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"

@@ -12,24 +12,24 @@ public class L3RealtimeReaderV2 {
         String topicName = args[0];
         int parallelism = Integer.parseInt(args[1]);
         String outputFileDir = args[2];
-        String key = args[3];
+        String size = args[3];
         boolean withLineage = Boolean.parseBoolean(args[4]);
 
         System.out.println("==== ARGS ====");
         System.out.println("\ttopicName = " + topicName);
         System.out.println("\tparallelism = " + parallelism);
         System.out.println("\toutputFileDir = " + outputFileDir);
-        System.out.println("\tkey = " + key);
+        System.out.println("\tsize = " + size);
         System.out.println("\nwithLineage = " + withLineage);
         System.out.println("==============");
         try {
-            BufferedWriter logWriter = new BufferedWriter(new FileWriter(outputFileDir + "/" + key + "_log.csv"));
+            BufferedWriter logWriter = new BufferedWriter(new FileWriter(outputFileDir + "/" + size + "_log.csv"));
             long startTime = System.currentTimeMillis();
             /* Write all output on files */
             List<Thread> threadList = new ArrayList<>();
             for (int idx = 0; idx < parallelism; idx++) {
                 System.out.println("ADD: " + idx);
-                threadList.add(new Thread(new ReadKafkaPartition(topicName, idx, outputFileDir, key, withLineage)));
+                threadList.add(new Thread(new ReadKafkaPartition(topicName, idx, outputFileDir, size, withLineage)));
             }
             for (int idx = 0; idx < parallelism; idx++) {
                 System.out.println("START: " + idx);

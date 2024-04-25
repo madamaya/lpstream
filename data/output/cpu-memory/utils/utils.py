@@ -111,7 +111,7 @@ def calcResults(queries, approaches, filterRate, plotTrends, startTime, size):
     maxCount = 0
     for query in queries:
         for approach in approaches:
-            files = glob.glob("./{}/{}/*_{}.log".format(query, approach, size))
+            files = glob.glob("./{}/{}/{}.log".format(query, approach, size))
 
             # Store results
             if query not in results:

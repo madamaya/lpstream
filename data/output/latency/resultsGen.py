@@ -54,7 +54,7 @@ if __name__ == "__main__":
                 if ("Syn" in query and size == -1) or ("Syn" not in query and size != -1):
                     continue
 
-                filePath = "./{}/{}/results/{}-result.json".format(query, approach, size)
+                filePath = "./{}/results/result-{}-{}.json".format(query, size, approach)
                 if os.path.exists(filePath):
                     with open(filePath) as f:
                         j_data = json.load(f)
@@ -62,6 +62,6 @@ if __name__ == "__main__":
                     results[query][approach] = j_data
 
         # Write results with csv format
-        for v_type in ["median", "mean", "std", "ifMed", "ifMean"]:
-            for l_type in ["S2S", "K2K", "DOM", "TRAVERSE"]:
+        for l_type in ["S2S", "K2K", "DOM", "TRAVERSE", "SIZE"]:
+            for v_type in ["median", "mean", "std", "ifMed", "ifMean"]:
                 format_print_results(results, queries, approaches, size, l_type, v_type)

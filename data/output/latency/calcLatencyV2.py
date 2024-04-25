@@ -26,6 +26,8 @@ def idx2name(idx):
         return "DOM"
     elif idx == 3:
         return "TRAVERSE"
+    elif idx == 4:
+        return "SIZE"
     else:
         raise Exception
 
@@ -33,20 +35,21 @@ def idx2name(idx):
 # Given:
 ## parallelism (int)
 ## outputFileDir (str)
-## key (str)
+## size (str)
 ## flag (str) {"latency", "throughput"}
 if __name__ == "__main__":
     assert len(sys.argv) == 5
 
     parallelism = int(sys.argv[1])
     outputFileDir = sys.argv[2]
-    key = sys.argv[3]
+    size = sys.argv[3]
     flag = sys.argv[4]
     query = outputFileDir.split("/")[-2]
     approach = outputFileDir.split("/")[-1]
+    filter_rate = 0.1
 
-    if not os.path.exists("{}/results".format(outputFileDir)):
-        os.makedirs("{}/results".format(outputFileDir))
+    #if not os.path.exists("{}/results".format(outputFileDir)):
+    #    os.makedirs("{}/results".format(outputFileDir))
     if not os.path.exists("{}/../results/fig".format(outputFileDir)):
         os.makedirs("{}/../results/fig".format(outputFileDir))
 
@@ -57,7 +60,7 @@ if __name__ == "__main__":
     pq = []
     f_list = []
     for idx in range(parallelism):
-        f = open("{}/{}_{}.csv".format(outputFileDir, key, idx))
+        f = open("{}/{}_{}.csv".format(outputFileDir, size, idx))
         f_list.append(f)
 
         line = f.readline()
@@ -73,7 +76,7 @@ if __name__ == "__main__":
     """
     Calculate latency trends every seconds
     """
-    with open("{}/results/{}-trend.csv".format(outputFileDir, key), "w") as w:
+    with open("{}/../results/trend-{}-{}.csv".format(outputFileDir, size, approach), "w") as w:
         latency_values_one_sec = []
         latency_values_all = []
         latency_trends = []
@@ -125,9 +128,8 @@ if __name__ == "__main__":
     """
     Calculate latency for whole data
     """
-    #with open("{}/results/{}-result.csv".format(outputFileDir, key), "w") as w:
-    head_drop_size = int(len(latency_values_all)*0)
-    tail_drop_size = int(len(latency_values_all)*1)
+    head_drop_size = int(len(latency_values_all)*filter_rate)
+    tail_drop_size = int(len(latency_values_all)*(1-filter_rate))
     medians = np.median(latency_values_all[head_drop_size:tail_drop_size], axis=0)
     means = np.mean(latency_values_all[head_drop_size:tail_drop_size], axis=0)
     stds = np.std(latency_values_all[head_drop_size:tail_drop_size], axis=0)
@@ -142,7 +144,7 @@ if __name__ == "__main__":
     #w.write("Time duration: {} [s]\n".format(end_time-start_time))
 
     if flag == "latency":
-        results = {"S2S": {}, "K2K": {}, "DOM": {}, "TRAVERSE": {}}
+        results = {"S2S": {}, "K2K": {}, "DOM": {}, "TRAVERSE": {}, "SIZE": {}}
     else:
         results = {"S2S": {}}
     # median
@@ -163,7 +165,7 @@ if __name__ == "__main__":
         for index, ifMean in enumerate(increaseFactorWithMean):
             results[idx2name(index)]["ifMean"] = ifMean
 
-    with open("{}/results/1_{}-result.json".format(outputFileDir, key), "w") as w:
+    with open("{}/../results/result-{}-{}.json".format(outputFileDir, size, approach), "w") as w:
         json.dump(results, w, indent=2)
 
     """
@@ -182,8 +184,13 @@ if __name__ == "__main__":
             plt.title("{} Latency".format(idx2name(idx)))
             plt.plot(latency_values_all[:,idx])
 
-            #plt.ylim(bottom=0)
-            unit = "ms" if idx == 2 else "ns"
+            plt.ylim(bottom=0)
+            if idx == 2:
+                unit = "ms"
+            elif idx == 4:
+                unit = "chars"
+            else:
+                unit = "ns"
             plt.ylabel("Latency [{}]".format(unit))
 
             plt.savefig("{}/../results/fig/line-{}-{}.png".format(outputFileDir, idx2name(idx), approach))
@@ -197,8 +204,13 @@ if __name__ == "__main__":
             plt.title("{} Latency ({})".format(idx2name(idx), l_type))
             plt.plot(latency_trends[:,idx+shift*column_num//2])
 
-            #plt.ylim(bottom=0)
-            unit = "ms" if idx == 2 else "ns"
+            plt.ylim(bottom=0)
+            if idx == 2:
+                unit = "ms"
+            elif idx == 4:
+                unit = "chars"
+            else:
+                unit = "ns"
             plt.ylabel("Latency [{}]".format(unit))
 
             plt.savefig("{}/../results/fig/trend-{}-{}-{}.png".format(outputFileDir, l_type, idx2name(idx), approach))

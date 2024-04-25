@@ -1,21 +1,23 @@
-import sys
+import os, sys
 import glob
+import json
 import numpy as np
-import pandas as pd
+
+increasing_factor_threshold = 1.5
 
 # TODO
-# query_name -> threshold
+# query_name -> threshold [ns]
 latency_threshold = {
-    "LR": 60000,
-    "Nexmark": 60000,
-    "Nexmark2": 60000,
-    "NYC": 60000,
-    "NYC2": 60000,
-    "YSB": 60000,
-    "YSB2": 60000,
-    "Syn1": 60000,
-    "Syn2": 60000,
-    "Syn3": 60000
+    "LR": 1e9, # realtime query
+    "Nexmark": 1e9, # include 20 [ms] window
+    "Nexmark2": 2e9, # include 1 [s] window
+    "NYC": 3e9, # include 3 [s] window
+    "NYC2": 15e9, # include 15 [s] window
+    "YSB": 1e9, # include 1 [s] window
+    "YSB2": 10e9, # include 10 [s] window
+    "Syn1": 1e9, # realtime query
+    "Syn2": 2e9, # include 1 [s] window
+    "Syn3": 10e9 # include 10 [s] window
 }
 
 def arg_parser(elements):
@@ -25,65 +27,39 @@ def arg_parser(elements):
     dataPath = elements[3]
     return queries, approaches, dataSizes, dataPath
 
-def calcLatency(filename, filterRate = 0.1):
-    latency_all = []
+def getLatencyResults(queries, approaches, dataSizes, dataPath):
+    results = {}
+    for query in queries:
+        for approach in approaches:
+            for size in dataSizes:
+                # Initialize results dir
+                if size not in results:
+                    results[size] = {}
+                if query not in results[size]:
+                    results[size][query] = {}
+                if approach not in results[size][query]:
+                    results[size][query][approach] = {}
 
-    # calc K2K-latency
-    print("read data")
-    with open(filename) as f:
-        while True:
-            line = f.readline()
-            if line == "":
-                break
-            elements = line.split(",")
-
-            k2k_starttime = int(elements[2])
-            k2k_endtime = int(elements[0])
-            latency = k2k_endtime - k2k_starttime
-            latency_all.append(latency)
-
-    print("calc median")
-    datanum = len(latency_all)
-    filterednum = int(datanum * filterRate)
-    np_latency_all = np.array(latency_all[filterednum:datanum-filterednum])
-    latency = np.median(np_latency_all)
-    return latency, np_latency_all
-
-def getLatencyValues(queries, approaches, dataSizes, dataPath):
-    pass
-    """
-    return_latency_map = {}
-    return_latency_all_map = {}
-    for dataSize in dataSizes:
-        return_latency_map[dataSize] = {}
-        return_latency_all_map[dataSize] = {}
-        # update queries
-        if dataSize == -1: # Realdata
-            c_queries = [q for q in queries if "Syn" not in q]
-        else: # Syn data
-            c_queries = [q for q in queries if "Syn" in q]
-
-        for query in c_queries:
-            return_latency_map[dataSize][query] = {}
-            return_latency_all_map[dataSize][query] = {}
-            for approach in approaches:
-                # obtain file name
-                print(dataPath + "/latency/{}/{}/1_{}.log".format(query, approach, dataSize))
-                file_cand = glob.glob(dataPath + "/latency/{}/{}/1_{}.log".format(query, approach, dataSize))
-                assert len(file_cand) <= 1, print(file_cand)
-
-                if len(file_cand) == 1:
-                    filename = file_cand[0]
-
-                    print("getLatencyValues: calcLatency ({}, {}, {})".format(query, approach, dataSize))
-                    latency, latency_all = calcLatency(filename)
-                    return_latency_map[dataSize][query][approach] = latency
-                    return_latency_all_map[dataSize][query][approach] = latency_all
+                # File exists or not
+                if not os.path.exists("{}/latency/{}/results/result-{}-{}.json".format(dataPath, query, size, approach)):
+                    # If the file does not exist, 'nan' value is assigned. ( results[size][query][approach][{'median'|'mean'|'ifMed'|'ifMean'}] )
+                    results[size][query][approach]["median"] = np.nan
+                    results[size][query][approach]["mean"] = np.nan
+                    results[size][query][approach]["ifMed"] = np.nan
+                    results[size][query][approach]["ifMean"] = np.nan
                 else:
-                    pass
+                    # If exists, open the file as a json.
+                    f = open("{}/latency/{}/{}/results/{}-result.json".format(dataPath, query, approach, size))
+                    jdata = json.load(f)
+                    f.close()
 
-    return return_latency_map, return_latency_all_map
-    """
+                    # Extract value ('S2S', 'median'), ('S2S', 'median'), ('S2S', 'ifMed'), ('S2S', 'ifMean')
+                    # Store each value to results[size][query][approach][{'median'|'mean'|'ifMed'|'ifMean'}]
+                    results[size][query][approach]["median"] = jdata["S2S"]["median"]
+                    results[size][query][approach]["mean"] = jdata["S2S"]["mean"]
+                    results[size][query][approach]["ifMed"] = jdata["S2S"]["ifMed"]
+                    results[size][query][approach]["ifMean"] = jdata["S2S"]["ifMean"]
+    return results
 
 def getCpuMemValues(queries, approaches, dataSizes, dataPath):
     return_cpu_map = {}
@@ -167,9 +143,8 @@ def getThroughputValues(queries, approaches, dataSizes, dataPath):
                     return_map[dataSize][query][approach] = float(line.split(",")[approach2idx[approach]])
     return return_map
 
-def isNotIncreasing(latency_sequence):
-    # TODO
-    return True
+def isNotIncreasing(ifMed, ifMean):
+    return ifMed <= 1.5
 
 def containValue(dct, query, approach, dataSize):
     if dataSize in dct and query in dct[dataSize] and approach in dct[dataSize][query]:
@@ -205,33 +180,33 @@ def isStable24(query, approach, dataSize, throughput_values, cpu_values, mem_val
     else:
         return "c0"
 
-def isStable(query, approach, dataSize, latency_values, latency_values_all, throughput_values, cpu_values, mem_values, inputRate) -> bool:
+def isStable(query, approach, dataSize, latency_values, throughput_values, cpu_values, mem_values, inputRate) -> bool:
     # stable:
     # c1. latency is not continuously increasing
     # c2. average cpu usage < 80 %
     # c3. median latency < XX seconds
     # c4. evaluated throughput is comparable with inputRate
 
-    if (containValue(latency_values_all, query, approach, dataSize) and
-        containValue(cpu_values, query, approach, dataSize) and
+    if (containValue(cpu_values, query, approach, dataSize) and
         containValue(latency_values, query, approach, dataSize) and
         containValue(throughput_values, query, approach, dataSize)):
         line = ""
         # c1
-        c1_result = isNotIncreasing(latency_values_all[dataSize][query][approach])
+        c1_result = isNotIncreasing(latency_values[dataSize][query][approach]["ifMed"], latency_values[dataSize][query][approach]["ifMean"])
 
         # c2
         c2_result = cpu_values[dataSize][query][approach] < 80
 
         # c3
-        c3_result = latency_values[dataSize][query][approach] < latency_threshold[query] # [ms]
+        c3_result = latency_values[dataSize][query][approach]["median"] < latency_threshold[query] # [ns]
 
         # c4
         c4_result = throughput_values[dataSize][query][approach] > inputRate * 0.8
 
-        if (np.isnan(latency_values_all[dataSize][query][approach]) or
-                np.isnan(cpu_values[dataSize][query][approach]) or
-                np.isnan(latency_values[dataSize][query][approach]) or
+        if (np.isnan(cpu_values[dataSize][query][approach]) or
+                np.isnan(latency_values[dataSize][query][approach]["median"]) or
+                np.isnan(latency_values[dataSize][query][approach]["ifMed"]) or
+                np.isnan(latency_values[dataSize][query][approach]["ifMean"]) or
                 np.isnan(throughput_values[dataSize][query][approach])):
             line += "nan"
         else:
@@ -278,10 +253,8 @@ if __name__ == "__main__":
     print("dataPath = {}, type = {}".format(dataPath, type(dataPath)))
 
     # Return a dictionary object (dict), consisting of each latency values
-    # dict[dataSize][query][approach] = xxx
-    # latency_values has latency valus at each case.
-    # latency_values_all has all latency data points at each case.
-    # latency_values, latency_values_all = getLatencyValues(queries, approaches, dataSizes, dataPath)
+    # dict[size][query][approach][{'median'|'mean'|'ifMed'|'ifMean'}] = xxx
+    latency_values = getLatencyResults(queries, approaches, dataSizes, dataPath)
 
     # Return a dictionary object (dict), consisting of each throughput values
     # dict[dataSize][query][approach] = xxx
@@ -303,8 +276,8 @@ if __name__ == "__main__":
                 if inputRate == -1:
                     raise Exception
 
-                #result = isStable(query, approach, dataSize, latency_values, latency_values_all, throughput_values, cpu_values, mem_values, inputRate)
-                result = isStable24(query, approach, dataSize, throughput_values, cpu_values, mem_values, inputRate)
+                result = isStable(query, approach, dataSize, latency_values, throughput_values, cpu_values, mem_values, inputRate)
+                #result = isStable24(query, approach, dataSize, throughput_values, cpu_values, mem_values, inputRate)
                 print(dataSize, query, approach, result)
 
                 # the result means that Flink was unstable
