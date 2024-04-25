@@ -4,19 +4,13 @@ source $(dirname $0)/../config.sh
 
 # type1
 # (-> must) $1: jar path, $2: main path, $3: parallelism, $4: inputDataSize
-# type2
-# (-> must) $1: jar path, $2: main path, $3: parallelism, $4: windowSize, $5: inputDataSize
 # type3
 # (-> must) $1: jar path, $2: main path, $3: parallelism, $4: queryName (${L3_HOME}/data/output/throughput/~~~, e.g., metrics1/YSB), $5: latencyFlag, $6: inputDataSize
 
 latencyFlag=1
 queryNameOption=""
-windowSizeOption=""
 inputDataSize=""
-if [ $# -eq 5 ]; then
-  windowSizeOption="--windowSize ${4}"
-  inputDataSize="--dataSize ${5}"
-elif [ $# -eq 6 ]; then
+if [ $# -eq 6 ]; then
   queryNameOption="--queryName ${4}"
   latencyFlag=${5}
   inputDataSize="--dataSize ${6}"
@@ -32,7 +26,6 @@ EXE_CMD="${FLINK_HOME}/bin/flink run -d \
 --class ${2} \
 ${1} \
 --lineageMode nonLineage \
-${windowSizeOption} \
 ${queryNameOption} \
 ${inputDataSize} \
 --invokeCpAssigner \
