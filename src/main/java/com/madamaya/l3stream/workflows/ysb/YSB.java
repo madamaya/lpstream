@@ -54,7 +54,7 @@ public class YSB {
                 .map(new ProjectAttributeYSB())
                 .map(new TsAssignYSB())
                 .keyBy(t -> t.getCampaignId())
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(1))))
+                .window(TumblingEventTimeWindows.of(Time.seconds(1)))
                 // .trigger(new TriggerYSB())
                 .aggregate(new CountYSB());
 

@@ -64,7 +64,7 @@ public class NYC {
                         return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
                     }
                 })
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(3))))
+                .window(TumblingEventTimeWindows.of(Time.seconds(3)))
                 .aggregate(new CountAndAvgDistance());
 
         KafkaSink<NYCResultTuple> sink;

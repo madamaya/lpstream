@@ -81,7 +81,7 @@ public class L3YSB {
                 .map(L3.map(new ProjectAttributeYSBL3())).uid("7")
                 .map(L3.mapTs(new TsAssignYSBL3())).uid("TsAssignYSBL3")
                 .keyBy(L3.keyBy(t -> t.getCampaignId(), String.class))
-                .window(TumblingEventTimeWindows.of(settings.assignExperimentWindowSize(Time.seconds(1))))
+                .window(TumblingEventTimeWindows.of(Time.seconds(1)))
                 .aggregate(L3.aggregateTs(new CountYSBL3())).uid("8");
 
         // L5
