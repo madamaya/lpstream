@@ -1,6 +1,5 @@
 package com.madamaya.l3stream.workflows.ysb.ops;
 
-import com.madamaya.l3stream.workflows.ysb.objects.YSBInternalTuple;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBInternalTupleGL;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
 import org.apache.flink.api.common.functions.MapFunction;

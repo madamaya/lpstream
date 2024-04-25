@@ -1,14 +1,10 @@
 package com.madamaya.l3stream.workflows.ysb.ops;
 
-import com.madamaya.l3stream.workflows.ysb.objects.YSBInternalTuple;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBInternalTupleGL;
-import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTupleGL;
 import io.palyvos.provenance.ananke.aggregate.ProvenanceAggregateStrategy;
 import io.palyvos.provenance.genealog.GenealogAccumulator;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.java.tuple.Tuple4;
-import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.tuple.Tuple6;
 
 import java.util.function.Supplier;

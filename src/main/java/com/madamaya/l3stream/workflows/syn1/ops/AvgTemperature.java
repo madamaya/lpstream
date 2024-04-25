@@ -3,8 +3,6 @@ package com.madamaya.l3stream.workflows.syn1.ops;
 import com.madamaya.l3stream.workflows.syn1.objects.SynResultTuple;
 import com.madamaya.l3stream.workflows.syn1.objects.SynTempTuple;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.java.tuple.Tuple5;
-import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.api.java.tuple.Tuple7;
 
 public class AvgTemperature implements AggregateFunction<SynTempTuple, Tuple7<Integer, Double, Long, Long, Long, Long, Long>, SynResultTuple> {

@@ -12,9 +12,6 @@ public class DataParserLRGL implements MapFunction<StringGL, LinearRoadInputTupl
 
     @Override
     public LinearRoadInputTupleGL map(StringGL input) throws Exception {
-        //ObjectNode jNode = jNodeGL.getObjectNode();
-
-        //String line = jNode.get("value").textValue();
         String inputStr = input.getString();
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
         String[] elements = delimiter.split(line);
@@ -33,9 +30,6 @@ public class DataParserLRGL implements MapFunction<StringGL, LinearRoadInputTupl
                 input.getStimulus()
         );
         out.setKey(String.valueOf(out.getVid()));
-        //out.setTimestamp(System.currentTimeMillis());
-        //out.setPartitionID(input.getPartitionID());
-
         GenealogMapHelper.INSTANCE.annotateResult(input, out);
         return out;
     }

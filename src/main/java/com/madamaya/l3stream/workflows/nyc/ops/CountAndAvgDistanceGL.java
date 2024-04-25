@@ -1,14 +1,10 @@
 package com.madamaya.l3stream.workflows.nyc.ops;
 
-import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTupleGL;
-import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTuple;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTupleGL;
 import io.palyvos.provenance.ananke.aggregate.ProvenanceAggregateStrategy;
 import io.palyvos.provenance.genealog.GenealogAccumulator;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.java.tuple.Tuple6;
-import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.api.java.tuple.Tuple8;
 
 import java.util.function.Supplier;

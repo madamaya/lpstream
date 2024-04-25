@@ -1,10 +1,6 @@
 package com.madamaya.l3stream.workflows.ysb.ops;
 
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
-import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTupleGL;
-import io.palyvos.provenance.genealog.GenealogGraphTraverser;
-import io.palyvos.provenance.l3stream.util.FormatLineage;
-import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 

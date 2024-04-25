@@ -50,10 +50,7 @@ public class BidderDataParserNex extends RichMapFunction<KafkaInputString, Nexma
             long dateTime = convertDateFormat(jnode.get("dateTime").asText());
             String extra = jnode.get("extra").asText();
 
-            // NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getStimulus());
             NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getDominantOpTime(), input.getKafkaAppandTime(), input.getStimulus());
-            // NexmarkBidTuple tuple = new NexmarkBidTuple(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getKafkaAppandTime());
-            //tuple.setDateTime(System.currentTimeMillis());
             return tuple;
         } else {
             return new NexmarkBidTuple(eventType);

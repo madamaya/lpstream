@@ -3,9 +3,9 @@ package com.madamaya.l3stream.workflows.lr;
 import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.glCommons.InitGLdataStringGL;
 import com.madamaya.l3stream.workflows.lr.ops.DataParserLRGL;
-import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLRGL;
 import com.madamaya.l3stream.workflows.lr.ops.LatencyKafkaSinkLRGLV2;
 import com.madamaya.l3stream.workflows.lr.ops.LineageKafkaSinkLRGLV2;
+import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLRGL;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadInputTupleGL;
@@ -27,17 +27,11 @@ public class GLLR {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
-        // env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "LR";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
-
-        /*
-        Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("transaction.timeout.ms", "540000");
-         */
 
         KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
@@ -48,7 +42,6 @@ public class GLLR {
                 .build();
 
         /* Query */
-        //DataStream<CountTupleGL> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<LinearRoadInputTupleGL> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR")
                 .map(new InitGLdataStringGL(settings))
                 .map(new DataParserLRGL())

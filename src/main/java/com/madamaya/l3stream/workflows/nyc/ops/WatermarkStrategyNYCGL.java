@@ -1,6 +1,5 @@
 package com.madamaya.l3stream.workflows.nyc.ops;
 
-import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTupleGL;
 import org.apache.flink.api.common.eventtime.*;
 

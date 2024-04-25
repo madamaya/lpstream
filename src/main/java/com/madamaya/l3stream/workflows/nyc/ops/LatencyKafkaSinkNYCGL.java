@@ -1,7 +1,6 @@
 package com.madamaya.l3stream.workflows.nyc.ops;
 
 import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTupleGL;
-import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTupleGL;
 import io.palyvos.provenance.genealog.GenealogGraphTraverser;
 import io.palyvos.provenance.l3stream.util.FormatLineage;
 import io.palyvos.provenance.util.ExperimentSettings;

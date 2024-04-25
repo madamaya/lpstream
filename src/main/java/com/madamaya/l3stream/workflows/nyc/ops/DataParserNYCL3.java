@@ -3,7 +3,6 @@ package com.madamaya.l3stream.workflows.nyc.ops;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.text.SimpleDateFormat;
 
@@ -19,11 +18,9 @@ public class DataParserNYCL3 implements MapFunction<KafkaInputString, NYCInputTu
        'tolls_amount', 'improvement_surcharge', 'total_amount',
        'congestion_surcharge', 'airport_fee'] */
 
-        // String line = jNode.get("value").textValue();
         String inputStr = input.getStr();
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
         NYCInputTuple tuple = new NYCInputTuple(line, sdf);
-        //tuple.setDropoffTime(System.currentTimeMillis());
         return tuple;
     }
 }

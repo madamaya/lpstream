@@ -1,7 +1,5 @@
 package com.madamaya.l3stream.workflows.nexmark.objects;
 
-import com.madamaya.l3stream.workflows.nexmark.Nexmark;
-
 public class NexmarkAuctionTuple extends NexmarkInputTuple {
     /*
      Sample Input:

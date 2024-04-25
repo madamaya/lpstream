@@ -37,19 +37,11 @@ public class L3NYC2 {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
-        if (settings.getLineageMode() == "LineageMode") {
-            // env.getCheckpointConfig().disableCheckpointing();
-        }
 
         final String queryFlag = "NYC2";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
-
-        /*
-        Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("transaction.timeout.ms", "540000");
-         */
 
         KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
@@ -60,7 +52,6 @@ public class L3NYC2 {
                 .build();
 
         /* Query */
-        //DataStream<L3StreamTupleContainer<NYCResultTuple>> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<L3StreamTupleContainer<NYCResultTuple>> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNYC").uid("1")
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserNYCL3())).uid("3")
@@ -85,31 +76,6 @@ public class L3NYC2 {
         } else {
             ds.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings, props)).uid(settings.getLineageMode());
         }
-        /*
-        if (settings.getLineageMode() == "NonLineageMode") {
-            // ds.map(new CpAssigner<>()).uid("8").addSink(NonLineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("9");
-            ds.map(new CpAssigner<>()).uid("8").sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("9");
-        } else {
-            env.getCheckpointConfig().disableCheckpointing();
-            // ds.map(new CpAssigner<>()).uid("10").addSink(LineageKafkaSink.newInstance(outputTopicName, kafkaProperties, settings)).uid("11");
-            ds.map(new CpAssigner<>()).uid("10").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("11");
-        }
-         */
-
-        /*
-        if (settings.cpmProcessing()) {
-            KafkaSource<L3StreamInput<String>> tempSource = KafkaSource.<L3StreamInput<String>>builder()
-                    .setBootstrapServers(brokers)
-                    .setTopics(inputTopicName)
-                    .setGroupId("tempSource")
-                    .setStartingOffsets(OffsetsInitializer.earliest())
-                    .setDeserializer(new StringL3DeserializerV2())
-                    .build();
-
-            DataStream ds2 = env.fromSource(tempSource, WatermarkStrategy.noWatermarks(), "tempSource").uid("100").setParallelism(1)
-                    .map(new CpManagerClient()).uid("101").setParallelism(1);
-        }
-         */
 
         env.execute(settings.getLineageMode() + "," + queryFlag);
     }

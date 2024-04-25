@@ -4,10 +4,8 @@ import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import io.palyvos.provenance.l3stream.conf.L3conf;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -33,14 +31,11 @@ public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTup
        'payment_type', 'fare_amount', 'extra', 'mta_tax', 'tip_amount',
        'tolls_amount', 'improvement_surcharge', 'total_amount',
        'congestion_surcharge', 'airport_fee'] */
-        // String line = jNode.get("value").textValue();
         count++;
         String inputStr = input.getStr();
         String line = inputStr.substring(1, inputStr.length() - 1).trim();
 
         NYCInputTuple tuple = new NYCInputTuple(line, input.getDominantOpTime(), input.getKafkaAppandTime(), input.getStimulus(), sdf);
-        // NYCInputTuple tuple = new NYCInputTuple(line, input.getKafkaAppandTime(), sdf);
-        //tuple.setDropoffTime(System.currentTimeMillis());
         return tuple;
     }
 

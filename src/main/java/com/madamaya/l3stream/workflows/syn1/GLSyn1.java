@@ -42,7 +42,6 @@ public class GLSyn1 {
                 .build();
 
         /* Query */
-        //DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<SynTempTupleGL> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceSyn1")
                 .map(new InitGLdataStringGL(settings))
                 .map(new TempParserSynGL())

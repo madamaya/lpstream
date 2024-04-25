@@ -5,7 +5,6 @@ import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class DataParserYSBL3 implements MapFunction<KafkaInputString, YSBInputTuple> {
     ObjectMapper om;
@@ -23,7 +22,6 @@ public class DataParserYSBL3 implements MapFunction<KafkaInputString, YSBInputTu
         long eventtime = Long.parseLong(jNode.get("event_time").textValue());
 
         YSBInputTuple tuple = new YSBInputTuple(adId, eventType, campaignId, eventtime);
-        //tuple.setEventtime(System.currentTimeMillis());
         return tuple;
     }
 }

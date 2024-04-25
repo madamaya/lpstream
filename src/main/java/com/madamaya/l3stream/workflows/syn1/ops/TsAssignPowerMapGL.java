@@ -1,8 +1,6 @@
 package com.madamaya.l3stream.workflows.syn1.ops;
 
-import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTuple;
 import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTupleGL;
-import com.madamaya.l3stream.workflows.syn1.objects.SynTempTupleGL;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
 import org.apache.flink.api.common.functions.MapFunction;
 

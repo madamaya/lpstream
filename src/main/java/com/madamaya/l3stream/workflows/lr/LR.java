@@ -30,11 +30,6 @@ public class LR {
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
-        /*
-        Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("transaction.timeout.ms", "540000");
-         */
-
         KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
@@ -44,7 +39,6 @@ public class LR {
                 .build();
 
         /* Query */
-        //DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<LinearRoadInputTuple> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR")
                 .map(new DataParserLR(settings))
                 .assignTimestampsAndWatermarks(new WatermarkStrategyLR());

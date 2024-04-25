@@ -55,10 +55,7 @@ public class AuctionDataParserNex extends RichMapFunction<KafkaInputString, Nexm
             int category = jnode.get("category").asInt();
             String extra = jnode.get("extra").asText();
 
-            // NexmarkAuctionTuple tuple = new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getStimulus());
             NexmarkAuctionTuple tuple = new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getDominantOpTime(), input.getKafkaAppandTime(), input.getStimulus());
-            // NexmarkAuctionTuple tuple = new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getKafkaAppandTime());
-            //tuple.setDateTime(System.currentTimeMillis());
             return tuple;
         } else {
             return new NexmarkAuctionTuple(eventType);

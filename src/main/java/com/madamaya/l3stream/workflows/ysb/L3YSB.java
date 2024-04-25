@@ -2,17 +2,9 @@ package com.madamaya.l3stream.workflows.ysb;
 
 import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.l3operator.util.CpAssigner;
-import com.madamaya.l3stream.workflows.nyc.ops.WatermarkStrategyNYC;
-import com.madamaya.l3stream.workflows.ysb.objects.YSBInputTuple;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
 import com.madamaya.l3stream.workflows.ysb.ops.*;
-import io.palyvos.provenance.l3stream.cpm.CpManagerClient;
-import io.palyvos.provenance.l3stream.util.LineageKafkaSink;
-import io.palyvos.provenance.l3stream.util.LineageKafkaSinkV2;
-import io.palyvos.provenance.l3stream.util.NonLineageKafkaSink;
-import io.palyvos.provenance.l3stream.util.NonLineageKafkaSinkV2;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputJsonNode;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
 import io.palyvos.provenance.l3stream.wrappers.operators.L3OpWrapperStrategy;
@@ -21,22 +13,12 @@ import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
-import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
-import org.apache.flink.streaming.util.serialization.JSONKeyValueDeserializationSchema;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
 
-import javax.annotation.Nullable;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class L3YSB {

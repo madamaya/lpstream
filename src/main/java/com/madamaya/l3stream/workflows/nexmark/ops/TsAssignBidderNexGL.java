@@ -1,6 +1,5 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
-import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTupleGL;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
 import org.apache.flink.api.common.functions.MapFunction;

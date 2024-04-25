@@ -1,14 +1,11 @@
 package com.madamaya.l3stream.workflows.ysb.ops;
 
-import com.madamaya.l3stream.glCommons.InputGL;
-import com.madamaya.l3stream.glCommons.JsonNodeGL;
 import com.madamaya.l3stream.glCommons.StringGL;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBInputTupleGL;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class DataParserYSBGL implements MapFunction<StringGL, YSBInputTupleGL> {
     ObjectMapper om;

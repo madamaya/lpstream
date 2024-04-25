@@ -3,7 +3,7 @@ package com.madamaya.l3stream.workflows.nyc.ops;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTuple;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.java.tuple.*;
+import org.apache.flink.api.java.tuple.Tuple8;
 
 public class CountAndAvgDistance implements AggregateFunction<NYCInputTuple, Tuple8<Integer, Long, Long, Double, Long, Long, Long, Long>, NYCResultTuple> {
     @Override

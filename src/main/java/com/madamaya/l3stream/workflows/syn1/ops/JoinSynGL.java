@@ -1,6 +1,8 @@
 package com.madamaya.l3stream.workflows.syn1.ops;
 
-import com.madamaya.l3stream.workflows.syn1.objects.*;
+import com.madamaya.l3stream.workflows.syn1.objects.SynJoinedTupleGL;
+import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTupleGL;
+import com.madamaya.l3stream.workflows.syn1.objects.SynTempTupleGL;
 import io.palyvos.provenance.genealog.GenealogJoinHelper;
 import org.apache.flink.api.common.functions.JoinFunction;
 

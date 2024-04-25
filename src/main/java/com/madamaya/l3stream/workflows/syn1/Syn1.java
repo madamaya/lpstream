@@ -39,7 +39,6 @@ public class Syn1 {
                 .build();
 
         /* Query */
-        //DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<SynTempTuple> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceSyn1")
                 .map(new TempParserSyn(settings))
                 .filter(t -> t.getType() == 0)

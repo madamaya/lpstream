@@ -29,17 +29,11 @@ public class GLNexmark2 {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
-        // env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "Nexmark2";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
-
-        /*
-        Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("transaction.timeout.ms", "540000");
-         */
 
         KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)

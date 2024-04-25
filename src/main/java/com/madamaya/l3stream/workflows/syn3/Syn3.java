@@ -43,7 +43,6 @@ public class Syn3 {
                 .build();
 
         /* Query */
-        //DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<SynResultTuple> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceSyn1")
                 .map(new TempParserSyn(settings))
                 .filter(t -> t.getType() == 0)

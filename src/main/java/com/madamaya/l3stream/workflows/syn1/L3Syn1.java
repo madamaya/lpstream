@@ -44,7 +44,6 @@ public class L3Syn1 {
                 .build();
 
         /* Query */
-        //DataStream<CountTuple> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
         DataStream<L3StreamTupleContainer<SynTempTuple>> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceSyn1").uid("1")
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new TempParserSynL3())).uid("3")

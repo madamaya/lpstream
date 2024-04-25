@@ -2,7 +2,6 @@ package com.madamaya.l3stream.workflows.syn1.ops;
 
 import com.madamaya.l3stream.workflows.syn1.objects.SynJoinedTuple;
 import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTuple;
-import com.madamaya.l3stream.workflows.syn1.objects.SynResultTuple;
 import com.madamaya.l3stream.workflows.syn1.objects.SynTempTuple;
 import org.apache.flink.api.common.functions.JoinFunction;
 

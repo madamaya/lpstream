@@ -9,7 +9,6 @@ public class WatermarkStrategyLRGL implements WatermarkStrategy<LinearRoadInputT
         return new TimestampAssigner<LinearRoadInputTupleGL>() {
             @Override
             public long extractTimestamp(LinearRoadInputTupleGL linearRoadInputTuple, long l) {
-                // return Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds();
                 return linearRoadInputTuple.getTimestamp();
             }
         };
@@ -21,7 +20,6 @@ public class WatermarkStrategyLRGL implements WatermarkStrategy<LinearRoadInputT
             long latest = 0;
             @Override
             public void onEvent(LinearRoadInputTupleGL linearRoadInputTuple, long l, WatermarkOutput watermarkOutput) {
-                // long ts = Time.seconds(linearRoadInputTuple.getTimestamp()).toMilliseconds();
                 long ts = linearRoadInputTuple.getTimestamp();
                 if (ts > latest) {
                     watermarkOutput.emitWatermark(new Watermark(latest));

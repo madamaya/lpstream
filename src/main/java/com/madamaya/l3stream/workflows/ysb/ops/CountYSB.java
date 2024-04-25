@@ -3,7 +3,7 @@ package com.madamaya.l3stream.workflows.ysb.ops;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBInternalTuple;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTuple;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.java.tuple.*;
+import org.apache.flink.api.java.tuple.Tuple6;
 
 public class CountYSB implements AggregateFunction<YSBInternalTuple, Tuple6<String, Long, Long, Long, Long, Long>, YSBResultTuple> {
     @Override

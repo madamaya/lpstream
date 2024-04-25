@@ -30,19 +30,11 @@ public class L3Nexmark2 {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
-        if (settings.getLineageMode() == "LineageMode") {
-            // env.getCheckpointConfig().disableCheckpointing();
-        }
 
         final String queryFlag = "Nexmark2";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = settings.getOutputTopicName(queryFlag + "-o");
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
-
-        /*
-        Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("transaction.timeout.ms", "540000");
-         */
 
         KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
                 .setBootstrapServers(brokers)
@@ -93,36 +85,6 @@ public class L3Nexmark2 {
         } else {
             joined.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         }
-        /*
-            if (settings.getLineageMode() == "NonLineageMode") {
-                if (settings.isInvokeCpAssigner()) {
-                    joined.map(new CpAssigner<>()).uid("13").sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("14");
-                } else {
-                    joined.sinkTo(NonLineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("15");
-                }
-            } else {
-                if (settings.isInvokeCpAssigner()) {
-                    joined.map(new CpAssigner<>()).uid("16").sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("17");
-                } else {
-                    joined.sinkTo(LineageKafkaSinkV2.newInstance(outputTopicName, brokers, settings)).uid("18");
-                }
-            }
-          */
-
-        /*
-        if (settings.cpmProcessing()) {
-            KafkaSource<L3StreamInput<String>> tempSource = KafkaSource.<L3StreamInput<String>>builder()
-                    .setBootstrapServers(brokers)
-                    .setTopics(inputTopicName)
-                    .setGroupId("tempSource")
-                    .setStartingOffsets(OffsetsInitializer.earliest())
-                    .setDeserializer(new StringL3DeserializerV2())
-                    .build();
-
-            DataStream ds2 = env.fromSource(tempSource, WatermarkStrategy.noWatermarks(), "tempSource").uid("100").setParallelism(1)
-                    .map(new CpManagerClient()).uid("101").setParallelism(1);
-        }
-         */
 
         env.execute(settings.getLineageMode() + "," + queryFlag);
     }

@@ -5,8 +5,6 @@ import com.madamaya.l3stream.workflows.syn1.objects.SynTempTupleGL;
 import io.palyvos.provenance.ananke.aggregate.ProvenanceAggregateStrategy;
 import io.palyvos.provenance.genealog.GenealogAccumulator;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.java.tuple.Tuple5;
-import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.api.java.tuple.Tuple7;
 
 import java.util.function.Supplier;

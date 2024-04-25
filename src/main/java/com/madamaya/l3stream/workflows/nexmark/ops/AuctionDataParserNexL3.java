@@ -46,7 +46,6 @@ public class AuctionDataParserNexL3 implements MapFunction<KafkaInputString, Nex
             String extra = jnode.get("extra").asText();
 
             NexmarkAuctionTuple tuple = new NexmarkAuctionTuple(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra);
-            //tuple.setDateTime(System.currentTimeMillis());
             return tuple;
         } else {
             return new NexmarkAuctionTuple(eventType);

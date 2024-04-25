@@ -21,7 +21,6 @@ public class NYCInputTuple {
     private long dominantOpTime = Long.MAX_VALUE;
     private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
-    // CNFM
 
     public NYCInputTuple(int vendorId, long dropoffTime, double tripDistance, long dropoffLocationId, long dominantOpTime, long kafkaAppendTime, long stimulus) {
         this.vendorId = vendorId;

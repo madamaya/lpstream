@@ -1,6 +1,5 @@
 package com.madamaya.l3stream.workflows.ysb.ops;
 
-import com.madamaya.l3stream.workflows.ysb.objects.YSBInputTuple;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBInputTupleGL;
 import org.apache.flink.api.common.eventtime.*;
 
