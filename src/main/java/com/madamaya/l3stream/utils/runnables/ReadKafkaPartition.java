@@ -19,13 +19,15 @@ public class ReadKafkaPartition implements Runnable {
     private String outputFileDir;
     private String size;
     private boolean withLineage;
+    private boolean isLatencyExperiment;
 
-    public ReadKafkaPartition(String topicName, int readPartition, String outputFileDir, String size, boolean withLineage) {
+    public ReadKafkaPartition(String topicName, int readPartition, String outputFileDir, String size, boolean withLineage, boolean isLatencyExperiment) {
         this.topicName = topicName;
         this.readPartition = readPartition;
         this.outputFileDir = outputFileDir;
         this.size = size;
         this.withLineage = withLineage;
+        this.isLatencyExperiment = isLatencyExperiment;
     }
 
     @Override
@@ -72,9 +74,14 @@ public class ReadKafkaPartition implements Runnable {
                         long k2kLatency = ts - Long.parseLong(elements[1]);
                         long domLatency = Long.parseLong(elements[2]);
                         long traverseTime = Long.parseLong(elements[3]);
-                        // 4 is the number of ','.
-                        int outputSize = recordValue.length() - elements[0].length() - elements[1].length() - elements[2].length() - elements[3].length() - 4;
-                        bw.write(partition + "," + ts + "," + s2sLatency + "," + k2kLatency + "," + domLatency + "," + traverseTime + "," + outputSize + "\n");
+                        String line = partition + "," + ts + "," + s2sLatency + "," + k2kLatency + "," + domLatency + "," + traverseTime;
+                        if (isLatencyExperiment) {
+                            // 4 is the number of ','.
+                            int outputSize = recordValue.length() - elements[0].length() - elements[1].length() - elements[2].length() - elements[3].length() - 4;
+                            int lineageSize = Integer.parseInt(recordValue.split(",Lineage\\(")[1].split("\\)\\[")[0]);
+                            line += ("," + outputSize + "," + lineageSize);
+                        }
+                        bw.write(line + "\n");
                     } else {
                         long s2sLatency = Long.parseLong(elements[0]);
                         long k2kLatency = ts - Long.parseLong(elements[1]);

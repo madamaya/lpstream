@@ -17,8 +17,9 @@ function readOutput () {
   outputFileDir=$2
   size=$3
   withLineage=$4
-  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeReaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${size} ${withLineage})"
-  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeReaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${size} ${withLineage}
+  isLatencyExperiment=$5
+  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeReaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${size} ${withLineage} ${isLatencyExperiment})"
+  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeReaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${size} ${withLineage} ${isLatencyExperiment}
 }
 
 function latencyCalcFromKafka () {

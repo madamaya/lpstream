@@ -1,6 +1,8 @@
 import os, sys
 import time
 import json
+import numpy as np
+import matplotlib.pyplot as plt
 
 filterRate = 0.1
 startTime = time.time()
@@ -28,6 +30,51 @@ def format_print_results(results, queries, approaches, size, latency_type, val_t
                     w.write(",{}".format(results[query][approach][latency_type][val_type]))
             w.write("\n")
         w.write("\n")
+
+
+def type2unit(latency_type):
+    if latency_type == "S2S":
+        return "ns"
+    elif latency_type == "K2K":
+        return "ms"
+    elif latency_type == "DOM":
+        return "ns"
+    elif latency_type == "TRAVERSE":
+        return "ns"
+    elif latency_type == "SIZE(Output)":
+        return "chars"
+    else:
+        raise Exception
+
+
+def make_plot_graph(results, queries, approaches, size, latency_type, val_type):
+    for query in queries:
+        value_list = []
+        colorList = []
+        for approach in approaches:
+            # Color
+            if approach == "baseline":
+                colorList.append("b")
+            elif approach == "genealog":
+                colorList.append("g")
+            elif approach == "l3stream":
+                colorList.append("r")
+            else:
+                colorList.append("m")
+
+            if (query not in results) or \
+                    (approach not in results[query]) or \
+                    (latency_type not in results[query][approach]) or \
+                    (val_type not in results[query][approach][latency_type]):
+                value_list.append(np.nan)
+            else:
+                value_list.append(results[query][approach][latency_type][val_type])
+
+        plt.bar(range(len(value_list)), value_list, tick_label=approaches, color=colorList)
+        plt.title("{} - {} - {}".format(latency_type, val_type, size))
+        plt.ylabel("{} [{}]".format(latency_type, type2unit(latency_type)))
+        plt.savefig("./results/figs/{}-{}-{}-{}.png".format(query, latency_type, val_type, size))
+        plt.close()
 
 
 if __name__ == "__main__":
@@ -62,6 +109,11 @@ if __name__ == "__main__":
                     results[query][approach] = j_data
 
         # Write results with csv format
-        for l_type in ["S2S", "K2K", "DOM", "TRAVERSE", "SIZE"]:
+        for l_type in ["S2S", "K2K", "DOM", "TRAVERSE", "SIZE(Output)", "SIZE(Lineage)"]:
             for v_type in ["median", "mean", "std", "ifMed", "ifMean"]:
                 format_print_results(results, queries, approaches, size, l_type, v_type)
+
+        # Plot result
+        for l_type in ["S2S", "K2K", "DOM", "TRAVERSE", "SIZE(Output)"]:
+            for v_type in ["median", "mean"]:
+                make_plot_graph(results, queries, approaches, size, l_type, v_type)

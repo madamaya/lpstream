@@ -8,12 +8,13 @@ import java.util.List;
 
 public class L3RealtimeReaderV2 {
     public static void main(String[] args) throws Exception {
-        assert args.length == 5;
+        assert args.length == 6;
         String topicName = args[0];
         int parallelism = Integer.parseInt(args[1]);
         String outputFileDir = args[2];
         String size = args[3];
         boolean withLineage = Boolean.parseBoolean(args[4]);
+        boolean isLatencyExperiment = Boolean.parseBoolean(args[5]);
 
         System.out.println("==== ARGS ====");
         System.out.println("\ttopicName = " + topicName);
@@ -29,7 +30,7 @@ public class L3RealtimeReaderV2 {
             List<Thread> threadList = new ArrayList<>();
             for (int idx = 0; idx < parallelism; idx++) {
                 System.out.println("ADD: " + idx);
-                threadList.add(new Thread(new ReadKafkaPartition(topicName, idx, outputFileDir, size, withLineage)));
+                threadList.add(new Thread(new ReadKafkaPartition(topicName, idx, outputFileDir, size, withLineage, isLatencyExperiment)));
             }
             for (int idx = 0; idx < parallelism; idx++) {
                 System.out.println("START: " + idx);

@@ -27,7 +27,9 @@ def idx2name(idx):
     elif idx == 3:
         return "TRAVERSE"
     elif idx == 4:
-        return "SIZE"
+        return "SIZE(Output)"
+    elif idx == 5:
+        return "SIZE(Lineage)"
     else:
         raise Exception
 
@@ -144,7 +146,7 @@ if __name__ == "__main__":
     #w.write("Time duration: {} [s]\n".format(end_time-start_time))
 
     if flag == "latency":
-        results = {"S2S": {}, "K2K": {}, "DOM": {}, "TRAVERSE": {}, "SIZE": {}}
+        results = {"S2S": {}, "K2K": {}, "DOM": {}, "TRAVERSE": {}, "SIZE(Output)": {}, "SIZE(Lineage)": {}}
     else:
         results = {"S2S": {}}
     # median
@@ -189,6 +191,8 @@ if __name__ == "__main__":
                 unit = "ms"
             elif idx == 4:
                 unit = "chars"
+            elif idx == 5:
+                unit = "tuples"
             else:
                 unit = "ns"
             plt.ylabel("Latency [{}]".format(unit))
@@ -209,6 +213,8 @@ if __name__ == "__main__":
                 unit = "ms"
             elif idx == 4:
                 unit = "chars"
+            elif idx == 5:
+                unit = "tuples"
             else:
                 unit = "ns"
             plt.ylabel("Latency [{}]".format(unit))

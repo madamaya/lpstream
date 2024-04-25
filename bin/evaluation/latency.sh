@@ -186,8 +186,8 @@ do
       echo "*** latency calc ***"
       echo "mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}"
       mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
-      echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage})"
-      readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage}
+      echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true)"
+      readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true
       echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency)"
       python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency
 
