@@ -22,6 +22,6 @@ public class LatencyKafkaSinkYSBV2 implements KafkaRecordSerializationSchema<YSB
     @Override
     public ProducerRecord<byte[], byte[]> serialize(YSBResultTuple tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
         String latency = Long.toString(System.nanoTime() - tuple.getStimulus());
-        return new ProducerRecord<>(topic, (latency + "," + tuple.getKafkaAppendTime() + "," + tuple.getDominantOpTime() + ", OUT:" + tuple).getBytes(StandardCharsets.UTF_8));
+        return new ProducerRecord<>(topic, (latency + "," + tuple.getKafkaAppendTime() + "," + tuple.getDominantOpTime() + "," + tuple).getBytes(StandardCharsets.UTF_8));
     }
 }
