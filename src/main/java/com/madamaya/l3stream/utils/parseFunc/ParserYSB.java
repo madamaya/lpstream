@@ -2,9 +2,6 @@ package com.madamaya.l3stream.utils.parseFunc;
 
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class ParserYSB implements InputParser {
     ObjectMapper om = new ObjectMapper();
     @Override

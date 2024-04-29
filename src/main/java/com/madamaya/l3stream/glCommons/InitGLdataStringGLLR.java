@@ -1,7 +1,6 @@
 package com.madamaya.l3stream.glCommons;
 
 import com.madamaya.l3stream.conf.L3Config;
-import io.palyvos.provenance.genealog.GenealogTupleType;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.RichMapFunction;

@@ -2,9 +2,9 @@ package com.madamaya.l3stream.workflows.lr;
 
 import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.workflows.lr.ops.DataParserLR;
-import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLR;
 import com.madamaya.l3stream.workflows.lr.ops.LatencyKafkaSinkLRV2;
 import com.madamaya.l3stream.workflows.lr.ops.OutputKafkaSinkLRV2;
+import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLR;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;

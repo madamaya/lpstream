@@ -6,8 +6,6 @@ import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputJsonNode;
 import io.palyvos.provenance.util.ExperimentSettings;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.PrintWriter;
 import java.nio.file.Files;

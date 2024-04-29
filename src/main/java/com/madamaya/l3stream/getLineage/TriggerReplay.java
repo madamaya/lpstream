@@ -1,13 +1,10 @@
 package com.madamaya.l3stream.getLineage;
 
 import com.madamaya.l3stream.conf.L3Config;
-import io.palyvos.provenance.l3stream.conf.L3conf;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class TriggerReplay {
     public static void main(String[] args) throws Exception {

@@ -16,9 +16,6 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.kafka.clients.producer.ProducerConfig;
-
-import java.util.Properties;
 
 public class L3Syn1 {
     public static void main(String[] args) throws Exception {

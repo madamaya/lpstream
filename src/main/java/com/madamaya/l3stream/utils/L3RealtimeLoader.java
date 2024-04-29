@@ -2,12 +2,9 @@ package com.madamaya.l3stream.utils;
 
 import com.madamaya.l3stream.utils.runnables.IngestKafkaPartition;
 import com.madamaya.l3stream.utils.runnables.ShutdownProcessing;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class L3RealtimeLoader {
     public static void main(String[] args) throws Exception {

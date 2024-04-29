@@ -3,7 +3,6 @@ package com.madamaya.l3stream.glCommons;
 import io.palyvos.provenance.genealog.GenealogData;
 import io.palyvos.provenance.genealog.GenealogTuple;
 import io.palyvos.provenance.genealog.GenealogTupleType;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class StringGL implements GenealogTuple {
     private GenealogData gdata;
