@@ -7,14 +7,27 @@ if [ $1 -eq 1 ]; then
 elif [ $1 -eq 2 ]; then
   source ./workflowConf/configNexmark.sh
 elif [ $1 -eq 3 ]; then
+  source ./workflowConf/configNexmark2.sh
+elif [ $1 -eq 4 ]; then
   source ./workflowConf/configNYC.sh
-else
+elif [ $1 -eq 5 ]; then
+  source ./workflowConf/configNYC2.sh
+elif [ $1 -eq 6 ]; then
   source ./workflowConf/configYSB.sh
+elif [ $1 -eq 7 ]; then
+  source ./workflowConf/configYSB2.sh
+elif [ $1 -eq 8 ]; then
+  source ./workflowConf/configSyn1.sh
+elif [ $1 -eq 9 ]; then
+  source ./workflowConf/configSyn2.sh
+else
+  source ./workflowConf/configSyn3.sh
 fi
-windowSize=1
-if [ $# -eq 2 ]; then
-  windowSize=$2
-fi
+
+size=$2
+inputRate=$3
+granularityTemp=100
+sleepTime=300
 
 source ./utils/logger.sh
 source ./utils/notifyEnd.sh
@@ -28,10 +41,8 @@ source ./utils/cpmanager.sh
 
 # Define log file
 echo "*** Define log file ***"
-echo "logDir=\"${L3_HOME}/data/log/${(L)testName}\""
-logDir="${L3_HOME}/data/log/${(L)testName}"
-echo "logFile=\"${logDir}/${testName}.log\""
-logFile="${logDir}/${testName}.log"
+echo "logDir=\"${L3_HOME}/data/log/${(L)query}\""
+logDir="${L3_HOME}/data/log/${(L)query}"
 
 if [ ! -d ${logDir} ]; then
   mkdir ${logDir}
@@ -42,73 +53,137 @@ echo "*** Initialize redis ***"
 echo "(redis-cli -h ${redisIP} FLUSHDB)"
 redis-cli -h ${redisIP} FLUSHDB
 
-## Start kafka logger
-echo "*** Start Kafka logger ***"
-echo "(startKafkaLogger ${logDir} ${logFile} ${outputTopicName})"
-startKafkaLogger ${logDir} ${logFile} ${outputTopicName} > /dev/null
-
-## start checkpoint manager server
-#echo "*** Start Checkpoint Management Server ***"
-#echo "(./startCpMServer.sh > /dev/null &)"
-#./startCpMServer.sh > /dev/null &
-
 ## submit Flink job
 cd ${BIN_DIR}/templates
 echo "*** Submit Flink job ***"
-echo "(./nonlineageCpAssigner.sh ${JAR_PATH} ${mainPath} ${parallelism} ${windowSize})"
-./nonlineageCpAssigner.sh ${JAR_PATH} ${mainPath} ${parallelism} ${windowSize}
+echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/l3stream 1 ${size})"
+./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/l3stream 1 ${size}
+
+# Start data ingestion
+echo "Start data ingestion"
+if [[ ${query} == *Syn* ]]; then
+  filePath="${L3_HOME}/data/input/data/${(L)query}.${size}.csv"
+elif [[ ${query} == *LR* ]] || [[ ${query} == *NYC* ]]; then
+  filePath="${L3_HOME}/data/input/data/${(L)query}.csv"
+else
+  filePath="${L3_HOME}/data/input/data/${(L)query}.json"
+fi
+qName=${query}
+topic=${query}-i
+granularity=${granularityTemp}
+## localhost
+if [ ${ingestNode} = "localhost" ]; then
+  ../dataingest/ingestData.sh ${filePath} ${qName} ${topic} ${parallelism} ${inputRate} ${granularity} &
+## cluster
+else
+  ssh ${ingestNode} /bin/zsh ${L3_HOME}/bin/dataingest/ingestData.sh ${filePath} ${qName} ${topic} ${parallelism} ${inputRate} ${granularity} &
+fi
 
 cd ${BIN_DIR}
 echo "*** Get jobid ***"
 echo "(jobid=\`getRunningJobID\`)"
 jobid=`getRunningJobID`
-echo ${jobid} > latestJobID.log
 
-## Notify all outputs were provided.
-echo "*** Notify all outputs were provided ***"
-echo "(notifyEnd ${logFile})"
-notifyEnd ${logFile}
+# Sleep
+echo "*** Sleep predefined time (${sleepTime} [s]) ***"
+echo "(sleep ${sleepTime})"
+sleep ${sleepTime}
 
 ## Cancel Flink job
 echo "*** Cancel Flink job ***"
 echo "(cancelFlinkJobs)"
 cancelFlinkJobs
 
-## Stop CpMServerManager
-#echo "*** Stop CpMServerManager ***"
-#echo "(stopCpMServer)"
-#stopCpMServer
+# Stop data ingestion
+## localhost
+echo "Stop data ingestion"
+if [ ${ingestNode} = "localhost" ]; then
+  ./dataingest/stopIngestion.sh
+## cluster
+else
+  ssh ${ingestNode} /bin/zsh ${L3_HOME}/bin/dataingest/stopIngestion.sh
+fi
 
-## Stop kafka logger
-echo "*** Stop kafka logger ***"
-echo "(stopLogger)"
-stopLogger
+## Read all data
+echo "(readOutput ${outputTopicName} ${logDir} ${size} false false true)" # There is no mean "false false" because these arguments are ignored.
+readOutput ${outputTopicName} ${logDir} ${size} false false true
 
 # Call Lineage Manager (lineage mode)
 # This driver emulates the call from "User, seeing flink output" to "Lineage Manager".
 
 ## Decide and write target outputs for lineage randomly in a log file
 echo "*** Decide target output for lineage randomly ***"
-echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.Sampling ${logFile} ${numOfSamples})"
-java -cp ${JAR_PATH} com.madamaya.l3stream.utils.Sampling ${logFile} ${numOfSamples}
+echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.Sampling ${logDir} ${size} ${parallelism} ${numOfSamples})"
+java -cp ${JAR_PATH} com.madamaya.l3stream.utils.Sampling ${logDir} ${size} ${parallelism} ${numOfSamples}
 
-## Obtain jobid from file.
-#jobid=`cat latestJobID.log`
+## Make lineage directory
+echo "(mkdir -p ${L3_HOME}/data/output/lineage/${query})"
+mkdir -p ${L3_HOME}/data/output/lineage/${query}
+echo "(mkdir -p ${L3_HOME}/data/lineage/${query})"
+mkdir -p ${L3_HOME}/data/lineage/${query}
 
 ## Read target outputs
 idx=1
-FILE="${logFile}.target.txt"
+fileSampledPath="${logDir}/${size}_sampled.csv"
 while read LINE
 do
-  #LINE2=`echo ${LINE} | sed -e 's/\\\//g'`
-  outputValue=`echo ${LINE} | jq '.OUT'`
-  outputTs=`echo ${LINE} | jq '.TS' | sed -e 's/"//g'`
-  CPID=`echo ${LINE} | jq '.CPID' | sed -e 's/"//g'`
+  # Stop cluster (Flink, Kafka, Redis)
+  echo "(stopBroker)"
+  stopBroker
+  echo "(stopZookeeper)"
+  stopZookeeper
+  echo "(stopRedis)"
+  stopRedis
+  echo "(stopFlinkCluster)"
+  stopFlinkCluster
+
+  echo "(sleep 30)"
+  sleep 30
+
+  # Remove cache
+  echo "(cleanCache)"
+  cleanCache
+
+  echo "(sleep 30)"
+  sleep 30
+
+  # Start cluster (Flink, Kafka, Redis)
+  echo "(startZookeeper)"
+  startZookeeper
+  echo "(startBroker)"
+  startBroker
+  echo "(startRedis)"
+  startRedis
+  echo "(startFlinkCluster)"
+  startFlinkCluster
+
+  echo "(sleep 30)"
+  sleep 30
+
+  # Remove cache
+  echo "(cleanCache)"
+  cleanCache
+  echo "(sleep 120)"
+  sleep 120
+
+  echo "(forceGConTM)"
+  forceGConTM
+  echo "(sleep 10)"
+  sleep 10
+
+  echo "This loop: " ${LINE}
+  # GNU awk
+  outputValue=`echo ${LINE} | awk 'match($0, /^[0-9]+,[0-9]+,(.*),[0-9]+$/, ret) {print ret[1]}'`
+  outputTs=`echo ${LINE} | awk 'match($0, /^[0-9]+,[0-9]+,.*,([0-9]+)$/, ret) {print ret[1]}'`
+
+  ## Start time
+  experimentID=`date "+%s"`
+
   ## Start Lineage Manager with normal mode
-  ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${experimentName}-${idx} ${windowSize} ${aggregateStrategy} ${CPID}
+  ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${query} ${size} ${experimentID}
 
   idx=`expr ${idx} + 1`
 
   echo "*** sleep 30 ***"
   sleep 30
-done < ${FILE}
+done < ${fileSampledPath}

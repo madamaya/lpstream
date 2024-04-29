@@ -9,41 +9,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class FindReplayCPID {
-    /*
-    public static void main(String[] args) throws Exception {
-        if (args.length != 1) {
-            System.out.println("-1");
-        }
-        int outputTs = Integer.parseInt(args[0]);
-        System.out.println("outputTs = " + outputTs);
-
-        JedisPool pool = new JedisPool("localhost", 6379);
-        final int N = 10;
-        try (Jedis jedis = pool.getResource()) {
-            // Write sample data
-            jedis.flushDB();
-            for (int cpid = 1; cpid <= N; cpid++) {
-                for (int idx = 1; idx <= 5; idx++) {
-                    jedis.set(cpid + "," + idx, String.valueOf(1000 * cpid + idx * 100));
-                }
-                jedis.set(String.valueOf(cpid), Integer.toString(1000 * cpid));
-            }
-
-            // Find replay cpid
-            Set<String> allKeys = jedis.keys("*");
-            System.out.println("Set<String> allKeys = " + allKeys);
-
-            List<Integer> validKeys = getValidKeys(allKeys);
-            System.out.println("List<String> validKeys = " + validKeys);
-
-            int id = findID(validKeys, jedis, outputTs);
-            System.out.println("id = " + id);
-
-            System.exit(id);
-        }
-    }
-     */
-
     private static int findID(Jedis jedis, int numOfSOp, long timestamp) throws InterruptedException {
         Set<String> keys = jedis.keys("*");
         HashMap<Integer, Tuple2<Long, Integer>> hm = new HashMap<>();

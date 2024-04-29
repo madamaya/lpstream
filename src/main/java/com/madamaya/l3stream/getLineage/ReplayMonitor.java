@@ -31,35 +31,24 @@ public class ReplayMonitor {
     static ObjectMapper om = new ObjectMapper();
 
     public static void main(String[] args) throws Exception {
-        long startTime = System.currentTimeMillis();
-
         long outputTs;
         String lineageTopic;
-        String experimentName; // Example: LR-baseline-1
-        String windowSize;
         String outputValue = "";
+        String query;
+        String size;
+        String experimentID;
 
-        /*
-        if (args.length == 4) {
+        if (args.length == 6 && args[2].length() > 0) {
             outputTs = Long.parseLong(args[0]);
             lineageTopic = args[1];
-            experimentName = args[2];
-            windowSize = args[3];
-        } else
-         */
-
-        if (args.length == 5) {
-
-            outputTs = Long.parseLong(args[0]);
-            lineageTopic = args[1];
-            // remove "\"" from beginnig and end of the input
-            outputValue = args[2].substring(0, args[2].length()-1).substring(1);
-            experimentName = args[3];
-            windowSize = args[4];
+            outputValue = args[2];
+            query = args[3];
+            size = args[4];
+            experimentID = args[5];
         } else {
             throw new IllegalArgumentException();
         }
-        // parseFlag = lineageTopic.contains("Nexmark");
+        long startTime = System.currentTimeMillis();
 
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, L3Config.BOOTSTRAP_IP_PORT);
@@ -77,14 +66,14 @@ public class ReplayMonitor {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
             for (ConsumerRecord record : records) {
                 count++;
-                String recordValue = (String) record.value();
-                if (count % 10 == 0) {
+                String currentRecord = (String) record.value();
+                if (count % 1000 == 0) {
                     System.out.print("\rcount = " + count);
                 }
-                if (checkSame(recordValue, outputValue, outputTs)) {
+                if (checkSame(currentRecord, outputValue, outputTs)) {
+                    System.out.println("count = " + count + " [END]");
+                    writeLineage(currentRecord, query, size, experimentID);
                     endTime = System.currentTimeMillis();
-                    writeLineage((String) record.value());
-                    cancelJob();
                     run = false;
                     break;
                 }
@@ -92,18 +81,9 @@ public class ReplayMonitor {
         }
         BufferedWriter bw;
         try {
-            String[] elements = experimentName.split("-");
-            String query = elements[0];
-            String id = elements[1];
-            String dataPath = L3conf.L3_HOME + "/data/output/metrics34/" + query;
-
-            if (Files.notExists(Paths.get(dataPath))) {
-                Files.createDirectories(Paths.get(dataPath));
-            }
-            bw = new BufferedWriter(new FileWriter(dataPath + "/" + id + "-" + windowSize + "-" + "monitor.log"));
-            // bw.write(startTime + "," + endTime + "," + outputCpID);
-            bw.write(startTime + "," + endTime);
-            bw.flush();
+            String dataPath = L3conf.L3_HOME + "/data/output/lineage/" + query;
+            bw = new BufferedWriter(new FileWriter(dataPath + "/" + size + "-" + "monitor.log", true));
+            bw.write(experimentID + "," + startTime + "," + endTime + "\n");
             bw.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -111,50 +91,28 @@ public class ReplayMonitor {
     }
 
     /* Sample data (recordValue) */
-    // {
-    //  "OUT":"NYCResultTuple{vendorId=1, dropoffLocationId=164, count=3, avgDistance=13.666666666666666, ts=1642839653000}",
-    //  "TS":"1642839653000",
-    //  "CPID":"-1",
-    //  "LINEAGE":[
-    //        {"value":"1,2022-01-22 16:34:03,2022-01-22 17:14:32,1.0,17.5,2.0,N,132,164,1,52.0,2.5,0.5,15.45,6.55,0.3,77.3,2.5,0.0","metadata":{"offset":429563,"topic":"NYC-i","partition":3}},
-    //        {"value":"1,2022-01-22 16:42:16,2022-01-22 17:20:53,1.0,18.0,2.0,N,132,164,1,52.0,3.75,0.5,10.0,6.55,0.3,73.1,2.5,1.25","metadata":{"offset":429777,"topic":"NYC-i","partition":3}},
-    //        {"value":"1,2022-01-22 16:42:11,2022-01-22 17:09:25,2.0,5.5,1.0,Y,151,164,1,23.0,2.5,0.5,5.25,0.0,0.3,31.55,2.5,0.0","metadata":{"offset":412428,"topic":"NYC-i","partition":2}}
-    //  ],
-    //  "FLAG":"true"
-    // }
+    // "Lineage([lineageSize]){[tuple1],...,[tupleN]},[outputTuple],[timestamp],[isReliable]"
     public static Tuple3<String, Long, Boolean> extractOutTsFlag(String recordValue) throws JsonProcessingException {
-        // CNFM
-        JsonNode jsonNode;
-        //if (parseFlag) {
-            //jsonNode = new ObjectMapper().readTree(recordValue.replace("\\", ""));
-        //} else {
-            jsonNode = om.readTree(recordValue);
-        //}
-        return Tuple3.of(jsonNode.get("OUT").asText(), jsonNode.get("TS").asLong(), jsonNode.get("FLAG").asBoolean());
+        // Make [ "Lineage([lineageSize]){[tuple1],...,[tupleN]", "[outputTuple],[timestamp],[isReliable]" ]
+        String[] elements = recordValue.split("],", 2);
+
+        // Extract the 2nd element and split it into values.
+        int beforeFlagCommaIdx = elements[1].lastIndexOf(",");
+        int beforeTsCommaIdx = elements[1].lastIndexOf(",", beforeFlagCommaIdx-1);
+        String outputString = elements[1].substring(0, beforeTsCommaIdx);
+        long ts = Long.parseLong(elements[1].substring(beforeTsCommaIdx+1, beforeFlagCommaIdx));
+        boolean reliable = Boolean.parseBoolean(elements[1].substring(beforeFlagCommaIdx+1));
+
+        return Tuple3.of(outputString, ts, reliable);
     }
 
     public static boolean checkSame(String recordValue, String outputValue, long outputTs) throws JsonProcessingException {
         Tuple3<String, Long, Boolean> t3 = extractOutTsFlag(recordValue);
-        if (outputValue.length() < 1) {
-            // check timestamp and flag
-            return t3.f1 == outputTs && t3.f2;
-        } else {
-            // check timestamp, value, and flag
-            // CNFM
-            //if (parseFlag) {
-                // return t3.f0.equals(outputValue.replace("\\", "")) && t3.f1 == outputTs && t3.f2;
-                //return t3.f0.equals(outputValue) && t3.f1 == outputTs && t3.f2;
-            //} else {
-                return t3.f0.equals(outputValue) && t3.f1 == outputTs && t3.f2;
-            //}
-        }
+        return t3.f0.equals(outputValue) && t3.f1 == outputTs && t3.f2;
     }
 
-    public static void writeLineage(String recordValue) {
-        // CNFM
-        // System.out.println("!!! This is a tentative implementation of writeLineage (ReplayMonitor.java). !!!");
-        System.out.println();
-        String filePath = L3Config.L3_HOME + "/data/lineage/" + System.currentTimeMillis() + ".txt";
+    public static void writeLineage(String recordValue, String query, String size, String experimentID) {
+        String filePath = L3Config.L3_HOME + "/data/lineage/" + query + "/" + size + "_" + experimentID + ".txt";
         try {
             BufferedWriter bf = new BufferedWriter(new FileWriter(filePath));
             bf.write(recordValue);
@@ -163,36 +121,5 @@ public class ReplayMonitor {
             throw new RuntimeException(e);
         }
         System.out.println("Lineage = " + recordValue);
-    }
-
-    public static void cancelJob() throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newBuilder().build();
-
-        // Create running jobid list, which should be canceled
-        HttpRequest request = HttpRequest
-                .newBuilder()
-                .uri(URI.create("http://" + L3Config.FLINK_IP + ":" + L3Config.FLINK_PORT + "/jobs/overview"))
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JsonNode jsonNode = om.readTree(response.body());
-        List<String> endIDs = new ArrayList<>();
-        for (int idx = 0; idx < jsonNode.get("jobs").size(); idx++) {
-            JsonNode current = jsonNode.get("jobs").get(idx);
-            String currentState = current.get("state").asText();
-            String currentName = current.get("name").asText().split(",")[0];
-            if (currentState.equals("RUNNING") && currentName.equals("LineageMode")) {
-                endIDs.add(current.get("jid").asText());
-            }
-        }
-
-        // Cancel flink job via REST API
-        for (int idx = 0; idx < endIDs.size(); idx++) {
-            request = HttpRequest
-                    .newBuilder()
-                    .uri(URI.create("http://" + L3Config.FLINK_IP + ":" + L3Config.FLINK_PORT + "/jobs/" + endIDs.get(idx)))
-                    .method("PATCH", HttpRequest.BodyPublishers.noBody())
-                    .build();
-            client.send(request, HttpResponse.BodyHandlers.ofString());
-        }
     }
 }
