@@ -130,6 +130,7 @@ cd ${BIN_DIR}/getLineage
 fileSampledPath="${logDir}/${size}_sampled.csv"
 while read LINE
 do
+<<OUT
   # Stop cluster (Flink, Kafka, Redis)
   echo "(stopBroker)"
   stopBroker
@@ -173,6 +174,7 @@ do
   forceGConTM
   echo "(sleep 10)"
   sleep 10
+OUT
 
   echo "This loop: " ${LINE}
   # GNU awk
