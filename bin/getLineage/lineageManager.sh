@@ -1,8 +1,8 @@
 #!/bin/zsh
 
-source ./config.sh
-source ./utils/flinkJob.sh
-source ./utils/notifyEnd.sh
+source ../config.sh
+source ../utils/flinkJob.sh
+source ../utils/notifyEnd.sh
 
 mode=$1
 

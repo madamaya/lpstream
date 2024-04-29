@@ -1,7 +1,6 @@
 #!/bin/zsh
 
 source $(dirname $0)/../config.sh
-source ../utils/cpmanager.sh
 source ../utils/flinkJob.sh
 source ../utils/kafkaUtils.sh
 source ../utils/redisUtils.sh

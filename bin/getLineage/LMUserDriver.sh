@@ -1,38 +1,40 @@
 #!/bin/zsh
 
-source ./config.sh
+source ../config.sh
 
 if [ $1 -eq 1 ]; then
-  source ./workflowConf/configLR.sh
+  source ../workflowConf/configLR.sh
 elif [ $1 -eq 2 ]; then
-  source ./workflowConf/configNexmark.sh
+  source ../workflowConf/configNexmark.sh
 elif [ $1 -eq 3 ]; then
-  source ./workflowConf/configNexmark2.sh
+  source ../workflowConf/configNexmark2.sh
 elif [ $1 -eq 4 ]; then
-  source ./workflowConf/configNYC.sh
+  source ../workflowConf/configNYC.sh
 elif [ $1 -eq 5 ]; then
-  source ./workflowConf/configNYC2.sh
+  source ../workflowConf/configNYC2.sh
 elif [ $1 -eq 6 ]; then
-  source ./workflowConf/configYSB.sh
+  source ../workflowConf/configYSB.sh
 elif [ $1 -eq 7 ]; then
-  source ./workflowConf/configYSB2.sh
+  source ../workflowConf/configYSB2.sh
 elif [ $1 -eq 8 ]; then
-  source ./workflowConf/configSyn1.sh
+  source ../workflowConf/configSyn1.sh
 elif [ $1 -eq 9 ]; then
-  source ./workflowConf/configSyn2.sh
+  source ../workflowConf/configSyn2.sh
 else
-  source ./workflowConf/configSyn3.sh
+  source ../workflowConf/configSyn3.sh
 fi
 
 size=$2
 inputRate=$3
 granularityTemp=100
-sleepTime=300
+sleepTime=15
 
-source ./utils/logger.sh
-source ./utils/notifyEnd.sh
-source ./utils/flinkJob.sh
-source ./utils/cpmanager.sh
+source ../utils/logger.sh
+source ../utils/notifyEnd.sh
+source ../utils/flinkJob.sh
+source ../utils/kafkaUtils.sh
+source ../utils/redisUtils.sh
+source ../utils/cleanCache.sh
 
 # Call Lineage Manager (normal mode)
 # This driver emulates the call from "Program Converter" to "Lineage Manager".
@@ -122,8 +124,9 @@ mkdir -p ${L3_HOME}/data/output/lineage/${query}
 echo "(mkdir -p ${L3_HOME}/data/lineage/${query})"
 mkdir -p ${L3_HOME}/data/lineage/${query}
 
+cd ${BIN_DIR}/getLineage
+
 ## Read target outputs
-idx=1
 fileSampledPath="${logDir}/${size}_sampled.csv"
 while read LINE
 do
@@ -182,8 +185,24 @@ do
   ## Start Lineage Manager with normal mode
   ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${query} ${size} ${experimentID}
 
-  idx=`expr ${idx} + 1`
-
   echo "*** sleep 30 ***"
   sleep 30
 done < ${fileSampledPath}
+
+# Delete kafka topic
+echo "*** Delete kafka topic ***"
+echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers})"
+${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers}
+echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers})"
+${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers}
+echo "(sleep 30)"
+sleep 30
+
+# Create kafka topic
+echo "*** Create kafka topic ***"
+echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
+${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
+echo "${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}"
+${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
+echo "(sleep 10)"
+sleep 10
