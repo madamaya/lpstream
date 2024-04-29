@@ -98,9 +98,6 @@ do
       # source ./config/${approach}_${query}.sh
       outputTopicName="${query}-o"
 
-      # Decide strategy
-      aggregateStrategy="unsortedPtr"
-
       # Start query
       if [ ${approach} = "baseline" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
@@ -186,8 +183,8 @@ do
       echo "*** latency calc ***"
       echo "mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}"
       mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
-      echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true)"
-      readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true
+      echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true false)" # isLatencyExperiment, isRawMode
+      readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true false
       echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency)"
       python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency
 

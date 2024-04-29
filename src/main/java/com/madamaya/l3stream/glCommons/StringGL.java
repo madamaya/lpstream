@@ -11,7 +11,6 @@ public class StringGL implements GenealogTuple {
     private long dominantOpTime;
     private long kafkaAppandTime;
     private long stimulus;
-    private int partitionID;
 
     public StringGL(String string, long dominantOpTime, long kafkaAppandTime, long stimulus) {
         this.string = string;
@@ -20,27 +19,12 @@ public class StringGL implements GenealogTuple {
         this.stimulus = stimulus;
     }
 
-    public StringGL(String string, long kafkaAppandTime, long stimulus, int partitionID) {
-        this.string = string;
-        this.kafkaAppandTime = kafkaAppandTime;
-        this.stimulus = stimulus;
-        this.partitionID = partitionID;
-    }
-
     public String getString() {
         return string;
     }
 
     public void setString(String string) {
         this.string = string;
-    }
-
-    public int getPartitionID() {
-        return partitionID;
-    }
-
-    public void setPartitionID(int partitionID) {
-        this.partitionID = partitionID;
     }
 
     public long getDominantOpTime() {
@@ -92,6 +76,8 @@ public class StringGL implements GenealogTuple {
 
     @Override
     public String toString() {
-        return string.toString();
+        return "StringGL{" +
+                "string='" + string + "'" +
+                '}';
     }
 }

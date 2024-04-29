@@ -113,7 +113,7 @@ public class SynTempTuple extends SynInputTuple {
 
     @Override
     public String toString() {
-        return "SynInputTuple{" +
+        return "SynTempTuple{" +
                 "machineId=" + machineId +
                 ", sensorId=" + sensorId +
                 ", temperature=" + temperature +

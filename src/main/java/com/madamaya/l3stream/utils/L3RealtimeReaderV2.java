@@ -8,13 +8,14 @@ import java.util.List;
 
 public class L3RealtimeReaderV2 {
     public static void main(String[] args) throws Exception {
-        assert args.length == 6;
+        assert args.length == 7;
         String topicName = args[0];
         int parallelism = Integer.parseInt(args[1]);
         String outputFileDir = args[2];
         String size = args[3];
         boolean withLineage = Boolean.parseBoolean(args[4]);
         boolean isLatencyExperiment = Boolean.parseBoolean(args[5]);
+        boolean isRawMode = Boolean.parseBoolean(args[6]);
 
         System.out.println("==== ARGS ====");
         System.out.println("\ttopicName = " + topicName);
@@ -22,6 +23,8 @@ public class L3RealtimeReaderV2 {
         System.out.println("\toutputFileDir = " + outputFileDir);
         System.out.println("\tsize = " + size);
         System.out.println("\nwithLineage = " + withLineage);
+        System.out.println("\nisLatencyExperiment = " + isLatencyExperiment);
+        System.out.println("\nisRawMode = " + isRawMode);
         System.out.println("==============");
         try {
             BufferedWriter logWriter = new BufferedWriter(new FileWriter(outputFileDir + "/" + size + "_log.csv"));
@@ -30,7 +33,7 @@ public class L3RealtimeReaderV2 {
             List<Thread> threadList = new ArrayList<>();
             for (int idx = 0; idx < parallelism; idx++) {
                 System.out.println("ADD: " + idx);
-                threadList.add(new Thread(new ReadKafkaPartition(topicName, idx, outputFileDir, size, withLineage, isLatencyExperiment)));
+                threadList.add(new Thread(new ReadKafkaPartition(topicName, idx, outputFileDir, size, withLineage, isLatencyExperiment, isRawMode)));
             }
             for (int idx = 0; idx < parallelism; idx++) {
                 System.out.println("START: " + idx);

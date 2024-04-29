@@ -3,9 +3,9 @@
 source $(dirname $0)/../config.sh
 
 # type1
-# $1: jar path, $2: main path, $3: parallelism, $4: queryName (${L3_HOME}/data/output/throughput/~~~, e.g., metrics1/YSB), $5: latencyFlag, $6: lineageTopic, $7: aggregateStrategy, $8: inputDataSize
+# $1: jar path, $2: main path, $3: parallelism, $4: queryName (${L3_HOME}/data/output/throughput/~~~, e.g., metrics1/YSB), $5: latencyFlag, $6: lineageTopic, $7: inputDataSize
 
-if [ $# -ne 8 ]; then
+if [ $# -ne 7 ]; then
   echo "Illegal args (lineageNoReplay.sh)"
   exit 1
 fi
@@ -19,8 +19,7 @@ ${1} \
 --lineageMode Lineage \
 --lineageTopic ${6} \
 --queryName ${4} \
---aggregateStrategy ${7} \
---dataSize ${8}
+--dataSize ${7}
 --latencyFlag ${5}"
 
 echo "${EXE_CMD}"

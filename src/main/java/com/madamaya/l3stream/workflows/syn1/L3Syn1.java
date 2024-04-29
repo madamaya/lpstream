@@ -48,14 +48,13 @@ public class L3Syn1 {
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new TempParserSynL3())).uid("3")
                 .filter(L3.filter(t -> t.getType() == 0)).uid("4")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn(), settings.readPartitionNum(env.getParallelism()))).uid("5");
+                .map(L3.updateTsWM(new WatermarkStrategyTempSyn(), 0)).uid("5")
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn(), settings.readPartitionNum(env.getParallelism()))).uid("6");
 
-        Properties props = new Properties();
-        props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
         if (settings.isInvokeCpAssigner()) {
-            ds.map(new CpAssigner<>()).uid("6").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings, props)).uid(settings.getLineageMode());
+            ds.map(new CpAssigner<>()).uid("7").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         } else {
-            ds.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings, props)).uid(settings.getLineageMode());
+            ds.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         }
 
         env.execute("Query: " + queryFlag);

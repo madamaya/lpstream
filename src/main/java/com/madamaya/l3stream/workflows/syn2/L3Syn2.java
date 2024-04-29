@@ -50,14 +50,16 @@ public class L3Syn2 {
                 .map(L3.initMap(settings, 0)).uid("2")
                 .map(L3.map(new TempParserSynL3())).uid("3")
                 .filter(L3.filter(t -> t.getType() == 0)).uid("4")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn(), settings.readPartitionNum(env.getParallelism()))).uid("5")
+                .map(L3.updateTsWM(new WatermarkStrategyTempSyn(), 0)).uid("5")
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn(), settings.readPartitionNum(env.getParallelism()))).uid("6")
                 .map(L3.mapTs(new TsAssignTempMapL3())).uid("TsAssignTempMapL3");
 
         DataStream<L3StreamTupleContainer<SynPowerTuple>> power = ds
-                .map(L3.initMap(settings, 1)).uid("6")
-                .map(L3.map(new PowerParserSynL3())).uid("7")
-                .filter(L3.filter(t -> t.getType() == 1)).uid("8")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyPowerSyn(), settings.readPartitionNum(env.getParallelism()))).uid("9")
+                .map(L3.initMap(settings, 1)).uid("7")
+                .map(L3.map(new PowerParserSynL3())).uid("8")
+                .filter(L3.filter(t -> t.getType() == 1)).uid("9")
+                .map(L3.updateTsWM(new WatermarkStrategyPowerSyn(), 1)).uid("10")
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyPowerSyn(), settings.readPartitionNum(env.getParallelism()))).uid("11")
                 .map(L3.mapTs(new TsAssignPowerMapL3())).uid("TsAssignPowerMapL3");
 
         DataStream<L3StreamTupleContainer<SynJoinedTuple>> joined = power.join(temp)
@@ -77,7 +79,7 @@ public class L3Syn2 {
                 .apply(L3.joinTs(new JoinSynL3()));
 
         if (settings.isInvokeCpAssigner()) {
-            joined.map(new CpAssigner<>()).uid("11").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
+            joined.map(new CpAssigner<>()).uid("12").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         } else {
             joined.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
         }

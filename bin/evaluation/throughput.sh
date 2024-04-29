@@ -114,9 +114,6 @@ do
         # source ./config/${approach}_${query}.sh
         outputTopicName="${query}-o"
 
-        # Decide strategy
-        aggregateStrategy="unsortedPtr"
-
         # Start query
         if [ ${approach} = "baseline" ]; then
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.${query}"
@@ -128,8 +125,8 @@ do
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.GL${query}"
           # Run
           echo "*** Run ***"
-          echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${aggregateStrategy} ${size})"
-          ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${aggregateStrategy} ${size}
+          echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size})"
+          ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size}
         elif [ ${approach} = "l3stream" ]; then
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
           # Run
@@ -140,8 +137,8 @@ do
           mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
           # Run
           echo "*** Run ***"
-          echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size})"
-          ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size}
+          echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${size})"
+          ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${size}
         fi
 
         # Start data ingestion
@@ -202,8 +199,8 @@ do
         echo "*** latency calc ***"
         echo "mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}"
         mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
-        echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} false)"
-        readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} false
+        echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} false false)" # isLatencyExperiment, isRawMode
+        readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} false false
         echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} throughput)"
         python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} throughput
 
