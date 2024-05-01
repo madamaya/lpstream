@@ -229,7 +229,7 @@ do
   cd ${L3_HOME}/data/output/latency
   python resultsGen.py "${queries}" "${approaches}" "${sizes}"
   cd ${L3_HOME}/data/output/throughput
-  python metrics1.py "${queries}" "${approaches}" "${sizes}"
+  python throughputCalc.py "${queries}" "${approaches}" "${sizes}"
 
   cd ${homedir}
   updateValid "${queries}" "${approaches}" "${sizes}"

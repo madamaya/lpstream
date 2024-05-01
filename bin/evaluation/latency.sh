@@ -213,7 +213,7 @@ python cpu-memory.py "${queries}" "${approaches}" "${sizes}"
 cd ${L3_HOME}/data/output/latency
 python resultsGen.py "${queries}" "${approaches}" "${sizes}"
 cd ${L3_HOME}/data/output/throughput/metrics1
-python metrics1.py "${queries}" "${approaches}" "${sizes}"
+python throughputCalc.py "${queries}" "${approaches}" "${sizes}"
 
 cd ${L3_HOME}/data/output
 mkdir -p latEval
