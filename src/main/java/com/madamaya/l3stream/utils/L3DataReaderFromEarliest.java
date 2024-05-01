@@ -84,25 +84,5 @@ public class L3DataReaderFromEarliest {
         } catch (Exception e) {
             System.err.println(e);
         }
-
-        /*
-        int count = 0;
-        BufferedWriter bw;
-        try {
-            bw = new BufferedWriter(new FileWriter(outputFilePath));
-
-            while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-                for (ConsumerRecord record : records) {
-                    count++;
-                    String recordValue = (String) record.value();
-                    bw.write(recordValue + "\n");
-                    bw.flush();
-                }
-            }
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-         */
     }
 }
