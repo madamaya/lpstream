@@ -49,7 +49,7 @@ def getLatencyResults(queries, approaches, dataSizes, dataPath):
                     results[size][query][approach]["ifMean"] = np.nan
                 else:
                     # If exists, open the file as a json.
-                    f = open("{}/latency/{}/{}/results/{}-result.json".format(dataPath, query, approach, size))
+                    f = open("{}/latency/{}/results/result-{}-{}.json".format(dataPath, query, size, approach))
                     jdata = json.load(f)
                     f.close()
 
