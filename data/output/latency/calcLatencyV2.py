@@ -135,8 +135,8 @@ if __name__ == "__main__":
     medians = np.median(latency_values_all[head_drop_size:tail_drop_size], axis=0)
     means = np.mean(latency_values_all[head_drop_size:tail_drop_size], axis=0)
     stds = np.std(latency_values_all[head_drop_size:tail_drop_size], axis=0)
-    increaseFactorWithMedian = getIncreaseFactor(latency_values_all, np.median)
-    increaseFactorWithMean = getIncreaseFactor(latency_values_all, np.mean)
+    increaseFactorWithMedian = getIncreaseFactor(latency_values_all[head_drop_size:tail_drop_size], np.median)
+    increaseFactorWithMean = getIncreaseFactor(latency_values_all[head_drop_size:tail_drop_size], np.mean)
 
     end_time = time.time()
 

@@ -105,7 +105,8 @@ if __name__ == "__main__":
                 if os.path.exists(filePath):
                     with open(filePath) as f:
                         j_data = json.load(f)
-                    results[query] = {}
+                    if query not in results:
+                        results[query] = {}
                     results[query][approach] = j_data
 
         # Write results with csv format
