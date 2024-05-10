@@ -27,7 +27,7 @@ fi
 size=$2
 inputRate=$3
 granularityTemp=100
-sleepTime=15
+sleepTime=180
 
 source ../utils/logger.sh
 source ../utils/notifyEnd.sh

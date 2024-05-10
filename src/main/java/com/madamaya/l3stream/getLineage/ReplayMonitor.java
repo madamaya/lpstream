@@ -56,6 +56,7 @@ public class ReplayMonitor {
 
         try { // TODO: CNFM: debug
             BufferedWriter bwDebug = new BufferedWriter(new FileWriter(L3conf.L3_HOME + "/data/output/lineage/" + query + "/" + System.currentTimeMillis() + ".log"));
+            System.out.println("ReplayMonitor.java: READY");
             while (run) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord record : records) {

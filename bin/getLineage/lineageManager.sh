@@ -35,6 +35,9 @@ echo "*** Start program to monitor specified output's lineage derivation ***"
 echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${query} ${size} ${experimentID} &)"
 java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${query} ${size} ${experimentID} &
 
+echo "(sleep 10)"
+sleep 10
+
 echo "*** Identify checkpointID from which replay will be started ***"
 echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.TriggerReplay ${jarPath} ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${numOfSourceOp} ${query} ${size} ${experimentID})"
 java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.TriggerReplay ${jarPath} ${mainPath} ${jobid} ${outputTs} ${lineageTopicName} ${maxWindowSize} ${numOfSourceOp} ${query} ${size} ${experimentID}
