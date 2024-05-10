@@ -53,22 +53,31 @@ public class ReplayMonitor {
         int count = 0;
         boolean run = true;
         long endTime = -1;
-        while (run) {
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-            for (ConsumerRecord record : records) {
-                count++;
-                String currentRecord = (String) record.value();
-                if (count % 1000 == 0) {
-                    System.out.print("\rcount = " + count);
-                }
-                if (checkSame(currentRecord, outputValue, outputTs)) {
-                    System.out.println("count = " + count + " [END]");
-                    writeLineage(currentRecord, query, size, experimentID);
-                    endTime = System.currentTimeMillis();
-                    run = false;
-                    break;
+
+        try { // TODO: CNFM: debug
+            BufferedWriter bwDebug = new BufferedWriter(new FileWriter(L3conf.L3_HOME + "/data/output/lineage/" + query + "/" + System.currentTimeMillis() + ".log"));
+            while (run) {
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+                for (ConsumerRecord record : records) {
+                    count++;
+                    String currentRecord = (String) record.value();
+                    bwDebug.write(currentRecord + "\n");
+                    if (count % 1000 == 0) {
+                        System.out.print("\rcount = " + count);
+                    }
+                    if (checkSame(currentRecord, outputValue, outputTs)) {
+                        System.out.println("count = " + count + " [END]");
+                        writeLineage(currentRecord, query, size, experimentID);
+                        endTime = System.currentTimeMillis();
+                        run = false;
+                        break;
+                    }
                 }
             }
+            bwDebug.close();
+        } catch (Exception e) {
+            System.err.println(e);
+            throw new RuntimeException();
         }
         BufferedWriter bw;
         try {
