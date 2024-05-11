@@ -40,7 +40,7 @@ public class L3Nexmark {
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
                 .setGroupId("1" + String.valueOf(System.currentTimeMillis()))
-                .setStartingOffsets(OffsetsInitializer.latest())
+                .setStartingOffsets(settings.setOffsetsInitializer())
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 

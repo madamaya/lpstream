@@ -43,7 +43,7 @@ public class L3Syn3 {
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
                 .setGroupId(String.valueOf(System.currentTimeMillis()))
-                .setStartingOffsets(OffsetsInitializer.latest())
+                .setStartingOffsets(settings.setOffsetsInitializer())
                 .setDeserializer(new StringDeserializerV2())
                 .build();
 
