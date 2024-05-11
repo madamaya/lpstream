@@ -65,23 +65,33 @@ public class ReplayMonitor {
         boolean run = true;
         long endTime = -1;
 
-        System.out.println("ReplayMonitor.java: READY");
-        while (run) {
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-            for (ConsumerRecord record : records) {
-                count++;
-                String currentRecord = (String) record.value();
-                if (count % 1 == 0) {
-                    System.out.print("\rcount = " + count);
+        BufferedWriter bwDebug;
+        try {
+            bwDebug = new BufferedWriter(new FileWriter(L3conf.L3_HOME + "/data/output/lineage/" + query + "/" + System.currentTimeMillis() + ".log"));
+            System.out.println("ReplayMonitor.java: READY");
+            while (run) {
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+                for (ConsumerRecord record : records) {
+                    count++;
+                    String currentRecord = (String) record.value();
+                    bwDebug.write(currentRecord + "\n");
+                    bwDebug.flush();
+                    if (count % 1 == 0) {
+                        System.out.print("\rcount = " + count);
+                    }
+                    if (checkSame(currentRecord, outputValue, outputTs)) {
+                        System.out.println("count = " + count + " [END]");
+                        writeLineage(currentRecord, query, size, experimentID);
+                        endTime = System.currentTimeMillis();
+                        run = false;
+                        break;
+                    }
                 }
-                if (checkSame(currentRecord, outputValue, outputTs)) {
-                    System.out.println("count = " + count + " [END]");
-                    writeLineage(currentRecord, query, size, experimentID);
-                    endTime = System.currentTimeMillis();
-                    run = false;
-                    break;
-                }
+
             }
+            bwDebug.close();
+        } catch (Exception e) {
+            throw new RuntimeException();
         }
 
         BufferedWriter bw;
