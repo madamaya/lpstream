@@ -27,7 +27,8 @@ ${1} \
 --maxParallelism ${3} \
 --lineageMode Lineage \
 --lineageTopic ${6} \
---latencyFlag ${latencyFlag}"
+--latencyFlag ${latencyFlag} \
+--startingOffset earliest"
 
 echo "${EXE_CMD}"
 eval ${EXE_CMD}

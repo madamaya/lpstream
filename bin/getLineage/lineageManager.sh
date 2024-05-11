@@ -32,8 +32,8 @@ fi
 
 echo "*** Start lineage derivation ***"
 echo "*** Start program to monitor specified output's lineage derivation ***"
-echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${query} ${size} ${experimentID} &)"
-java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${query} ${size} ${experimentID} &
+echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${query} ${size} ${experimentID} ${parallelism} &)"
+java -cp ${JAR_PATH} com.madamaya.l3stream.getLineage.ReplayMonitor ${outputTs} ${lineageTopicName} ${outputValue} ${query} ${size} ${experimentID} ${parallelism} &
 
 echo "(sleep 10)"
 sleep 10

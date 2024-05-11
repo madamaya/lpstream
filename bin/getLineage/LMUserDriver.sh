@@ -132,45 +132,45 @@ while read LINE
 do
   # Stop cluster (Flink, Kafka, Redis)
   echo "(stopBroker)"
-  stopBroker
+  stopBroker < /dev/null
   echo "(stopZookeeper)"
-  stopZookeeper
+  stopZookeeper < /dev/null
   echo "(stopRedis)"
-  stopRedis
+  stopRedis < /dev/null
   echo "(stopFlinkCluster)"
-  stopFlinkCluster
+  stopFlinkCluster < /dev/null
 
   echo "(sleep 30)"
   sleep 30
 
   # Remove cache
   echo "(cleanCache)"
-  cleanCache
+  cleanCache < /dev/null
 
   echo "(sleep 30)"
   sleep 30
 
   # Start cluster (Flink, Kafka, Redis)
   echo "(startZookeeper)"
-  startZookeeper
+  startZookeeper < /dev/null
   echo "(startBroker)"
-  startBroker
+  startBroker < /dev/null
   echo "(startRedis)"
-  startRedis
+  startRedis < /dev/null
   echo "(startFlinkCluster)"
-  startFlinkCluster
+  startFlinkCluster < /dev/null
 
   echo "(sleep 30)"
   sleep 30
 
   # Remove cache
   echo "(cleanCache)"
-  cleanCache
+  cleanCache < /dev/null
   echo "(sleep 120)"
   sleep 120
 
   echo "(forceGConTM)"
-  forceGConTM
+  forceGConTM < /dev/null
   echo "(sleep 10)"
   sleep 10
 
@@ -184,9 +184,6 @@ do
 
   ## Start Lineage Manager with normal mode
   ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${query} ${size} ${experimentID}
-
-  echo "*** sleep 30 ***"
-  sleep 30
 done < ${fileSampledPath}
 
 # Delete kafka topic
