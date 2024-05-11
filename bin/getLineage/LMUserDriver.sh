@@ -184,22 +184,22 @@ do
 
   ## Start Lineage Manager with normal mode
   ./lineageManager.sh ${JAR_PATH} ${mainPath} ${jobid} ${outputTs} ${outputValue} ${maxWindowSize} ${lineageTopicName} ${query} ${size} ${experimentID}
+
+  # Delete kafka topic
+  echo "*** Delete kafka topic ***"
+  echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers})"
+  ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers}
+  echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers})"
+  ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers}
+  echo "(sleep 30)"
+  sleep 30
+
+  # Create kafka topic
+  echo "*** Create kafka topic ***"
+  echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
+  ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
+  echo "${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}"
+  ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
+  echo "(sleep 10)"
+  sleep 10
 done < ${fileSampledPath}
-
-# Delete kafka topic
-echo "*** Delete kafka topic ***"
-echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers})"
-${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers}
-echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers})"
-${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers}
-echo "(sleep 30)"
-sleep 30
-
-# Create kafka topic
-echo "*** Create kafka topic ***"
-echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
-${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
-echo "${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}"
-${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
-echo "(sleep 10)"
-sleep 10
