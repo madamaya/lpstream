@@ -36,6 +36,13 @@ source ../utils/kafkaUtils.sh
 source ../utils/redisUtils.sh
 source ../utils/cleanCache.sh
 
+# CNFM: バグ1:ReplayMonitor.javaがKafkaの出力をreadしてくれない時がある.
+# → 毎回LineageTopicのデータを削除して，ReplayMonitorはEarliestからreadしてみる
+# CNFM: バグ2:キャッシュ削除すると標準入力が吸われてループが1回しか回らない.
+# → /dev/null を追加して様子を見る→DONE
+# CNFM: バグ3:Checkpointなしで最初から実行するとき，Kafka offsetがlatestだからレコードがKafkaから流れてこず，Lineageが導出されない．
+# → 修正する→DONE
+
 # Call Lineage Manager (normal mode)
 # This driver emulates the call from "Program Converter" to "Lineage Manager".
 # Therefore, "ChkDir, CpMServerIP, CpMServerPort, RedisIP, and RedisPort" have been already configured.
@@ -189,8 +196,6 @@ do
   echo "*** Delete kafka topic ***"
   echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers})"
   ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers}
-  echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers})"
-  ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers}
   echo "(sleep 30)"
   sleep 30
 
@@ -198,8 +203,24 @@ do
   echo "*** Create kafka topic ***"
   echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
   ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
-  echo "${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}"
-  ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
   echo "(sleep 10)"
   sleep 10
 done < ${fileSampledPath}
+
+# Delete kafka topic
+echo "*** Delete kafka topic ***"
+echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers})"
+${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers}
+echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers})"
+${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers}
+echo "(sleep 30)"
+sleep 30
+
+# Create kafka topic
+echo "*** Create kafka topic ***"
+echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
+${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
+echo "${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}"
+${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
+echo "(sleep 10)"
+sleep 10
