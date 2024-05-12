@@ -3,7 +3,7 @@
 source ../config.sh
 
 queries=(1 2 3 4 5 6 7 8 9 10)
-sizes=(-1 10 100 400)
+sizes=(10 100 400 -1)
 pivot=8
 for size in ${sizes[@]}
 do
@@ -22,6 +22,6 @@ do
 
     echo "Next: query=${query}, size=${size}"
     echo "(./LMUserDriver.sh ${query} ${size} 10000 | tee progress.${query}.${size}.log)"
-    #./LMUserDriver.sh ${query} ${size} 10000 | tee progress.${query}.${size}.log
+    ./LMUserDriver.sh ${query} ${size} 10000 | tee progress.${query}.${size}.log
   done
 done
