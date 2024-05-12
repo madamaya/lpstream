@@ -36,13 +36,6 @@ source ../utils/kafkaUtils.sh
 source ../utils/redisUtils.sh
 source ../utils/cleanCache.sh
 
-# CNFM: バグ1:ReplayMonitor.javaがKafkaの出力をreadしてくれない時がある.
-# → 毎回LineageTopicのデータを削除して，ReplayMonitorはEarliestからreadしてみる
-# CNFM: バグ2:キャッシュ削除すると標準入力が吸われてループが1回しか回らない.
-# → /dev/null を追加して様子を見る→DONE
-# CNFM: バグ3:Checkpointなしで最初から実行するとき，Kafka offsetがlatestだからレコードがKafkaから流れてこず，Lineageが導出されない．
-# → 修正する→DONE
-
 # Call Lineage Manager (normal mode)
 # This driver emulates the call from "Program Converter" to "Lineage Manager".
 # Therefore, "ChkDir, CpMServerIP, CpMServerPort, RedisIP, and RedisPort" have been already configured.
@@ -67,6 +60,10 @@ cd ${BIN_DIR}/templates
 echo "*** Submit Flink job ***"
 echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/l3stream 1 ${size})"
 ./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/l3stream 1 ${size}
+
+## Sleep
+echo "(sleep 30)"
+sleep 30
 
 # Start data ingestion
 echo "Start data ingestion"
