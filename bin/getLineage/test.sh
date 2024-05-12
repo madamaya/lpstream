@@ -10,7 +10,7 @@ do
   for query in ${queries[@]}
   do
     # Skip invalid cases
-    if [[ ${query} -gt ${pivot} ]]; then
+    if [[ ${query} -ge ${pivot} ]]; then
       if [ ${size} -eq -1 ]; then
         continue
       fi
@@ -22,6 +22,6 @@ do
 
     echo "Next: query=${query}, size=${size}"
     echo "(./LMUserDriver.sh ${query} ${size} 10000 | tee progress.${query}.${size}.log)"
-    ./LMUserDriver.sh ${query} ${size} 10000 | tee progress.${query}.${size}.log
+    #./LMUserDriver.sh ${query} ${size} 10000 | tee progress.${query}.${size}.log
   done
 done
