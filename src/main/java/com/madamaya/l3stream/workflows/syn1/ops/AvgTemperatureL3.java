@@ -22,7 +22,7 @@ public class AvgTemperatureL3 implements AggregateFunction<SynTempTuple, Tuple4<
 
     @Override
     public SynResultTuple getResult(Tuple4<Integer, Double, Long, Long> acc) {
-        return new SynResultTuple(acc.f0, acc.f1 / acc.f2, acc.f3);
+        return new SynResultTuple(acc.f0, acc.f1 / acc.f2, acc.f2, acc.f3);
     }
 
     @Override

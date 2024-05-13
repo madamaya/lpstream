@@ -8,6 +8,9 @@ public class SynResultTuple {
     private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
+    // CNFM: デバッグ用，実験時削除
+    private long count = -999999999;
+
     public SynResultTuple(int machineId, double avgTemp, long timestamp, long dominantOpTime, long kafkaAppendTime, long stimulus) {
         this.machineId = machineId;
         this.avgTemp = avgTemp;
@@ -20,6 +23,13 @@ public class SynResultTuple {
     public SynResultTuple(int machineId, double avgTemp, long timestamp) {
         this.machineId = machineId;
         this.avgTemp = avgTemp;
+        this.timestamp = timestamp;
+    }
+
+    public SynResultTuple(int machineId, double avgTemp, long count, long timestamp) {
+        this.machineId = machineId;
+        this.avgTemp = avgTemp;
+        this.count = count;
         this.timestamp = timestamp;
     }
 
@@ -76,6 +86,7 @@ public class SynResultTuple {
         return "SynResultTuple{" +
                 "machineId=" + machineId +
                 ", avgTemp=" + avgTemp +
+                ", count =" + count +
                 ", timestamp=" + timestamp +
                 '}';
     }
