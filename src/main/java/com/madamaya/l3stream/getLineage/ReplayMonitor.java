@@ -114,7 +114,9 @@ public class ReplayMonitor {
         // Extract the 2nd element and split it into values.
         int beforeFlagCommaIdx = elements[1].lastIndexOf(",");
         int beforeTsCommaIdx = elements[1].lastIndexOf(",", beforeFlagCommaIdx-1);
-        String outputString = elements[1].substring(0, beforeTsCommaIdx);
+        // CNFM: デバッグ用
+        // String outputString = elements[1].substring(0, beforeTsCommaIdx);
+        String outputString = elements[1].substring(0, beforeTsCommaIdx).replaceAll(":::::.*", "");
         long ts = Long.parseLong(elements[1].substring(beforeTsCommaIdx+1, beforeFlagCommaIdx));
         boolean reliable = Boolean.parseBoolean(elements[1].substring(beforeFlagCommaIdx+1));
 

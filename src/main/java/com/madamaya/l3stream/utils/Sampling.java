@@ -97,7 +97,9 @@ public class Sampling {
                         throw new ArithmeticException();
                     }
                     if (sampledOutputIndex.contains(count + inloop_count)) {
-                        sampledOutputs.add(i + "," + inloop_count + "," + line);
+                        // CNFM: デバッグ用
+                        // sampledOutputs.add(i + "," + inloop_count + "," + line);
+                        sampledOutputs.add(i + "," + inloop_count + "," + line.split(":::::")[0]);
                     }
                     inloop_count += 1;
 

@@ -1,5 +1,8 @@
 package com.madamaya.l3stream.workflows.syn1.objects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SynResultTuple {
     private int machineId;
     private double avgTemp;
@@ -10,6 +13,7 @@ public class SynResultTuple {
 
     // CNFM: デバッグ用，実験時削除
     private long count = -999999999;
+    private List<SynTempTuple> inputs = new ArrayList<>();
 
     public SynResultTuple(int machineId, double avgTemp, long timestamp, long dominantOpTime, long kafkaAppendTime, long stimulus) {
         this.machineId = machineId;
@@ -26,10 +30,11 @@ public class SynResultTuple {
         this.timestamp = timestamp;
     }
 
-    public SynResultTuple(int machineId, double avgTemp, long count, long timestamp) {
+    public SynResultTuple(int machineId, double avgTemp, long count, List<SynTempTuple> inputs, long timestamp) {
         this.machineId = machineId;
         this.avgTemp = avgTemp;
         this.count = count;
+        this.inputs = inputs;
         this.timestamp = timestamp;
     }
 
@@ -86,8 +91,9 @@ public class SynResultTuple {
         return "SynResultTuple{" +
                 "machineId=" + machineId +
                 ", avgTemp=" + avgTemp +
-                ", count =" + count +
+                ", count=" + count +
                 ", timestamp=" + timestamp +
+                ":::::inputs=" + inputs +
                 '}';
     }
 }
