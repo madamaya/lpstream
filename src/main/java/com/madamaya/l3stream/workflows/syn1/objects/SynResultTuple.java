@@ -88,12 +88,12 @@ public class SynResultTuple {
 
     @Override
     public String toString() {
+        // CNFM: デバッグ用
         return "SynResultTuple{" +
                 "machineId=" + machineId +
                 ", avgTemp=" + avgTemp +
                 ", count=" + count +
                 ", timestamp=" + timestamp +
-                ":::::inputs=" + inputs +
-                '}';
+                "}:::::inputs=" + inputs;
     }
 }
