@@ -99,7 +99,9 @@ public class Sampling {
                     if (sampledOutputIndex.contains(count + inloop_count)) {
                         // CNFM: デバッグ用
                         // sampledOutputs.add(i + "," + inloop_count + "," + line);
-                        sampledOutputs.add(i + "," + inloop_count + "," + line.split(":::::")[0]);
+                        String[] elements = line.split(":::::");
+                        String ts = elements[1].split(",")[elements[1].split(",").length-1];
+                        sampledOutputs.add(i + "," + inloop_count + "," + elements[0] + "," + ts);
                     }
                     inloop_count += 1;
 
