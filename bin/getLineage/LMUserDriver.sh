@@ -61,9 +61,15 @@ echo "*** Submit Flink job ***"
 echo "(./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/l3stream 1 ${size})"
 ./nonlineage.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/l3stream 1 ${size}
 
-## Sleep
-echo "(sleep 30)"
-sleep 30
+while true
+do
+  running=`getRunningJobID`
+  echo "running =" ${running}
+  if [ ${running} != "-1" ]; then
+    echo "break"
+    break
+  fi
+done
 
 # Start data ingestion
 echo "Start data ingestion"
