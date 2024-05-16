@@ -67,9 +67,6 @@ public class FindReplayCPID {
     public static int getReplayID(long outputTs, long maxWindowSize, int numOfSource) {
         JedisPool pool = new JedisPool(L3Config.REDIS_IP, L3Config.REDIS_PORT);
         try (Jedis jedis = pool.getResource()) {
-            Set<String> keys = jedis.keys("*");
-            List<Integer> validKeyds = getValidKeys(keys);
-            // return findID(validKeyds, jedis, outputTs - maxWindowSize);
             return findID(jedis, numOfSource, outputTs - maxWindowSize);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
