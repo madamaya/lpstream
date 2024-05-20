@@ -66,6 +66,8 @@ do
   running=`getRunningJobID`
   echo "running =" ${running}
   if [ ${running} != "-1" ]; then
+    echo "(sleep 5)"
+    sleep 5
     echo "break"
     break
   fi
