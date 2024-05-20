@@ -34,7 +34,11 @@ public class FindReplayCPID {
         for (int cpid = cpidMax; cpid > 0; cpid--) {
             Tuple2<Long, Integer> element = hm.get(cpid);
             if (element != null && element.f1 == (L3Config.PARALLELISM * numOfSOp) && element.f0 < timestamp) {
-                return cpid;
+                if (element.f0 < 0) {
+                    return 0;
+                } else {
+                    return cpid;
+                }
             }
         }
 
