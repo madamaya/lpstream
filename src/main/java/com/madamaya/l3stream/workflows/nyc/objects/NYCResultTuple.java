@@ -99,7 +99,7 @@ public class NYCResultTuple {
                 "vendorId=" + vendorId +
                 ", dropoffLocationId=" + dropoffLocationId +
                 ", count=" + count +
-                ", avgDistance=" + avgDistance +
+                ", avgDistance=" + String.format("%.10f", avgDistance) +
                 ", ts=" + ts +
                 '}';
     }
