@@ -75,7 +75,7 @@ public class SynResultTuple {
     public String toString() {
         return "SynResultTuple{" +
                 "machineId=" + machineId +
-                ", avgTemp=" + avgTemp +
+                ", avgTemp=" + String.format("%.10f" , avgTemp) +
                 ", timestamp=" + timestamp +
                 '}';
     }

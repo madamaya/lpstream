@@ -1,10 +1,9 @@
-package com.madamaya.l3stream.getLineage;
+package com.madamaya.l3stream.utils.runnables;
 
 import com.madamaya.l3stream.conf.L3Config;
 import io.palyvos.provenance.l3stream.conf.L3conf;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -16,60 +15,60 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-public class ReplayMonitor {
-    static ObjectMapper om = new ObjectMapper();
+public class Monitor implements Runnable {
+    private long outputTs;
+    private String lineageTopic;
+    private String outputValue = "";
+    private String query;
+    private String size;
+    private String experimentID;
+    private int parallelism;
+    private int partition;
+    private long startTime;
 
-    public static void main(String[] args) throws Exception {
-        long outputTs;
-        String lineageTopic;
-        String outputValue = "";
-        String query;
-        String size;
-        String experimentID;
-        int parallelism;
+    public Monitor(long outputTs, String lineageTopic, String outputValue, String query, String size, String experimentID, int parallelism, int partition, long startTime) {
+        this.outputTs = outputTs;
+        this.lineageTopic = lineageTopic;
+        this.outputValue = outputValue;
+        this.query = query;
+        this.size = size;
+        this.experimentID = experimentID;
+        this.parallelism = parallelism;
+        this.partition = partition;
+        this.startTime = startTime;
+    }
 
-        if (args.length == 7 && args[2].length() > 0) {
-            outputTs = Long.parseLong(args[0]);
-            lineageTopic = args[1];
-            outputValue = args[2];
-            query = args[3];
-            size = args[4];
-            experimentID = args[5];
-            parallelism = Integer.parseInt(args[6]);
-        } else {
-            throw new IllegalArgumentException();
-        }
-        long startTime = System.currentTimeMillis();
+    @Override
+    public void run() {
+        System.out.println("Monitor (start): " + partition);
 
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, L3Config.BOOTSTRAP_IP_PORT);
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "replaymonitor-" + System.currentTimeMillis());
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "monitor-" + System.currentTimeMillis());
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
+
         List<TopicPartition> list = new ArrayList<>();
-        for (int i = 0; i < parallelism; i++) {
-            list.add(new TopicPartition(lineageTopic, i));
-        }
+        list.add(new TopicPartition(lineageTopic, partition));
         consumer.assign(list);
         consumer.seekToBeginning(list);
-        // consumer.subscribe(Arrays.asList(lineageTopic));
 
         int count = 0;
-        boolean run = true;
         long endTime = -1;
+        boolean active = true;
+        boolean lineageDerivationFlag = false;
 
         BufferedWriter bwDebug;
         try {
-            bwDebug = new BufferedWriter(new FileWriter(L3conf.L3_HOME + "/data/output/lineage/" + query + "/" + System.currentTimeMillis() + ".log"));
-            System.out.println("ReplayMonitor.java: READY");
-            while (run) {
+            bwDebug = new BufferedWriter(new FileWriter(L3conf.L3_HOME + "/data/output/lineage/" + query + "/" + System.currentTimeMillis() + "-" + partition + ".log"));
+            System.out.println("Monitor.java: READY (" + partition + ")");
+            while (!Thread.interrupted() && active) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord record : records) {
                     count++;
@@ -80,29 +79,33 @@ public class ReplayMonitor {
                         System.out.print("\rcount = " + count);
                     }
                     if (checkSame(currentRecord, outputValue, outputTs)) {
-                        System.out.println("count = " + count + " [END]");
+                        System.out.println("count = " + count + " [END] (" + partition + ")");
                         writeLineage(currentRecord, query, size, experimentID);
                         endTime = System.currentTimeMillis();
-                        run = false;
+                        active = false;
+                        lineageDerivationFlag = true;
                         break;
                     }
                 }
-
             }
             bwDebug.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException();
         }
 
-        BufferedWriter bw;
-        try {
-            String dataPath = L3conf.L3_HOME + "/data/output/lineage/" + query;
-            bw = new BufferedWriter(new FileWriter(dataPath + "/" + size + "-" + "monitor.log", true));
-            bw.write(experimentID + "," + startTime + "," + endTime + "\n");
-            bw.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (lineageDerivationFlag) {
+            BufferedWriter bw;
+            try {
+                String dataPath = L3conf.L3_HOME + "/data/output/lineage/" + query;
+                bw = new BufferedWriter(new FileWriter(dataPath + "/" + size + "-" + "monitor.log", true));
+                bw.write(experimentID + "," + startTime + "," + endTime + "," + partition + "\n");
+                bw.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+
+        System.out.println("Monitor (END): " + partition);
     }
 
     /* Sample data (recordValue) */
