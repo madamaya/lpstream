@@ -7,6 +7,8 @@ import java.util.List;
 
 public class ReplayMonitorV2 {
     public static void main(String[] args) throws Exception {
+        long startTime = System.currentTimeMillis();
+
         long outputTs;
         String lineageTopic;
         String outputValue = "";
@@ -26,7 +28,6 @@ public class ReplayMonitorV2 {
         } else {
             throw new IllegalArgumentException();
         }
-        long startTime = System.currentTimeMillis();
 
         List<Thread> threadList = new ArrayList<>();
         for (int idx = 0; idx < parallelism; idx++) {

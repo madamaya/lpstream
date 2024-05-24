@@ -64,32 +64,24 @@ public class Monitor implements Runnable {
         boolean active = true;
         boolean lineageDerivationFlag = false;
 
-        BufferedWriter bwDebug;
         try {
-            bwDebug = new BufferedWriter(new FileWriter(L3conf.L3_HOME + "/data/output/lineage/" + query + "/" + System.currentTimeMillis() + "-" + partition + ".log"));
             System.out.println("Monitor.java: READY (" + partition + ")");
             while (!Thread.interrupted() && active) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
                 for (ConsumerRecord record : records) {
                     count++;
                     String currentRecord = (String) record.value();
-                    bwDebug.write(currentRecord + "\n");
-                    bwDebug.flush();
-                    if (count % 1 == 0) {
-                        System.out.print("\rcount = " + count);
-                    }
                     if (checkSame(currentRecord, outputValue, outputTs)) {
-                        System.out.println("count = " + count + " [END] (" + partition + ")");
                         writeLineage(currentRecord, query, size, experimentID);
                         endTime = System.currentTimeMillis();
+                        System.out.println("count = " + count + " [END] (" + partition + ")");
                         active = false;
                         lineageDerivationFlag = true;
                         break;
                     }
                 }
             }
-            bwDebug.close();
-        } catch (IOException e) {
+        } catch (JsonProcessingException e) {
             throw new RuntimeException();
         }
 
@@ -138,6 +130,5 @@ public class Monitor implements Runnable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Lineage = " + recordValue);
     }
 }
