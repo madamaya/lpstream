@@ -38,10 +38,11 @@ do
 
       # In some cases, input rate make smaller than given one to keep flink stable.
       # This lines can be defined after throughput evaluation.
-      #if [[ ~~~ ]]; then
-      #  throughput=~~~
-      #else
-      throughput=${original_throughput}
+      if { [[ ${query} == "Syn2" ]] && [[ ${size} == 400 ]] } || { [[ ${query} == "Syn3" ]] && [[ ${size} == 400 ]] }; then
+        throughput=10000
+      else
+        throughput=${original_throughput}
+      fi
 
       # Stop cluster (Flink, Kafka, Redis)
       echo "(stopBroker)"
