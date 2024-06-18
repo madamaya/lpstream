@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
                 key = query + "," + approach + "," + str(size)
                 if key not in results:
-                    results[key] = [[1000], [10000000]]
+                    results[key] = [[0], [9999999999]]
 
                 if flag == "stable":
                     results[key][0].append(inputRate)
@@ -44,11 +44,16 @@ if __name__ == "__main__":
                             continue
                     key = query + "," + approach + "," + str(size)
                     if key not in results:
-                        results[key] = [[100000], [2600000]]
+                        results[key] = [[-400000], [2600000]]
 
     with open("config.csv", "w") as w:
         for key in results.keys():
             start = sorted(results[key][0])[-1]
             end = sorted(results[key][1])[0]
-            increment = round(((end - start) / 5) / 1000) * 1000
+            if start == -400000:
+                increment = (end - start) // 6
+            elif start == 0:
+                increment = (end - start) // 10
+            else:
+                increment = (end - start) // 5
             w.write("{},{},{},{}\n".format(key, str(start), str(end), str(increment)))

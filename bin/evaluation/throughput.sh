@@ -23,7 +23,7 @@ homedir=`pwd`
 rm finishedComb.csv ./thLog/parameters.log
 touch finishedComb.csv ./thLog/parameters.log
 
-for inputRateIdx in `seq 0 5`
+for inputRateIdx in `seq 0 9`
 do
   for size in ${sizes[@]}
   do
@@ -53,8 +53,17 @@ do
         # Define inputRate
         line=`cat ./thConf/config.csv | grep "${query},${approach},${size},"`
         start_value=`echo ${line} | awk -F, '{print $4}'`
+        end_value=`echo ${line} | awk -F, '{print $5}'`
         increment_value=`echo ${line} | awk -F, '{print $6}'`
         inputRate=$((start_value + increment_value * inputRateIdx))
+
+        # Skip some cases
+        if [ ${inputRateIdx} -eq 0 ]; then
+          continue
+        fi
+        if [ ${inputRate} -ge ${end_value} ]; then
+          continue
+        fi
 
         echo "${query},${approach},${size},${inputRate}" >> ./thLog/parameters.log
 

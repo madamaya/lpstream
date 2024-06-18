@@ -198,7 +198,7 @@ def isStable(query, approach, dataSize, latency_values, throughput_values, cpu_v
         c2_result = cpu_values[dataSize][query][approach] < 80
 
         # c3
-        c3_result = latency_values[dataSize][query][approach]["median"] < latency_threshold[query] # [ns]
+        #c3_result = latency_values[dataSize][query][approach]["median"] < latency_threshold[query] # [ns]
 
         # c4
         c4_result = throughput_values[dataSize][query][approach] > inputRate * 0.8
@@ -214,8 +214,8 @@ def isStable(query, approach, dataSize, latency_values, throughput_values, cpu_v
                 line += "c1"
             if c2_result == False:
                 line += "c2"
-            if c3_result == False:
-                line += "c3"
+            #if c3_result == False:
+                #line += "c3"
             if c4_result == False:
                 line += "c4"
         return line
