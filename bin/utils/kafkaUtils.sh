@@ -17,8 +17,19 @@ function startZookeeper() {
     echo "${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties"
     ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
   else
-    echo "ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/zookeeper-start.sh"
-    ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/startKafkaCluster/zookeeper-start.sh
+    while true
+    do
+      echo "ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/zookeeper-start.sh"
+      ssh ${zookeeperIP} /bin/zsh ${L3_HOME}/bin/utils/startKafkaCluster/zookeeper-start.sh
+      sleep 10
+      checkZookeeperProcess=`ssh ${zookeeperIP} ps aux | grep kafka | wc -l`
+      if [ ${checkZookeeperProcess} -eq 1 ]; then
+        echo "Zookeeper on ${zookeeperIP} [start] -> OK."
+        break
+      fi
+      echo "Zookeeper on ${zookeeperIP} [start] -> Failed."
+      stopZookeeper
+    done
   fi
 }
 
@@ -44,8 +55,19 @@ function startBroker() {
       brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
       for broker in ${brokers[@]}
       do
-        echo "ssh ${broker} /bin/zsh ${L3_HOME}/bin/utils/broker-start.sh"
-        ssh ${broker} /bin/zsh ${L3_HOME}/bin/utils/startKafkaCluster/broker-start.sh
+        while true
+        do
+          echo "ssh ${broker} /bin/zsh ${L3_HOME}/bin/utils/broker-start.sh"
+          ssh ${broker} /bin/zsh ${L3_HOME}/bin/utils/startKafkaCluster/broker-start.sh
+          sleep 10
+          brokerProcess=`ssh ${broker} ps aux | grep kafka | wc -l`
+          if [ ${brokerProcess} -eq 1 ]; then
+            echo "Broker on ${broker} [start] -> OK"
+            break
+          fi
+          echo "Broker on ${broker} [start] -> Failed"
+          stopBroker
+        done
       done
   fi
 }
