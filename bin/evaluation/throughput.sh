@@ -209,8 +209,8 @@ do
         mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
         echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} false false)" # isLatencyExperiment, isRawMode
         readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} false false
-        echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} throughput)"
-        python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} throughput
+        echo "(python calcLatencyV2th.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} throughput)"
+        python calcLatencyV2th.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} throughput
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"
@@ -235,8 +235,8 @@ do
 
   cd ${L3_HOME}/data/output/cpu-memory
   python cpu-memory.py "${queries}" "${approaches}" "${sizes}"
-  cd ${L3_HOME}/data/output/latency
-  python resultsGen.py "${queries}" "${approaches}" "${sizes}"
+  #cd ${L3_HOME}/data/output/latency
+  #python resultsGen.py "${queries}" "${approaches}" "${sizes}"
   cd ${L3_HOME}/data/output/throughput
   python throughputCalc.py "${queries}" "${approaches}" "${sizes}"
 

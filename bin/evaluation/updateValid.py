@@ -43,8 +43,8 @@ def getLatencyResults(queries, approaches, dataSizes, dataPath):
                 # File exists or not
                 if not os.path.exists("{}/latency/{}/results/result-{}-{}.json".format(dataPath, query, size, approach)):
                     # If the file does not exist, 'nan' value is assigned. ( results[size][query][approach][{'median'|'mean'|'ifMed'|'ifMean'}] )
-                    results[size][query][approach]["median"] = np.nan
-                    results[size][query][approach]["mean"] = np.nan
+                    #results[size][query][approach]["median"] = np.nan
+                    #results[size][query][approach]["mean"] = np.nan
                     results[size][query][approach]["ifMed"] = np.nan
                     results[size][query][approach]["ifMean"] = np.nan
                 else:
@@ -55,8 +55,8 @@ def getLatencyResults(queries, approaches, dataSizes, dataPath):
 
                     # Extract value ('S2S', 'median'), ('S2S', 'median'), ('S2S', 'ifMed'), ('S2S', 'ifMean')
                     # Store each value to results[size][query][approach][{'median'|'mean'|'ifMed'|'ifMean'}]
-                    results[size][query][approach]["median"] = jdata["S2S"]["median"]
-                    results[size][query][approach]["mean"] = jdata["S2S"]["mean"]
+                    #results[size][query][approach]["median"] = jdata["S2S"]["median"]
+                    #results[size][query][approach]["mean"] = jdata["S2S"]["mean"]
                     results[size][query][approach]["ifMed"] = jdata["S2S"]["ifMed"]
                     results[size][query][approach]["ifMean"] = jdata["S2S"]["ifMean"]
     return results
