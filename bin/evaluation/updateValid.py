@@ -196,9 +196,11 @@ if __name__ == "__main__":
                     continue
 
                 inputRate = latency_values[dataSize][query][approach]["inputRate"]
+                if np.isnan(inputRate):
+                    continue
 
                 result = isStable(query, approach, dataSize, latency_values, throughput_values, cpu_values, mem_values, inputRate)
-                print(dataSize, query, approach, result)
+                print(dataSize, query, approach, inputRate, result)
 
                 # the result means that Flink was unstable
                 with open("./finishedComb.csv", "a") as w:
