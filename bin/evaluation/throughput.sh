@@ -11,13 +11,9 @@ source ./thUtils/thUtils.sh
 
 granularityTemp=100
 queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
-#queries=(Syn1)
 approaches=(baseline genealog l3stream l3streamlin)
-#approaches=(baseline)
 sizes=(-1 10 100 400)
-#sizes=(10)
 sleepTime=600
-#inputRates=(5000)
 homedir=`pwd`
 
 rm finishedComb.csv ./thLog/parameters.log
@@ -78,15 +74,15 @@ do
         echo "(stopFlinkCluster)"
         stopFlinkCluster
 
-        echo "(sleep 30)"
-        sleep 30
+        echo "(sleep 10)"
+        sleep 10
 
         # Remove cache
         echo "(cleanCache)"
         cleanCache
 
-        echo "(sleep 30)"
-        sleep 30
+        echo "(sleep 10)"
+        sleep 10
 
         # Start cluster (Flink, Kafka, Redis)
         echo "(startZookeeper)"
@@ -98,14 +94,14 @@ do
         echo "(startFlinkCluster)"
         startFlinkCluster
 
-        echo "(sleep 30)"
-        sleep 30
+        echo "(sleep 10)"
+        sleep 10
 
         # Remove cache
         echo "(cleanCache)"
         cleanCache
-        echo "(sleep 120)"
-        sleep 120
+        echo "(sleep 30)"
+        sleep 30
 
         echo "(forceGConTM)"
         forceGConTM
@@ -209,8 +205,8 @@ do
         mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
         echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} false false)" # isLatencyExperiment, isRawMode
         readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} false false
-        echo "(python calcLatencyV2th.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} throughput)"
-        python calcLatencyV2th.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} throughput
+        echo "(python calcLatencyV2th2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${inputRate} throughput)"
+        python calcLatencyV2th2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${inputRate} throughput
 
         # Delete kafka topic
         echo "*** Delete kafka topic ***"
@@ -235,8 +231,6 @@ do
 
   cd ${L3_HOME}/data/output/cpu-memory
   python cpu-memory.py "${queries}" "${approaches}" "${sizes}"
-  #cd ${L3_HOME}/data/output/latency
-  #python resultsGen.py "${queries}" "${approaches}" "${sizes}"
   cd ${L3_HOME}/data/output/throughput
   python throughputCalc.py "${queries}" "${approaches}" "${sizes}"
 

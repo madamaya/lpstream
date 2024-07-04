@@ -152,15 +152,15 @@ do
   echo "(stopFlinkCluster)"
   stopFlinkCluster < /dev/null
 
-  echo "(sleep 30)"
-  sleep 30
+  echo "(sleep 10)"
+  sleep 10
 
   # Remove cache
   echo "(cleanCache)"
   cleanCache < /dev/null
 
-  echo "(sleep 30)"
-  sleep 30
+  echo "(sleep 10)"
+  sleep 10
 
   # Start cluster (Flink, Kafka, Redis)
   echo "(startZookeeper)"
@@ -172,14 +172,14 @@ do
   echo "(startFlinkCluster)"
   startFlinkCluster < /dev/null
 
-  echo "(sleep 30)"
-  sleep 30
+  echo "(sleep 10)"
+  sleep 10
 
   # Remove cache
   echo "(cleanCache)"
   cleanCache < /dev/null
-  echo "(sleep 120)"
-  sleep 120
+  echo "(sleep 30)"
+  sleep 30
 
   echo "(forceGConTM)"
   forceGConTM < /dev/null
