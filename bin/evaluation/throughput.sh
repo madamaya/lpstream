@@ -69,6 +69,8 @@ do
         stopBroker
         echo "(stopZookeeper)"
         stopZookeeper
+        echo "ssh ${redisIP} redis-cli -h ${redisIP} flushdb"
+        ssh ${redisIP} redis-cli -h ${redisIP} flushdb
         echo "(stopRedis)"
         stopRedis
         echo "(stopFlinkCluster)"
@@ -91,6 +93,8 @@ do
         startBroker
         echo "(startRedis)"
         startRedis
+        echo "ssh ${redisIP} redis-cli -h ${redisIP} flushdb"
+        ssh ${redisIP} redis-cli -h ${redisIP} flushdb
         echo "(startFlinkCluster)"
         startFlinkCluster
 
