@@ -146,7 +146,10 @@ def isStable(query, approach, dataSize, latency_values, throughput_values, cpu_v
         c2_result = cpu_values[dataSize][query][approach] < 80
 
         # c4
-        c4_result = throughput_values[dataSize][query][approach] > inputRate * 0.9
+        if query == "Nexmark" or query == "Nexmark2" or query == "Syn2":
+            c4_result = throughput_values[dataSize][query][approach]/2 > inputRate * 0.9
+        else:
+            c4_result = throughput_values[dataSize][query][approach] > inputRate * 0.9
 
         if (np.isnan(cpu_values[dataSize][query][approach]) or
                 np.isnan(latency_values[dataSize][query][approach]["ifMed"]) or
