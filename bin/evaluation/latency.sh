@@ -42,6 +42,7 @@ do
         throughput=${original_throughput}
       fi
 
+      cd ../templates
       # Stop cluster (Flink, Kafka, Redis)
       echo "(stopBroker)"
       stopBroker
