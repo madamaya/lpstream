@@ -14,8 +14,7 @@ queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
 approaches=(baseline genealog l3stream l3streamlin)
 sizes=(-1 10 100 400)
 sleepTime=600
-
-cd ../templates
+homedir=`pwd`
 
 for size in ${sizes[@]}
 do
@@ -23,6 +22,8 @@ do
   do
     for query in ${queries[@]}
     do
+      cd ${homedir}
+
       if [[ ${query} == *Syn* ]]; then
         if [ ${size} -eq -1 ]; then
           continue
