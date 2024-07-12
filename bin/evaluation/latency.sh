@@ -10,7 +10,7 @@ source ../utils/cpuMemoryLoadLogger.sh
 
 original_throughput=${1}
 granularityTemp=100
-queries=(Syn1 Syn2 Syn3 LR NYC Nexmark YSB NYC2 Nexmark2 YSB2)
+queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
 approaches=(baseline genealog l3stream l3streamlin)
 sizes=(-1 10 100 400)
 sleepTime=600
@@ -110,8 +110,8 @@ do
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.GL${query}"
         # Run
         echo "*** Run ***"
-        echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${aggregateStrategy} ${size})"
-        ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${aggregateStrategy} ${size}
+        echo "(./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size})"
+        ./genealog.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${size}
       elif [ ${approach} = "l3stream" ]; then
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
         # Run
@@ -122,8 +122,8 @@ do
         mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
         # Run
         echo "*** Run ***"
-        echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size})"
-        ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${aggregateStrategy} ${size}
+        echo "(./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${size})"
+        ./lineageNoReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${query}/${approach} 0 ${outputTopicName} ${size}
       fi
 
       # Start data ingestion
@@ -180,7 +180,7 @@ do
       fi
 
       # Latency calculation
-      cd ${L3_HOME}/data/output
+      cd ${L3_HOME}/data/output/latency
       echo "*** latency calc ***"
       echo "mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}"
       mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
@@ -214,7 +214,7 @@ cd ${L3_HOME}/data/output/cpu-memory
 python cpu-memory.py "${queries}" "${approaches}" "${sizes}"
 cd ${L3_HOME}/data/output/latency
 python resultsGen.py "${queries}" "${approaches}" "${sizes}"
-cd ${L3_HOME}/data/output/throughput/metrics1
+cd ${L3_HOME}/data/output/throughput
 python throughputCalc.py "${queries}" "${approaches}" "${sizes}"
 
 cd ${L3_HOME}/data/output
