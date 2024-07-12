@@ -219,7 +219,7 @@ python throughputCalc.py "${queries}" "${approaches}" "${sizes}"
 
 cd ${L3_HOME}/data/output
 mkdir -p latEval
-cp -r latency latEval/latency${throughput}
-cp -r throughput latEval/throughput${throughput}
-cp -r cpu-memory latEval/cpu-memory${throughput}
+cp -r latency latEval/latency
+cp -r throughput latEval/throughput
+cp -r cpu-memory latEval/cpu-memory
 ./flesh.sh fleshAll
