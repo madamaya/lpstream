@@ -9,6 +9,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.InterruptException;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -83,6 +84,8 @@ public class Monitor implements Runnable {
             }
         } catch (JsonProcessingException e) {
             throw new RuntimeException();
+        } catch (InterruptException e) {
+            System.out.println("Monitor (interrupted): " + partition);
         }
 
         if (lineageDerivationFlag) {
