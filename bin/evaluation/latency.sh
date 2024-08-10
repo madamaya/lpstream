@@ -8,7 +8,8 @@ source ../utils/cleanCache.sh
 source ../utils/logger.sh
 source ../utils/cpuMemoryLoadLogger.sh
 
-original_throughput=${1}
+#original_throughput=${1}
+throughput=10000
 granularityTemp=100
 queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
 approaches=(baseline genealog l3stream l3streamlin)
@@ -36,11 +37,11 @@ do
 
       # In some cases, input rate make smaller than given one to keep flink stable.
       # This lines can be defined after throughput evaluation.
-      if { [[ ${query} == "Syn2" ]] && [[ ${size} == 400 ]] } || { [[ ${query} == "Syn3" ]] && [[ ${size} == 400 ]] }; then
-        throughput=10000
-      else
-        throughput=${original_throughput}
-      fi
+      #if { [[ ${query} == "Syn2" ]] && [[ ${size} == 400 ]] } || { [[ ${query} == "Syn3" ]] && [[ ${size} == 400 ]] }; then
+        #throughput=10000
+      #else
+        #throughput=${original_throughput}
+      #fi
 
       cd ../templates
       # Stop cluster (Flink, Kafka, Redis)
