@@ -24,7 +24,7 @@ size=$9
 experimentID=${10}
 
 # define numOfSourceOp
-if [[ ${mainPath} == *Nexmark* ]]; then
+if [[ ${mainPath} == *Nexmark* ]] || [[ ${mainPath} == *Syn2* ]]; then
   numOfSourceOp=2
 else
   numOfSourceOp=1
