@@ -25,9 +25,9 @@ else
 fi
 
 size=$2
-inputRate=10000
+inputRate=50000
 granularityTemp=100
-sleepTime=180
+sleepTime=600
 
 source ../utils/logger.sh
 source ../utils/notifyEnd.sh
