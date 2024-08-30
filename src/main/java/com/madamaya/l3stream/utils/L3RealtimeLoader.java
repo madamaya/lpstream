@@ -34,6 +34,6 @@ public class L3RealtimeLoader {
             new Thread(new IngestKafkaPartition(filePath, qName, topic, idx, throughput / parallelism, thMap, granularity, datanum / parallelism)).start();
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownProcessing(thMap)));
+        Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownProcessing(filePath, thMap, throughput)));
     }
 }
