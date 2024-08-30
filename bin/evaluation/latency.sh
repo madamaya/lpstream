@@ -11,9 +11,9 @@ source ../utils/cpuMemoryLoadLogger.sh
 #original_throughput=${1}
 throughput=10000
 granularityTemp=100
-queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
+queries=(Syn1 Syn2 Syn3 LR Nexmark NYC Nexmark2 NYC2)
 approaches=(baseline genealog l3stream l3streamlin)
-sizes=(-1 10 100 400)
+sizes=(-1 10 50 100)
 sleepTime=600
 homedir=`pwd`
 
@@ -34,14 +34,6 @@ do
           continue
         fi
       fi
-
-      # In some cases, input rate make smaller than given one to keep flink stable.
-      # This lines can be defined after throughput evaluation.
-      #if { [[ ${query} == "Syn2" ]] && [[ ${size} == 400 ]] } || { [[ ${query} == "Syn3" ]] && [[ ${size} == 400 ]] }; then
-        #throughput=10000
-      #else
-        #throughput=${original_throughput}
-      #fi
 
       cd ../templates
       # Stop cluster (Flink, Kafka, Redis)
