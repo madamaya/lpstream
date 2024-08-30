@@ -59,19 +59,15 @@ public class NYC2 {
                 .aggregate(new CountAndAvgDistance());
 
         KafkaSink<NYCResultTuple> sink;
-        Properties props = new Properties();
-        props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
         if (settings.getLatencyFlag() == 1) {
             sink = KafkaSink.<NYCResultTuple>builder()
                     .setBootstrapServers(brokers)
-                    .setKafkaProducerConfig(props)
                     .setRecordSerializer(new OutputKafkaSinkNYCV2(outputTopicName))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         } else {
             sink = KafkaSink.<NYCResultTuple>builder()
                     .setBootstrapServers(brokers)
-                    .setKafkaProducerConfig(props)
                     .setRecordSerializer(new LatencyKafkaSinkNYCV2(outputTopicName))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();

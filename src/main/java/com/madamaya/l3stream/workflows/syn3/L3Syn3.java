@@ -60,7 +60,9 @@ public class L3Syn3 {
                 .aggregate(L3.aggregateTs(new AvgTemperatureL3())).uid("7");
 
         Properties props = new Properties();
-        props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
+        if (settings.getLineageMode() == "LineageMode") {
+            props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
+        }
         if (settings.isInvokeCpAssigner()) {
             ds.map(new CpAssigner<>()).uid("8").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings, props)).uid(settings.getLineageMode());
         } else {

@@ -49,23 +49,18 @@ public class YSB {
                 .map(new TsAssignYSB())
                 .keyBy(t -> t.getCampaignId())
                 .window(TumblingEventTimeWindows.of(Time.seconds(1)))
-                // .trigger(new TriggerYSB())
                 .aggregate(new CountYSB());
 
         KafkaSink<YSBResultTuple> sink;
-        Properties props = new Properties();
-        props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
         if (settings.getLatencyFlag() == 1) {
             sink = KafkaSink.<YSBResultTuple>builder()
                     .setBootstrapServers(brokers)
-                    .setKafkaProducerConfig(props)
                     .setRecordSerializer(new OutputKafkaSinkYSBV2(outputTopicName))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         } else {
             sink = KafkaSink.<YSBResultTuple>builder()
                     .setBootstrapServers(brokers)
-                    .setKafkaProducerConfig(props)
                     .setRecordSerializer(new LatencyKafkaSinkYSBV2(outputTopicName))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();

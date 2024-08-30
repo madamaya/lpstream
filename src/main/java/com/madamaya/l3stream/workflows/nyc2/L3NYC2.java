@@ -70,7 +70,9 @@ public class L3NYC2 {
 
         // L5
         Properties props = new Properties();
-        props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
+        if (settings.getLineageMode() == "LineageMode") {
+            props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
+        }
         if (settings.isInvokeCpAssigner()) {
             ds.map(new CpAssigner<>()).uid("8").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings, props)).uid(settings.getLineageMode());
         } else {
