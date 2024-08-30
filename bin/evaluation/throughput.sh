@@ -51,7 +51,12 @@ do
         start_value=`echo ${line} | awk -F, '{print $4}'`
         end_value=`echo ${line} | awk -F, '{print $5}'`
         increment_value=`echo ${line} | awk -F, '{print $6}'`
-        inputRate=$((start_value + increment_value * inputRateIdx))
+        tmpinputRate=$((start_value + increment_value * inputRateIdx))
+        if [ ${increment_value} -lt 100000 ] && [ ${tmpinputRate} -gt 100000 ]; then
+          inputRate=$(((tmpinputRate - 100000) * 10 + 100000))
+        else
+          inputRate=${tmpinputRate}
+        fi
 
         # Skip some cases
         if [ ${inputRateIdx} -eq 0 ]; then
