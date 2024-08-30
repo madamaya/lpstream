@@ -15,9 +15,10 @@ if __name__ == "__main__":
         raise Exception
 
     cases = [
-        [10, 0.1],
-        [100, 0.4],
-        [400, 1.4]
+        #[10, 0.1],
+        [50, 0.3],
+        #[100, 0.4],
+        #[400, 1.4]
     ]
     for case in cases:
         # Parameters
