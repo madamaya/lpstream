@@ -3,7 +3,7 @@
 source ../config.sh
 
 # Real dataset
-for idx in `seq 1 5`
+for idx in `seq 1 7`
 do
   echo "./LMUserDriver.sh ${idx} -1 |& tee lineageDuration_${idx}_-1.log"
   ./LMUserDriver.sh ${idx} -1 |& tee lineageDuration_${idx}_-1.log
