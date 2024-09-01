@@ -188,8 +188,8 @@ do
 
   echo "This loop: " ${LINE}
   # GNU awk
-  outputValue=`echo ${LINE} | awk 'match($0, /^[0-9]+,[0-9]+,(.*),[0-9]+$/, ret) {print ret[1]}'`
-  outputTs=`echo ${LINE} | awk 'match($0, /^[0-9]+,[0-9]+,.*,([0-9]+)$/, ret) {print ret[1]}'`
+  outputValue=`echo ${LINE} | awk 'match($0, /^[0-9]+,[0-9]+,(.*),[0-9]+,[0-9]+$/, ret) {print ret[1]}'`
+  outputTs=`echo ${LINE} | awk 'match($0, /^[0-9]+,[0-9]+,.*,([0-9]+),[0-9]+$/, ret) {print ret[1]}'`
 
   ## Start time
   experimentID=`date "+%s"`
