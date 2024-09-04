@@ -9,7 +9,7 @@ source ../utils/logger.sh
 source ../utils/cpuMemoryLoadLogger.sh
 
 #original_throughput=${1}
-throughput=10000
+throughput=50000
 granularityTemp=100
 queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
 approaches=(baseline genealog l3stream l3streamlin)

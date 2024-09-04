@@ -30,7 +30,7 @@ if __name__ == "__main__":
                 else:
                     raise Exception
     else:
-        queries = ["Syn1", "Syn2", "Syn3", "LR", "Nexmark", "Nexmark2", "NYC", "NYC2"]
+        queries = ["Syn1", "Syn2", "Syn3", "LR", "Nexmark", "Nexmark2", "NYC", "NYC2", "YSB", "YSB2"]
         approaches = ["baseline", "genealog", "l3stream", "l3streamlin"]
         sizes = [-1, 10, 50, 100]
         for query in queries:
