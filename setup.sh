@@ -1,15 +1,20 @@
 #!/bin/zsh
 
 source ./bin/config.sh
-#LRScaleFactor=1
-LRScaleFactor=10
-#NexmarkTupleNum=1000000
-NexmarkTupleNum=275000000
-#NYCstartYear=2022
-NYCstartYear=2017
+
+# Experiments
+#LRScaleFactor=10
+#NexmarkTupleNum=275000000
+#NYCstartYear=2017
+#NYCendYear=2023
+#YSBTupleNum=360000000
+
+# Test
+LRScaleFactor=1
+NexmarkTupleNum=1000000
+NYCstartYear=2022
 NYCendYear=2023
-#YSBTupleNum=60933230
-YSBTupleNum=360000000
+YSBTupleNum=60933230
 
 if [ $# -ne 1 ]; then
   echo "Illegal Arguments."
@@ -82,7 +87,7 @@ elif [ $1 = "mainData" ]; then
   echo "START: python dataGen.py ${parallelism}" >> ../dataGen.log
   python dataGen.py ${parallelism}
   echo "END: python dataGen.py ${parallelism}" >> ../dataGen.log
-  for i in 10 100 400
+  for i in 10 100
   do
     echo "START: ./copy.sh ${parallelism} ${i}"
     ./copy.sh ${parallelism} ${i}

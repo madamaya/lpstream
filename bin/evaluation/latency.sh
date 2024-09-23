@@ -13,7 +13,7 @@ throughput=50000
 granularityTemp=100
 queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
 approaches=(baseline genealog l3stream l3streamlin)
-sizes=(-1 10 50 100)
+sizes=(-1 10 100)
 sleepTime=600
 homedir=`pwd`
 
@@ -183,6 +183,8 @@ do
       readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true false
       echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency)"
       python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency
+      echo "(python calcLatencyV2-bar.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency)"
+      python calcLatencyV2-bar.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency
 
       # Delete kafka topic
       echo "*** Delete kafka topic ***"
@@ -209,6 +211,7 @@ cd ${L3_HOME}/data/output/cpu-memory
 python cpu-memory.py "${queries}" "${approaches}" "${sizes}"
 cd ${L3_HOME}/data/output/latency
 python resultsGen.py "${queries}" "${approaches}" "${sizes}"
+python resultsGen-bar2.py "${queries}" "${approaches}" "${sizes}"
 cd ${L3_HOME}/data/output/throughput
 python throughputCalc.py "${queries}" "${approaches}" "${sizes}"
 

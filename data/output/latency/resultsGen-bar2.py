@@ -15,17 +15,30 @@ def arg_parser(elements):
 def make_sub_graph(s2s_list_all, query, size, idx, ax):
     if query == "LR" or query == "Syn1":
         #s2s_list_all = s2s_list_all / 1000
-        ax[idx//4,idx%4].set_ylabel("Latency [µs]")
+        ax[idx//7,idx%7].set_ylabel("[µs]", rotation=0)
     else:
         #s2s_list_all = s2s_list_all / 1000000000
-        ax[idx//4,idx%4].set_ylabel("Latency [s]")
+        ax[idx//7,idx%7].set_ylabel("[s]", rotation=0)
+    ax[idx//7,idx%7].yaxis.set_label_coords(-0.1, 1)
 
-    ax[idx//4,idx%4].boxplot(s2s_list_all, showfliers=False)
-    ax[idx//4,idx%4].set_xticklabels(["baseline", "genealog", "ordinary", "provenance"])
-    if size == -1:
-        ax[idx//4,idx%4].set_title("{}".format(query))
+    ax[idx//7,idx%7].boxplot(s2s_list_all, showfliers=False)
+    ax[idx//7,idx%7].set_xticklabels(["B", "G", "O", "P"])
+
+    if "Syn" not in query:
+        title = query
     else:
-        ax[idx//4,idx%4].set_title("{} ({})".format(query, size))
+        if query == "Syn1":
+            title = "SynA"
+        elif query == "Syn2":
+            title = "SynB"
+        elif query == "Syn3":
+            title = "SynC"
+        else:
+            raise Exception
+    if size == -1:
+        ax[idx//7,idx%7].set_title("{}".format(title))
+    else:
+        ax[idx//7,idx%7].set_title("{} ({})".format(title, size))
 
 
 def type2unit(latency_type):
@@ -58,12 +71,12 @@ if __name__ == "__main__":
     if not os.path.exists("./results-bar2/figs"):
         os.makedirs("./results-bar2/figs")
 
-    fig, ax = plt.subplots(4, 4, figsize=(16,10))
+    fig, ax = plt.subplots(2, 7, figsize=(17,5))
     idx = 0
     for query in queries:
         for size in dataSizes:
             # invalid cases
-            if ("Syn" in query and size == -1) or ("Syn" not in query and size != -1):
+            if ("Syn" in query and size == -1) or ("Syn" not in query and size != -1) or (size == 50):
                 continue
 
             s2s_list_all = []
@@ -88,4 +101,5 @@ if __name__ == "__main__":
             idx += 1
 
     fig.tight_layout()
-    plt.savefig("./results-bar2/figs/latencies.png")
+    plt.subplots_adjust(hspace=0.25)
+    plt.savefig("./results-bar2/figs/latencies2.pdf")
