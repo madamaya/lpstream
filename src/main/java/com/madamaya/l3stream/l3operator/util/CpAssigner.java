@@ -9,13 +9,15 @@ public class CpAssigner<T> implements MapFunction<L3StreamTupleContainer<T>, L3S
 
     @Override
     public L3StreamTupleContainer<T> map(L3StreamTupleContainer<T> value) throws Exception {
-        L3StreamTupleContainer<T> ret = new L3StreamTupleContainer<>(value);
-        ret.setCheckpointId(latestCpId);
-        return ret;
+        //L3StreamTupleContainer<T> ret = new L3StreamTupleContainer<>(value);
+        //ret.setCheckpointId(latestCpId);
+        //return ret;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void notifyCheckpointComplete(long l) throws Exception {
-        latestCpId = l;
+        //latestCpId = l;
+        throw new UnsupportedOperationException();
     }
 }
