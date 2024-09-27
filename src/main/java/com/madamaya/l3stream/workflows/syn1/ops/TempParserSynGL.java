@@ -1,20 +1,34 @@
 package com.madamaya.l3stream.workflows.syn1.ops;
 
-import com.madamaya.l3stream.glCommons.StringGL;
+import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.workflows.syn1.objects.SynTempTupleGL;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
-import org.apache.flink.api.common.functions.MapFunction;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputStringGL;
+import io.palyvos.provenance.util.ExperimentSettings;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
 
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
-public class TempParserSynGL implements MapFunction<StringGL, SynTempTupleGL> {
+public class TempParserSynGL extends RichMapFunction<KafkaInputStringGL, SynTempTupleGL> {
     private static final Pattern delimiter = Pattern.compile(",");
+    long start;
+    long count;
+    ExperimentSettings settings;
+
+    public TempParserSynGL(ExperimentSettings settings) {
+        this.settings = settings;
+    }
 
     @Override
-    public SynTempTupleGL map(StringGL input) throws Exception {
-        String inputStr = input.getString();
+    public SynTempTupleGL map(KafkaInputStringGL input) throws Exception {
+        String inputStr = input.getStr();
         String[] elements = delimiter.split(inputStr);
         int type = Integer.parseInt(elements[0]);
+        count++;
         if (type == 0) {
             SynTempTupleGL tuple = new SynTempTupleGL(
                     type,
@@ -30,7 +44,32 @@ public class TempParserSynGL implements MapFunction<StringGL, SynTempTupleGL> {
             GenealogMapHelper.INSTANCE.annotateResult(input, tuple);
             return tuple;
         } else {
-            return new SynTempTupleGL(type);
+            SynTempTupleGL tuple = new SynTempTupleGL(type);
+            GenealogMapHelper.INSTANCE.annotateResult(input, tuple);
+            return tuple;
         }
+    }
+
+    @Override
+    public void open(Configuration parameters) throws Exception {
+        super.open(parameters);
+        start = System.nanoTime();
+        count = 0L;
+    }
+
+    @Override
+    public void close() throws Exception {
+        long end = System.nanoTime();
+
+        String dataPath = L3Config.L3_HOME + "/data/output/throughput/" + settings.getQueryName();
+        if (Files.notExists(Paths.get(dataPath))) {
+            Files.createDirectories(Paths.get(dataPath));
+        }
+
+        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + 0 + "_" + getRuntimeContext().getIndexOfThisSubtask() + "_" + settings.getDataSize() + ".log");
+        pw.println(start + "," + end + "," + (end - start) + "," + count);
+        pw.flush();
+        pw.close();
+        super.close();
     }
 }

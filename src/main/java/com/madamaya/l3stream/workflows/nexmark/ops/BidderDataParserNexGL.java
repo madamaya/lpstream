@@ -1,22 +1,32 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
-import com.madamaya.l3stream.glCommons.StringGL;
+import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTupleGL;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
-import org.apache.flink.api.common.functions.MapFunction;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputStringGL;
+import io.palyvos.provenance.util.ExperimentSettings;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class BidderDataParserNexGL implements MapFunction<StringGL, NexmarkBidTupleGL> {
+public class BidderDataParserNexGL extends RichMapFunction<KafkaInputStringGL, NexmarkBidTupleGL> {
+    long start;
+    long count;
+    ExperimentSettings settings;
     ObjectMapper om;
     final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-    public BidderDataParserNexGL() {
+    public BidderDataParserNexGL(ExperimentSettings settings) {
+        this.settings = settings;
         this.om = new ObjectMapper();
     }
 
@@ -26,10 +36,10 @@ public class BidderDataParserNexGL implements MapFunction<StringGL, NexmarkBidTu
     // bid: auction, bidder, price, channel, url, dateTime, extra
     */
     @Override
-    public NexmarkBidTupleGL map(StringGL input) throws Exception {
-        JsonNode jsonNodes = om.readTree(input.getString());
+    public NexmarkBidTupleGL map(KafkaInputStringGL input) throws Exception {
+        JsonNode jsonNodes = om.readTree(input.getStr());
         int eventType = jsonNodes.get("event_type").asInt();
-
+        count++;
         // eventType is auction
         if (eventType == 2) {
             JsonNode jnode = jsonNodes.get("bid");
@@ -43,11 +53,35 @@ public class BidderDataParserNexGL implements MapFunction<StringGL, NexmarkBidTu
 
             NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType, auctionId, bidder, price, channel, url, dateTime, extra, input.getDominantOpTime(), input.getKafkaAppandTime(), input.getStimulus());
             GenealogMapHelper.INSTANCE.annotateResult(input, out);
-
             return out;
         } else {
-            return new NexmarkBidTupleGL(eventType);
+            NexmarkBidTupleGL out = new NexmarkBidTupleGL(eventType);
+            GenealogMapHelper.INSTANCE.annotateResult(input, out);
+            return out;
         }
+    }
+
+    @Override
+    public void open(Configuration parameters) throws Exception {
+        super.open(parameters);
+        start = System.nanoTime();
+        count = 0L;
+    }
+
+    @Override
+    public void close() throws Exception {
+        long end = System.nanoTime();
+
+        String dataPath = L3Config.L3_HOME + "/data/output/throughput/" + settings.getQueryName();
+        if (Files.notExists(Paths.get(dataPath))) {
+            Files.createDirectories(Paths.get(dataPath));
+        }
+
+        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + 1 + "_" + getRuntimeContext().getIndexOfThisSubtask() + "_" + settings.getDataSize() + ".log");
+        pw.println(start + "," + end + "," + (end - start) + "," + count);
+        pw.flush();
+        pw.close();
+        super.close();
     }
 
     private long convertDateFormat(String dateLine) {

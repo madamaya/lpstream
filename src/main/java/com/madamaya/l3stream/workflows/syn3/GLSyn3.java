@@ -1,7 +1,6 @@
 package com.madamaya.l3stream.workflows.syn3;
 
 import com.madamaya.l3stream.conf.L3Config;
-import com.madamaya.l3stream.glCommons.InitGLdataStringGL;
 import com.madamaya.l3stream.workflows.syn1.objects.SynResultTupleGL;
 import com.madamaya.l3stream.workflows.syn1.ops.AvgTemperatureGL;
 import com.madamaya.l3stream.workflows.syn1.ops.TempParserSynGL;
@@ -9,8 +8,8 @@ import com.madamaya.l3stream.workflows.syn1.ops.TsAssignTempMapGL;
 import com.madamaya.l3stream.workflows.syn1.ops.WatermarkStrategyTempSynGL;
 import com.madamaya.l3stream.workflows.syn3.ops.LatencyKafkaSinkSyn3GLV2;
 import com.madamaya.l3stream.workflows.syn3.ops.LineageKafkaSinkSyn3GLV2;
-import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2GL;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputStringGL;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -40,18 +39,17 @@ public class GLSyn3 {
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
-        KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
+        KafkaSource<KafkaInputStringGL> source = KafkaSource.<KafkaInputStringGL>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
                 .setGroupId(String.valueOf(System.currentTimeMillis()))
                 .setStartingOffsets(OffsetsInitializer.latest())
-                .setDeserializer(new StringDeserializerV2())
+                .setDeserializer(new StringDeserializerV2GL())
                 .build();
 
         /* Query */
         DataStream<SynResultTupleGL> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceSyn1")
-                .map(new InitGLdataStringGL(settings))
-                .map(new TempParserSynGL())
+                .map(new TempParserSynGL(settings))
                 .filter(t -> t.getType() == 0)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyTempSynGL())
                 .map(new TsAssignTempMapGL())

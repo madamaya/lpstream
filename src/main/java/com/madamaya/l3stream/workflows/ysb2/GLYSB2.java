@@ -1,11 +1,10 @@
 package com.madamaya.l3stream.workflows.ysb2;
 
 import com.madamaya.l3stream.conf.L3Config;
-import com.madamaya.l3stream.glCommons.InitGLdataStringGL;
 import com.madamaya.l3stream.workflows.ysb.objects.YSBResultTupleGL;
 import com.madamaya.l3stream.workflows.ysb.ops.*;
-import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2GL;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputStringGL;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -35,18 +34,17 @@ public class GLYSB2 {
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
-        KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
+        KafkaSource<KafkaInputStringGL> source = KafkaSource.<KafkaInputStringGL>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
                 .setGroupId(String.valueOf(System.currentTimeMillis()))
                 .setStartingOffsets(OffsetsInitializer.latest())
-                .setDeserializer(new StringDeserializerV2())
+                .setDeserializer(new StringDeserializerV2GL())
                 .build();
 
         /* Query */
         DataStream<YSBResultTupleGL> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceYSB")
-                .map(new InitGLdataStringGL(settings))
-                .map(new DataParserYSBGL())
+                .map(new DataParserYSBGL(settings))
                 .assignTimestampsAndWatermarks(new WatermarkStrategyYSBGL())
                 .filter(t -> t.getEventType().equals("view"))
                 .map(new ProjectAttributeYSBGL())

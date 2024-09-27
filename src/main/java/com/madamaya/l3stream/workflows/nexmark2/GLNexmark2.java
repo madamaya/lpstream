@@ -1,13 +1,12 @@
 package com.madamaya.l3stream.workflows.nexmark2;
 
 import com.madamaya.l3stream.conf.L3Config;
-import com.madamaya.l3stream.glCommons.InitGLdataStringGL;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTupleGL;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTupleGL;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTupleGL;
 import com.madamaya.l3stream.workflows.nexmark.ops.*;
-import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
-import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2GL;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputStringGL;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -35,26 +34,24 @@ public class GLNexmark2 {
         final String outputTopicName = queryFlag + "-o";
         final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
-        KafkaSource<KafkaInputString> source = KafkaSource.<KafkaInputString>builder()
+        KafkaSource<KafkaInputStringGL> source = KafkaSource.<KafkaInputStringGL>builder()
                 .setBootstrapServers(brokers)
                 .setTopics(inputTopicName)
                 .setGroupId("1" + String.valueOf(System.currentTimeMillis()))
                 .setStartingOffsets(OffsetsInitializer.latest())
-                .setDeserializer(new StringDeserializerV2())
+                .setDeserializer(new StringDeserializerV2GL())
                 .build();
 
         /* Query */
-        DataStream<KafkaInputString> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark");
+        DataStream<KafkaInputStringGL> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark");
         DataStream<NexmarkAuctionTupleGL> auction = sourceDs
-                .map(new InitGLdataStringGL(settings, 0))
-                .map(new AuctionDataParserNexGL())
+                .map(new AuctionDataParserNexGL(settings))
                 .filter(t -> t.getEventType() == 1)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNexGL())
                 .map(new TsAssignAuctionNexGL());
 
         DataStream<NexmarkBidTupleGL> bid = sourceDs
-                .map(new InitGLdataStringGL(settings, 1))
-                .map(new BidderDataParserNexGL())
+                .map(new BidderDataParserNexGL(settings))
                 .filter(t -> t.getEventType() == 2)
                 .assignTimestampsAndWatermarks(new WatermarkStrategyBidNexGL())
                 .map(new TsAssignBidderNexGL());
