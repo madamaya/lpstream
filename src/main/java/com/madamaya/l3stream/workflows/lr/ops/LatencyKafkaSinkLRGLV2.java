@@ -26,8 +26,8 @@ public class LatencyKafkaSinkLRGLV2 implements KafkaRecordSerializationSchema<Li
     public ProducerRecord<byte[], byte[]> serialize(LinearRoadInputTupleGL tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
         long traversalStartTime = System.nanoTime();
         Set<TimestampedUIDTuple> lineage = genealogGraphTraverser.getProvenance(tuple);
-        String lineageStr = FormatLineage.formattedLineage(lineage);
         long traversalEndTime = System.nanoTime();
+        String lineageStr = FormatLineage.formattedLineage(lineage);
 
         String latency = Long.toString(traversalEndTime - tuple.getStimulus());
         String traversalTime = Long.toString(traversalEndTime - traversalStartTime);

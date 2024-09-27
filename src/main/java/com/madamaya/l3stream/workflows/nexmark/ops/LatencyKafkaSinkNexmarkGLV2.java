@@ -26,8 +26,8 @@ public class LatencyKafkaSinkNexmarkGLV2 implements KafkaRecordSerializationSche
     public ProducerRecord<byte[], byte[]> serialize(NexmarkJoinedTupleGL tuple, KafkaSinkContext kafkaSinkContext, Long aLong) {
         long traversalStartTime = System.nanoTime();
         Set<TimestampedUIDTuple> lineage = genealogGraphTraverser.getProvenance(tuple);
-        String lineageStr = FormatLineage.formattedLineage(lineage);
         long traversalEndTime = System.nanoTime();
+        String lineageStr = FormatLineage.formattedLineage(lineage);
 
         String latency = Long.toString(traversalEndTime - tuple.getStimulus());
         String traversalTime = Long.toString(traversalEndTime - traversalStartTime);
