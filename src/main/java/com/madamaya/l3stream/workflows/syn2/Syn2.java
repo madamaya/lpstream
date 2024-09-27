@@ -68,7 +68,7 @@ public class Syn2 {
                                 return synTempTuple.getMachineId();
                             }
                 }).window(TumblingEventTimeWindows.of(Time.seconds(1)))
-                .apply(new JoinSyn());
+                .with(new JoinSyn());
 
         KafkaSink<SynJoinedTuple> sink;
         if (settings.getLatencyFlag() == 1) {

@@ -75,7 +75,7 @@ public class GLSyn2 {
             }
         })
         .window(TumblingEventTimeWindows.of(Time.seconds(1)))
-        .apply(new JoinSynGL());
+        .with(new JoinSynGL());
 
         KafkaSink<SynJoinedTupleGL> sink;
         if (settings.getLatencyFlag() == 1) {

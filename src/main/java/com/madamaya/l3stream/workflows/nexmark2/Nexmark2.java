@@ -68,7 +68,7 @@ public class Nexmark2 {
                     }
                 })
                 .window(TumblingEventTimeWindows.of(Time.seconds(1)))
-                .apply(new JoinNex())
+                .with(new JoinNex())
                 .filter(t -> t.getCategory() == 10);
 
         KafkaSink<NexmarkJoinedTuple> sink;

@@ -73,7 +73,7 @@ public class GLNexmark2 {
                     }
                 })
                 .window(TumblingEventTimeWindows.of(Time.seconds(1)))
-                .apply(new JoinNexGL())
+                .with(new JoinNexGL())
                 .filter(t -> t.getCategory() == 10);
 
         KafkaSink<NexmarkJoinedTupleGL> sink;
