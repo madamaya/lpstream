@@ -7,8 +7,8 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 public class NexmarkJoinedTupleGL extends NexmarkJoinedTuple implements GenealogTuple {
     private GenealogData gdata;
 
-    public NexmarkJoinedTupleGL(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long dominantOpTime, long kafkaAppendTime, long stimulus) {
-        super(auctionId, bidder, price, channel, url, bid_dateTime, bid_extra, itemName, desc, initBid, reserve, auction_dateTime, expires, seller, category, auction_extra, dominantOpTime, kafkaAppendTime, stimulus);
+    public NexmarkJoinedTupleGL(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long timestamp, long dominantOpTime, long kafkaAppendTime, long stimulus) {
+        super(auctionId, bidder, price, channel, url, bid_dateTime, bid_extra, itemName, desc, initBid, reserve, auction_dateTime, expires, seller, category, auction_extra, timestamp, dominantOpTime, kafkaAppendTime, stimulus);
     }
 
     @Override
@@ -20,15 +20,5 @@ public class NexmarkJoinedTupleGL extends NexmarkJoinedTuple implements Genealog
     @Override
     public GenealogData getGenealogData() {
         return gdata;
-    }
-
-    @Override
-    public long getTimestamp() {
-        return super.getAuction_dateTime();
-    }
-
-    @Override
-    public void setTimestamp(long timestamp) {
-        super.setAuction_dateTime(timestamp);
     }
 }

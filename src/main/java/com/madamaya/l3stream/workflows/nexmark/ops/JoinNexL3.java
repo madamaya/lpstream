@@ -24,7 +24,8 @@ public class JoinNexL3 implements JoinFunction<NexmarkAuctionTuple, NexmarkBidTu
                 auctionTuple.getExpires(),
                 auctionTuple.getSeller(),
                 auctionTuple.getCategory(),
-                auctionTuple.getExtra()
+                auctionTuple.getExtra(),
+                Math.max(bidTuple.getDateTime(), auctionTuple.getDateTime())
         );
     }
 }

@@ -17,11 +17,12 @@ public class NexmarkJoinedTuple {
     private int seller;
     private int category;
     private String auction_extra;
+    private long timestamp;
     private long dominantOpTime = Long.MAX_VALUE;
     private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
-    public NexmarkJoinedTuple(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long dominantOpTime, long kafkaAppendTime, long stimulus) {
+    public NexmarkJoinedTuple(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long timestamp, long dominantOpTime, long kafkaAppendTime, long stimulus) {
         this.auctionId = auctionId;
         this.bidder = bidder;
         this.price = price;
@@ -38,12 +39,13 @@ public class NexmarkJoinedTuple {
         this.seller = seller;
         this.category = category;
         this.auction_extra = auction_extra;
+        this.timestamp = timestamp;
         this.dominantOpTime = dominantOpTime;
         this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
-    public NexmarkJoinedTuple(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra) {
+    public NexmarkJoinedTuple(int auctionId, int bidder, long price, String channel, String url, long bid_dateTime, String bid_extra, String itemName, String desc, int initBid, int reserve, long auction_dateTime, long expires, int seller, int category, String auction_extra, long timestamp) {
         this.auctionId = auctionId;
         this.bidder = bidder;
         this.price = price;
@@ -60,6 +62,7 @@ public class NexmarkJoinedTuple {
         this.seller = seller;
         this.category = category;
         this.auction_extra = auction_extra;
+        this.timestamp = timestamp;
     }
 
     public int getAuctionId() {
@@ -190,6 +193,14 @@ public class NexmarkJoinedTuple {
         this.auction_extra = auction_extra;
     }
 
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public long getDominantOpTime() {
         return dominantOpTime;
     }
@@ -233,6 +244,7 @@ public class NexmarkJoinedTuple {
                 ", seller=" + seller +
                 ", category=" + category +
                 ", auction_extra='" + auction_extra + '\'' +
+                ", timestamp=" + timestamp +
                 '}';
     }
 }
