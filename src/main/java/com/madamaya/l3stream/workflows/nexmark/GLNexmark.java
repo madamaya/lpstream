@@ -80,6 +80,12 @@ public class GLNexmark {
                     .setRecordSerializer(new LineageKafkaSinkNexmarkGLV2(outputTopicName, settings))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
+        } else if (settings.getLatencyFlag() == 100) {
+            sink = KafkaSink.<NexmarkJoinedTupleGL>builder()
+                    .setBootstrapServers(brokers)
+                    .setRecordSerializer(new OutputKafkaSinkNexmarkGLV2(outputTopicName, settings))
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                    .build();
         } else {
             sink = KafkaSink.<NexmarkJoinedTupleGL>builder()
                     .setBootstrapServers(brokers)

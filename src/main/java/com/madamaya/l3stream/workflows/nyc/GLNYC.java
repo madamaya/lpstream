@@ -70,6 +70,13 @@ public class GLNYC {
                     .setRecordSerializer(new LineageKafkaSinkNYCGLV2(outputTopicName, settings))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
+        } else if (settings.getLatencyFlag() == 100) {
+            sink = KafkaSink.<NYCResultTupleGL>builder()
+                    .setBootstrapServers(brokers)
+                    .setKafkaProducerConfig(props)
+                    .setRecordSerializer(new OutputKafkaSinkNYCGLV2(outputTopicName, settings))
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                    .build();
         } else {
             sink = KafkaSink.<NYCResultTupleGL>builder()
                     .setBootstrapServers(brokers)

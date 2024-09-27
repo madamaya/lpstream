@@ -8,6 +8,7 @@ import com.madamaya.l3stream.workflows.syn1.ops.TsAssignTempMapGL;
 import com.madamaya.l3stream.workflows.syn1.ops.WatermarkStrategyTempSynGL;
 import com.madamaya.l3stream.workflows.syn3.ops.LatencyKafkaSinkSyn3GLV2;
 import com.madamaya.l3stream.workflows.syn3.ops.LineageKafkaSinkSyn3GLV2;
+import com.madamaya.l3stream.workflows.syn3.ops.OutputKafkaSinkSyn3GLV2;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2GL;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputStringGL;
 import io.palyvos.provenance.util.ExperimentSettings;
@@ -65,6 +66,13 @@ public class GLSyn3 {
                     .setBootstrapServers(brokers)
                     .setKafkaProducerConfig(props)
                     .setRecordSerializer(new LineageKafkaSinkSyn3GLV2(outputTopicName, settings))
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                    .build();
+        } else if (settings.getLatencyFlag() == 100) {
+            sink = KafkaSink.<SynResultTupleGL>builder()
+                    .setBootstrapServers(brokers)
+                    .setKafkaProducerConfig(props)
+                    .setRecordSerializer(new OutputKafkaSinkSyn3GLV2(outputTopicName, settings))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         } else {

@@ -1,12 +1,14 @@
 package com.madamaya.l3stream.workflows.syn2;
 
 import com.madamaya.l3stream.conf.L3Config;
+import com.madamaya.l3stream.workflows.nyc.ops.OutputKafkaSinkNYCGLV2;
 import com.madamaya.l3stream.workflows.syn1.objects.SynJoinedTupleGL;
 import com.madamaya.l3stream.workflows.syn1.objects.SynPowerTupleGL;
 import com.madamaya.l3stream.workflows.syn1.objects.SynTempTupleGL;
 import com.madamaya.l3stream.workflows.syn1.ops.*;
 import com.madamaya.l3stream.workflows.syn2.ops.LatencyKafkaSinkSyn2GLV2;
 import com.madamaya.l3stream.workflows.syn2.ops.LineageKafkaSinkSyn2GLV2;
+import com.madamaya.l3stream.workflows.syn2.ops.OutputKafkaSinkSyn2GLV2;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2GL;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputStringGL;
 import io.palyvos.provenance.util.ExperimentSettings;
@@ -77,6 +79,12 @@ public class GLSyn2 {
             sink = KafkaSink.<SynJoinedTupleGL>builder()
                     .setBootstrapServers(brokers)
                     .setRecordSerializer(new LineageKafkaSinkSyn2GLV2(outputTopicName, settings))
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                    .build();
+        } else if (settings.getLatencyFlag() == 100) {
+            sink = KafkaSink.<SynJoinedTupleGL>builder()
+                    .setBootstrapServers(brokers)
+                    .setRecordSerializer(new OutputKafkaSinkSyn2GLV2(outputTopicName, settings))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         } else {

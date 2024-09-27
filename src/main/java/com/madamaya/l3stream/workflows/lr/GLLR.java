@@ -1,10 +1,7 @@
 package com.madamaya.l3stream.workflows.lr;
 
 import com.madamaya.l3stream.conf.L3Config;
-import com.madamaya.l3stream.workflows.lr.ops.DataParserLRGL;
-import com.madamaya.l3stream.workflows.lr.ops.LatencyKafkaSinkLRGLV2;
-import com.madamaya.l3stream.workflows.lr.ops.LineageKafkaSinkLRGLV2;
-import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLRGL;
+import com.madamaya.l3stream.workflows.lr.ops.*;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2GL;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputStringGL;
 import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadInputTupleGL;
@@ -50,6 +47,12 @@ public class GLLR {
             sink = KafkaSink.<LinearRoadInputTupleGL>builder()
                     .setBootstrapServers(brokers)
                     .setRecordSerializer(new LineageKafkaSinkLRGLV2(outputTopicName, settings))
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                    .build();
+        } else if (settings.getLatencyFlag() == 100) {
+            sink = KafkaSink.<LinearRoadInputTupleGL>builder()
+                    .setBootstrapServers(brokers)
+                    .setRecordSerializer(new OutputKafkaSinkLRGLV2(outputTopicName, settings))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
         } else {

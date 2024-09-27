@@ -63,6 +63,13 @@ public class GLYSB2 {
                     .setRecordSerializer(new LineageKafkaSinkYSBGLV2(outputTopicName, settings))
                     .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                     .build();
+        } else if (settings.getLatencyFlag() == 100) {
+            sink = KafkaSink.<YSBResultTupleGL>builder()
+                    .setBootstrapServers(brokers)
+                    .setKafkaProducerConfig(props)
+                    .setRecordSerializer(new OutputKafkaSinkYSBGLV2(outputTopicName, settings))
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                    .build();
         } else {
             sink = KafkaSink.<YSBResultTupleGL>builder()
                     .setBootstrapServers(brokers)
