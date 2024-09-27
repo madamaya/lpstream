@@ -1,7 +1,6 @@
 package com.madamaya.l3stream.workflows.nexmark;
 
 import com.madamaya.l3stream.conf.L3Config;
-import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTuple;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTuple;
@@ -10,12 +9,12 @@ import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
 import io.palyvos.provenance.l3stream.wrappers.operators.L3OpWrapperStrategy;
+import io.palyvos.provenance.l3stream.wrappers.operators.NonLineageModeStrategy;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.connector.kafka.source.KafkaSource;
-import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
@@ -45,24 +44,44 @@ public class L3Nexmark {
                 .build();
 
         /* Query */
+        // Source
         DataStream<KafkaInputString> sourceDs = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceNexmark").uid("1");
+        // InitMap & Parse & Filter
         DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction = sourceDs
                 .map(L3.initMap(settings, 0)).uid("2")
                 .map(L3.map(new AuctionDataParserNexL3())).uid("3")
-                .filter(L3.filter(t -> t.getEventType() == 1)).uid("4")
-                .map(L3.updateTsWM(new WatermarkStrategyAuctionNex(), 0)).uid("5")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.readPartitionNum(env.getParallelism()))).uid("6")
-                .map(L3.mapTs(new TsAssignAuctionNexL3())).uid("TsAssignAuctionNexL3");
+                .filter(L3.filter(t -> t.getEventType() == 1)).uid("4");
+        // Additional operator (assignChkTs or extractInputTs)
+        DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction2;
+        if (L3.getClass() == NonLineageModeStrategy.class) {
+            auction2 = auction.map(L3.assignChkTs(new WatermarkStrategyAuctionNex(), 0)).uid("5");
+        } else {
+            auction2 = auction.map(L3.extractInputTs(new WatermarkStrategyAuctionNex())).uid("6");
+        }
+        // Main process
+        DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction3 = auction2
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.readPartitionNum(env.getParallelism()))).uid("7")
+                .map(L3.mapTs(new TsAssignAuctionNexL3())).uid("8");
 
+        // InitMap & Parse & Filter
         DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid = sourceDs
-                .map(L3.initMap(settings, 1)).uid("8")
-                .map(L3.map(new BidderDataParserNexL3())).uid("9")
-                .filter(L3.filter(t -> t.getEventType() == 2)).uid("10")
-                .map(L3.updateTsWM(new WatermarkStrategyBidNex(), 1)).uid("11")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.readPartitionNum(env.getParallelism()))).uid("12")
-                .map(L3.mapTs(new TsAssignBidderNexL3())).uid("TsAssignBidderNexL3");
+                .map(L3.initMap(settings, 1)).uid("9")
+                .map(L3.map(new BidderDataParserNexL3())).uid("10")
+                .filter(L3.filter(t -> t.getEventType() == 2)).uid("11");
+        // Additional operator (assignChkTs or extractInputTs)
+        DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid2;
+        if (L3.getClass() == NonLineageModeStrategy.class) {
+            bid2 = bid.map(L3.assignChkTs(new WatermarkStrategyBidNex(), 1)).uid("12");
+        } else {
+            bid2 = bid.map(L3.extractInputTs(new WatermarkStrategyBidNex())).uid("13");
+        }
+        // Main process
+        DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid3 = bid2
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.readPartitionNum(env.getParallelism()))).uid("14")
+                .map(L3.mapTs(new TsAssignBidderNexL3())).uid("15");
 
-        DataStream<L3StreamTupleContainer<NexmarkJoinedTuple>> joined = auction.join(bid)
+        // Main process
+        DataStream<L3StreamTupleContainer<NexmarkJoinedTuple>> joined = auction3.join(bid3)
                 .where(L3.keyBy(new KeySelector<NexmarkAuctionTuple, Integer>() {
                     @Override
                     public Integer getKey(NexmarkAuctionTuple auctionTuple) throws Exception {
@@ -76,16 +95,12 @@ public class L3Nexmark {
                     }
                 }, Integer.class))
                 .window(TumblingEventTimeWindows.of(Time.milliseconds(20)))
-                .apply(L3.joinTs(new JoinNexL3()))
-                .filter(L3.filter(t -> t.getCategory() == 10)).uid("14");
+                .with(L3.joinTs(new JoinNexL3())).uid("16")
+                .filter(L3.filter(t -> t.getCategory() == 10)).uid("17");
 
-        // L5
-        if (settings.isInvokeCpAssigner()) {
-            joined.map(new CpAssigner<>()).uid("15").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
-        } else {
-            joined.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
-        }
+        // Sink
+        joined.process(L3.extractTs()).uid("18").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
 
-        env.execute(settings.getLineageMode() + "," + queryFlag);
+        env.execute(settings.getLineageMode() + ": " + queryFlag);
     }
 }

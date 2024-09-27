@@ -1,19 +1,18 @@
 package com.madamaya.l3stream.workflows.lr;
 
 import com.madamaya.l3stream.conf.L3Config;
-import com.madamaya.l3stream.l3operator.util.CpAssigner;
 import com.madamaya.l3stream.workflows.lr.ops.DataParserLRL3;
 import com.madamaya.l3stream.workflows.lr.ops.WatermarkStrategyLR;
 import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2;
 import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.l3stream.wrappers.objects.L3StreamTupleContainer;
 import io.palyvos.provenance.l3stream.wrappers.operators.L3OpWrapperStrategy;
+import io.palyvos.provenance.l3stream.wrappers.operators.NonLineageModeStrategy;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import io.palyvos.provenance.util.ExperimentSettings;
 import io.palyvos.provenance.util.FlinkSerializerActivator;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.connector.kafka.source.KafkaSource;
-import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
@@ -41,19 +40,24 @@ public class L3LR {
                 .build();
 
         /* Query */
+        // Source & InitMap & Parse
         DataStream<L3StreamTupleContainer<LinearRoadInputTuple>> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR").uid("1")
                 .map(L3.initMap(settings)).uid("2")
-                .map(L3.map(new DataParserLRL3())).uid("3")
-                .map(L3.updateTsWM(new WatermarkStrategyLR(), 0)).uid("4")
-                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(), settings.readPartitionNum(env.getParallelism()))).uid("5");
-
-        // L5
-        if (settings.isInvokeCpAssigner()) {
-            ds.map(new CpAssigner<>()).uid("11").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
+                .map(L3.map(new DataParserLRL3())).uid("3");
+        // Additional operator (assignChkTs or extractInputTs)
+        DataStream<L3StreamTupleContainer<LinearRoadInputTuple>> ds2;
+        if (L3.getClass() == NonLineageModeStrategy.class) {
+            ds2 = ds.map(L3.assignChkTs(new WatermarkStrategyLR(), 0)).uid("4");
         } else {
-            ds.sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
+            ds2 = ds.map(L3.extractInputTs(new WatermarkStrategyLR())).uid("5");
         }
+        // Main process
+        DataStream<L3StreamTupleContainer<LinearRoadInputTuple>> ds3 = ds2
+                .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(), settings.readPartitionNum(env.getParallelism()))).uid("6");
 
-        env.execute(settings.getLineageMode() + "," + queryFlag);
+        // Sink
+        ds3.process(L3.extractTs()).uid("7").sinkTo(settings.getKafkaSink().newInstance(outputTopicName, brokers, settings)).uid(settings.getLineageMode());
+
+        env.execute(settings.getLineageMode() + ": " + queryFlag);
     }
 }
