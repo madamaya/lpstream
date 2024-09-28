@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-source ../../config.sh
+source ../config.sh
 
 # Real dataset
 for idx in `seq 1 7`
@@ -19,9 +19,6 @@ do
   done
 done
 
-queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
-sizes=(-1 10 100 400)
-
-cd ${L3_HOME}/bin/test/script
+cd ${L3_HOME}/bin/test/scripts
 echo "(python test2.py "${queries}" "${sizes}" ${L3_HOME}/data/log)"
 python test2.py "${queries}" "${sizes}" ${L3_HOME}/data/log

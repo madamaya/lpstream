@@ -9,7 +9,7 @@ def arg_parser(elements):
 
 def make_chk_ts_map(query, size):
     return_map = {}
-    with open("{}_{}.log".format(query, size)) as f:
+    with open("../redis_log/{}_{}.log".format(query, size)) as f:
         for line in f:
             elements = line.replace("\n", "").split(",")
             return_map[int(elements[0])] = int(elements[1])
@@ -39,19 +39,38 @@ def get_ws(query):
     else:
         raise Exception
 
-def make_results_set(path, size, chkts):
+
+def make_results_set(path, size, flag):
     results_set = set()
     files = glob.glob("{}/{}_*.csv".format(path, size))
     for file in files:
         with open(file) as f:
             for line in f:
-                elements = line.split(":::::")
-                timestamp = int(elements[2].replace("\n", ""))
-                if timestamp > chkts:
-                    results_set.add(elements[0].replace("\n", ""))
+                elements = line.replace("\n", "").split(":::::")
+                if flag == True:
+                    element = elements[0]
+                else:
+                    element = ":::::".join(elements[:2])
+                results_set.add(element)
     return results_set
 
-def cmp_base_and_current_result(base_approach_result_set, approach_path, size, chkts, ws):
+def make_results_set_ts(path, size, chkts, flag):
+    results_set = set()
+    files = glob.glob("{}/{}_*.csv".format(path, size))
+    for file in files:
+        with open(file) as f:
+            for line in f:
+                elements = line.replace("\n", "").split(":::::")
+                if flag == True:
+                    element = elements[0]
+                else:
+                    element = ":::::".join(elements[:2])
+                timestamp = int(elements[2])
+                if timestamp > chkts:
+                    results_set.add(element)
+    return results_set
+
+def cmp_base_and_current_result(base_approach_result_set, gen_approach_result_set, approach_path, size, chkts, ws):
     result_flag = True
     results_set = set()
     files = glob.glob("{}/{}_*.csv".format(approach_path, size))
@@ -62,23 +81,29 @@ def cmp_base_and_current_result(base_approach_result_set, approach_path, size, c
                 output = elements[0]
                 lineage = elements[1]
                 ts = int(elements[2])
-                reliable_flag = bool(elements[3])
+                reliable_flag = elements[3]
 
                 if ts > chkts + ws:
                     if output not in base_approach_result_set:
+                        result_flag = False
                         print("NOT_FOUND_ERROR: " + output)
 
-                    if reliable_flag == True:
+                    if reliable_flag == "true":
+                        if output + ":::::" + lineage not in gen_approach_result_set:
+                            result_flag = False
+                            print("LINEAGE_NOT_CORRECT_ERROR: " + output)
                         results_set.add(output)
                     else:
+                        result_flag = False
                         print("RELIABLE_FLAG_ERROR: " + output)
                         results_set.add(output)
                 elif ts > chkts:
                     if output not in base_approach_result_set:
+                        result_flag = False
                         print("NOT_FOUND_ERROR: " + output)
                     results_set.add(output)
 
-    result_flag = len(base_approach_result_set) == len(results_set) and len(base_approach_result_set) == len(base_approach_result_set & results_set)
+    result_flag &= len(base_approach_result_set) == len(results_set) and len(base_approach_result_set) == len(base_approach_result_set & results_set)
     return result_flag
 
 if __name__ == "__main__":
@@ -96,17 +121,25 @@ if __name__ == "__main__":
     with open("test2_result.log", "w") as w:
         for size in dataSizes:
             for query in queries:
-                if ("Syn" in query and size == -1) or ("Syn" not in queries and size != -1):
+                if ("Syn" in query and size == -1) or ("Syn" not in query and size != -1):
                     continue
 
                 query_result = True
                 chktimestamps = make_chk_ts_map(query, size)
                 ws = get_ws(query)
-                for replay_idx in range(1, 5+1):
-                    base_approach = "l3stream"
-                    base_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query, base_approach), size, chktimestamps[replay_idx])
-                    current_result = cmp_base_and_current_result(base_approach_result_set, "{}/{}/l3streamlin/{}".format(outputDir, query, replay_idx), size, chktimestamps[replay_idx], ws)
 
+                base_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query, "l3stream"), size, True)
+                gen_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query, "genealog"), size, True)
+                if len(base_approach_result_set) == len(gen_approach_result_set) and len(base_approach_result_set) == len(base_approach_result_set & gen_approach_result_set):
+                    print("L3Stream == Gen ✅")
+                else:
+                    print("L3Stream == Gen ❌")
+                    query_result = False
+
+                gen_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query, "genealog"), size, False)
+                for replay_idx in range(1, 5+1):
+                    base_approach_result_set = make_results_set_ts("{}/{}/{}".format(outputDir, query, "l3stream"), size, chktimestamps[replay_idx], True)
+                    current_result = cmp_base_and_current_result(base_approach_result_set, gen_approach_result_set, "{}/{}/l3streamlin/{}".format(outputDir, query, replay_idx), size, chktimestamps[replay_idx], ws)
                     if current_result == True:
                         print("{},{}: ✅".format(query, replay_idx))
                     else:

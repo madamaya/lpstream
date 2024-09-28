@@ -15,30 +15,30 @@ def make_results_set(approach_path, size, flag):
         with open(file) as f:
             for line in f:
                 if flag == True:
-                    results_set.add(line.split(":::::")[0].replace("\n", ""))
+                    results_set.add(line.replace("\n", "").split(":::::")[0])
                 else:
-                    elements = line.split(":::::")
-                    elements[-1].replace("\n", "")
+                    elements = line.replace("\n", "").split(":::::")
                     results_set.add(":::::".join(elements[:2]))
     return results_set
 
 def cmp_base_and_current_result(base_approach_result_set, approach_path, size, flag):
     result_flag = True
     files = glob.glob("{}/{}_*.csv".format(approach_path, size))
+    current_set = set()
     for file in files:
         with open(file) as f:
             for line in f:
                 if flag == True:
-                    element = line.split(":::::")[0].replace("\n", "")
+                    element = line.replace("\n", "").split(":::::")[0]
                 else:
-                    elements = line.split(":::::")
-                    elements[-1].replace("\n", "")
+                    elements = line.replace("\n", "").split(":::::")
                     element = ":::::".join(elements[:2])
 
+                current_set.add(element)
                 if element not in base_approach_result_set:
                     result_flag = False
                     print("Not Found: " + element)
-    return result_flag
+    return result_flag and len(base_approach_result_set) == len(current_set)
 
 if __name__ == "__main__":
     if len(sys.argv) != 5:
@@ -57,7 +57,7 @@ if __name__ == "__main__":
         test_result = True
         for size in dataSizes:
             for query in queries:
-                if ("Syn" in query and size == -1) or ("Syn" not in queries and size != -1):
+                if ("Syn" in query and size == -1) or ("Syn" not in query and size != -1):
                     continue
 
                 base_approach = approaches[0]
@@ -85,16 +85,18 @@ if __name__ == "__main__":
         else:
             print("1-1: ❌")
             w.write("1-1: ❌\n")
+
         # Test1-2 (Compare output and provenance of GeneaLog and Provenance)
         test_result = True
         for size in dataSizes:
             for query in queries:
-                if ("Syn" in query and size == -1) or ("Syn" not in queries and size != -1):
+                if ("Syn" in query and size == -1) or ("Syn" not in query and size != -1):
                     continue
 
                 base_approach = approaches[1]
                 current_approach = approaches[3]
                 base_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query, base_approach), size, False)
+                test_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query, current_approach), size, False)
                 current_result = cmp_base_and_current_result(base_approach_result_set, "{}/{}/{}".format(outputDir, query, current_approach), size, False)
 
                 if current_result == True:

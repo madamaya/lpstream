@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-source $(dirname $0)/../../config.sh
+source $(dirname $0)/../config.sh
 source ../utils/flinkJob.sh
 source ../utils/kafkaUtils.sh
 source ../utils/redisUtils.sh
@@ -114,11 +114,6 @@ do
       # Stop CPU/Memory logger
       stopCpuMemoryLogger
 
-      # Stop query
-      echo "*** Cancel running flink job ***"
-      echo "(cancelFlinkJobs)"
-      cancelFlinkJobs
-
       # Stop data ingestion
       ## localhost
       echo "Stop data ingestion"
@@ -136,13 +131,17 @@ do
         withLineage="false"
       fi
 
-      # Latency calculation
       cd ${L3_HOME}/data/output/latency
       echo "*** latency calc ***"
       echo "mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}"
       mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
       echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true true)" # isLatencyExperiment, isRawMode
       readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true true
+
+      # Stop query
+      echo "*** Cancel running flink job ***"
+      echo "(cancelFlinkJobs)"
+      cancelFlinkJobs
 
       # Delete kafka topic
       echo "*** Delete kafka topic ***"
@@ -165,7 +164,7 @@ do
   done
 done
 
-cd ${L3_HOME}/bin/test/script
+cd ${L3_HOME}/bin/test/scripts
 echo "(python test1.py "${queries}" "${approaches}" "${sizes}" ${L3_HOME}/data/output/latency)"
 python test1.py "${queries}" "${approaches}" "${sizes}" ${L3_HOME}/data/output/latency
 

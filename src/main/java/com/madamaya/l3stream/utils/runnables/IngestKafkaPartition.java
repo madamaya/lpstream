@@ -68,7 +68,13 @@ public class IngestKafkaPartition implements Runnable {
     @Override
     public void run() {
         // sendFromFile();
-        sendFromFileLoop();
+        if (this.stopDataNum < 0) {
+            sendFromFileLoop();
+        } else if (this.stopDataNum > 0) {
+            sendFromFileLoopNum();
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     public void sendFromFileLoop() {
@@ -119,9 +125,64 @@ public class IngestKafkaPartition implements Runnable {
                         map.put(partition, dataNum / ((System.nanoTime() - stime) / 1e9));
                     }
                 }
-                if (stopDataNum > 0 && countAll > stopDataNum) {
-                    System.out.println("stopDataNum > 0 && countAll > stopDataNum");
-                    active = false;
+            }
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+    }
+
+    public void sendFromFileLoopNum() {
+        BufferedReader br;
+        try {
+            String line;
+            long count = 0;
+            long countAll = 0;
+            long dataNum = 0;
+
+            long currentTime = 0;
+            long incrementTime = 1000000000 / throughput;
+
+            boolean active = true;
+
+            long stime = System.nanoTime();
+            long prevTime = System.nanoTime();
+            while (active) {
+                br = new BufferedReader(new FileReader(filePath));
+                while ((line = br.readLine()) != null) {
+                    // Send data
+                    countAll++;
+                    // String sendLine = ip.attachTimestamp(line, System.currentTimeMillis());
+                    String sendLine = ip.attachTimestamp(line, currentTime / 1000000);
+                    currentTime += incrementTime;
+                    // System.out.println(sendLine);
+                    producer.send(new ProducerRecord<String, String>(topic, partition, null, null, sendLine),
+                            (recordMetadata, e) -> {
+                                if (e != null) {
+                                    e.printStackTrace();
+                                }
+                            });
+
+                    // Check tupleNum sent for latest interval
+                    if (++count == (throughput / granularity)) {
+                        dataNum += count;
+                        count = 0;
+
+                        long sleepTime = 1000 / granularity - ((System.nanoTime() - prevTime) / 1000000);
+                        if (sleepTime > 0) {
+                            // System.out.println(sleepTime);
+                            Thread.sleep(sleepTime);
+                        } else {
+                            // System.out.println("delay: " + sleepTime + " [ms]");
+                            // prevTime = System.nanoTime();
+                        }
+                        prevTime += (1000000000 / granularity);
+                        map.put(partition, dataNum / ((System.nanoTime() - stime) / 1e9));
+                    }
+                    if (stopDataNum > 0 && countAll >= stopDataNum) {
+                        System.out.println("stopDataNum > 0 && countAll > stopDataNum");
+                        active = false;
+                        break;
+                    }
                 }
             }
         } catch (Exception e) {
