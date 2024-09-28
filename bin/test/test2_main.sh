@@ -220,7 +220,7 @@ echo "*** Create kafka topic ***"
 echo "${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}"
 ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
 echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-o --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
-${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-o} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
+${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-o --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
 echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
 ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${lineageTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
 echo "(sleep 10)"
