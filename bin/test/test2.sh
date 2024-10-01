@@ -2,11 +2,14 @@
 
 source ../config.sh
 
+queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
+sizes=(-1 10 100 400)
+
 # Real dataset
 for idx in `seq 1 7`
 do
   echo "./test2_main.sh ${idx} -1 |& tee test2_${idx}_-1.log"
-  ./test2_main.sh ${idx} -1 |& tee lineageDuration_${idx}_-1.log
+  ./test2_main.sh ${idx} -1 |& tee test2_${idx}_-1.log
 done
 
 # Synthetic dataset

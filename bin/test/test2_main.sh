@@ -107,8 +107,8 @@ do
 
   cd ${BIN_DIR}
   echo "*** Get jobid ***"
-  echo "(jobid=\`getRunningJobID\`)"
-  jobid=`getRunningJobID`
+  echo "(ordinaryjobid=\`getRunningJobID\`)"
+  ordinaryjobid=`getRunningJobID`
 
   # Sleep
   echo "*** Sleep predefined time (${sleepTime} [s]) ***"
@@ -134,20 +134,6 @@ do
   echo "(cancelFlinkJobs)"
   cancelFlinkJobs
 
-  # Delete kafka topic
-  echo "*** Delete kafka topic ***"
-  echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${outputTopicName} --bootstrap-server ${bootstrapServers})"
-  ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${outputTopicName} --bootstrap-server ${bootstrapServers}
-  echo "(sleep 30)"
-  sleep 30
-
-  # Create kafka topic
-  echo "*** Create kafka topic ***"
-  echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${outputTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
-  ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${outputTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
-  echo "(sleep 10)"
-  sleep 10
-
   if [ ${approach} = "l3stream" ]; then
     cd ${BIN_DIR}/test
     if [ ! -d ${L3_HOME}/bin/test/redis_log ]; then
@@ -156,11 +142,29 @@ do
     cd ./scripts
     echo "(python make_redis_log.py ${qName} ${size} ${redisIP} ${redisPort} ${parallelism})"
     python make_redis_log.py ${qName} ${size} ${redisIP} ${redisPort} ${parallelism}
+  else
+    # Delete kafka topic
+    echo "*** Delete kafka topic ***"
+    echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers})"
+    ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${query}-i --bootstrap-server ${bootstrapServers}
+    echo "(${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${outputTopicName} --bootstrap-server ${bootstrapServers})"
+    ${KAFKA_HOME}/bin/kafka-topics.sh --delete --topic ${outputTopicName} --bootstrap-server ${bootstrapServers}
+    echo "(sleep 30)"
+    sleep 30
+
+    # Create kafka topic
+    echo "*** Create kafka topic ***"
+    echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
+    ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${query}-i --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
+    echo "(${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${outputTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism})"
+    ${KAFKA_HOME}/bin/kafka-topics.sh --create --topic ${outputTopicName} --bootstrap-server ${bootstrapServers} --partitions ${parallelism}
+    echo "(sleep 10)"
+    sleep 10
   fi
 done
 
 cd ${BIN_DIR}/templates
-for replay_idx in `seq 1 5`
+for replay_idx in `seq 2 5`
 do
   echo "*** Define log file ***"
   echo "logDir=\"${L3_HOME}/data/log/${(L)query}/l3streamlin/${replay_idx}\""
@@ -172,8 +176,9 @@ do
 
   ## Replay ordinary workflow from chk-i
   echo "*** Submit job (from chk-${replay_idx}) ***"
-  echo "(./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${jobid} ${replay_idx} ${lineageTopicName} 100)"
-  ./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${jobid} ${replay_idx} ${lineageTopicName} 100
+  mainPath="com.madamaya.l3stream.workflows.${(L)query}.L3${query}"
+  echo "(./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${ordinaryjobid} ${replay_idx} ${lineageTopicName} 100)"
+  ./lineageReplay.sh ${JAR_PATH} ${mainPath} ${parallelism} ${ordinaryjobid} ${replay_idx} ${lineageTopicName} 100
 
   # Sleep
   echo "*** Sleep predefined time (${sleepTime} [s]) ***"
