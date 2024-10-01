@@ -68,7 +68,7 @@ public class IngestKafkaPartition implements Runnable {
     @Override
     public void run() {
         // sendFromFile();
-        if (this.stopDataNum < 0) {
+        if (this.stopDataNum <= 0) {
             sendFromFileLoop();
         } else if (this.stopDataNum > 0) {
             sendFromFileLoopNum();
