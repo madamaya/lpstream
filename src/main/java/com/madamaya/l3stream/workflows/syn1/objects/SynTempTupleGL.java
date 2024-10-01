@@ -20,7 +20,7 @@ public class SynTempTupleGL extends SynTempTuple implements GenealogTuple {
     }
 
     public SynTempTupleGL(SynTempTupleGL tuple) {
-        super(tuple.getType(), tuple.getMachineId(), tuple.getSensorId(), tuple.getTemperature(), tuple.getLog(), tuple.getDominantOpTime(), tuple.getTimestamp(), tuple.getKafkaAppendTime(), tuple.getStimulus());
+        super(tuple.getType(), tuple.getMachineId(), tuple.getSensorId(), tuple.getTemperature(), tuple.getLog(), tuple.getTimestamp(), tuple.getDominantOpTime(), tuple.getKafkaAppendTime(), tuple.getStimulus());
     }
 
     @Override
