@@ -8,12 +8,12 @@ source ../utils/cleanCache.sh
 source ../utils/logger.sh
 source ../utils/cpuMemoryLoadLogger.sh
 
-#original_throughput=${1}
-throughput=50000
+original_throughput=50000
+#throughput=50000
 granularityTemp=100
 queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
 approaches=(baseline genealog l3stream l3streamlin)
-sizes=(-1 10 50 100)
+sizes=(-1 10 100 400)
 sleepTime=600
 homedir=`pwd`
 
@@ -35,14 +35,26 @@ do
         fi
       fi
 
+      # set 10,000 if maximum throughput < 50,000
+      #if [ ${query} ]; then
+      # write process
+      #else
+      throughput=${original_throughput}
+      #fi
+
       cd ../templates
       # Stop cluster (Flink, Kafka, Redis)
       echo "(stopBroker)"
       stopBroker
       echo "(stopZookeeper)"
       stopZookeeper
-      echo "ssh ${redisIP} redis-cli -h ${redisIP} flushdb"
-      ssh ${redisIP} redis-cli -h ${redisIP} flushdb
+      if [ ${redisIP} = "localhost" ]; then
+        echo "redis-cli -h ${redisIP} flushdb"
+        redis-cli -h ${redisIP} flushdb
+      else
+        echo "ssh ${redisIP} redis-cli -h ${redisIP} flushdb"
+        ssh ${redisIP} redis-cli -h ${redisIP} flushdb
+      fi
       echo "(stopRedis)"
       stopRedis
       echo "(stopFlinkCluster)"
@@ -65,8 +77,13 @@ do
       startBroker
       echo "(startRedis)"
       startRedis
-      echo "ssh ${redisIP} redis-cli -h ${redisIP} flushdb"
-      ssh ${redisIP} redis-cli -h ${redisIP} flushdb
+      if [ ${redisIP} = "localhost" ]; then
+        echo "redis-cli -h ${redisIP} flushdb"
+        redis-cli -h ${redisIP} flushdb
+      else
+        echo "ssh ${redisIP} redis-cli -h ${redisIP} flushdb"
+        ssh ${redisIP} redis-cli -h ${redisIP} flushdb
+      fi
       echo "(startFlinkCluster)"
       startFlinkCluster
 
@@ -181,8 +198,11 @@ do
       mkdir -p ${L3_HOME}/data/output/latency/${query}/${approach}
       echo "(readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true false)" # isLatencyExperiment, isRawMode
       readOutput ${outputTopicName} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} ${withLineage} true false
-      echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency)"
-      python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency
+      #echo "(python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency)"
+      #python calcLatencyV2.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency
+      echo "(python calcLatencyV2-bar.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency)"
+      python calcLatencyV2-bar.py ${parallelism} ${L3_HOME}/data/output/latency/${query}/${approach} ${size} latency
+
 
       # Delete kafka topic
       echo "*** Delete kafka topic ***"
@@ -208,7 +228,8 @@ done
 cd ${L3_HOME}/data/output/cpu-memory
 python cpu-memory.py "${queries}" "${approaches}" "${sizes}"
 cd ${L3_HOME}/data/output/latency
-python resultsGen.py "${queries}" "${approaches}" "${sizes}"
+#python resultsGen.py "${queries}" "${approaches}" "${sizes}"
+python resultsGen-bar2.py "${queries}" "${approaches}" "${sizes}"
 cd ${L3_HOME}/data/output/throughput
 python throughputCalc.py "${queries}" "${approaches}" "${sizes}"
 

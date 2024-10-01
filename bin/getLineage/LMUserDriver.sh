@@ -52,8 +52,13 @@ fi
 
 ## Initialize redis
 echo "*** Initialize redis ***"
-echo "(redis-cli -h ${redisIP} FLUSHDB)"
-redis-cli -h ${redisIP} FLUSHDB
+if [ ${redisIP} = "localhost" ]; then
+  echo "redis-cli -h ${redisIP} flushdb"
+  redis-cli -h ${redisIP} flushdb
+else
+  echo "ssh ${redisIP} redis-cli -h ${redisIP} flushdb"
+  ssh ${redisIP} redis-cli -h ${redisIP} flushdb
+fi
 
 ## submit Flink job
 cd ${BIN_DIR}/templates

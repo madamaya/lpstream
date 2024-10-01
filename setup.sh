@@ -100,61 +100,8 @@ elif [ $1 = "mainData" ]; then
   done
 
   echo "*** END ***"
-elif [ $1 = "testData" ]; then
-  ## Generate splitted data for result tests
-  cd ./data/input
-
-  ### For LinearRoad
-  echo "*** Generate test data for LR ***"
-  python split.py ./data/lr.csv
-
-  ### For Nexmark
-  echo "*** Generate test data for Nexmark ***"
-  python split.py ./data/nexmark.json
-
-  ### For NYC
-  echo "*** Generate test data for NYC ***"
-  python split.py ./data/nyc.csv
-
-  ### For YSB
-  echo "*** Generate test data for YSB ***"
-  python split.py ./data/ysb.json
-
-  echo "*** END ***"
 elif [ $1 = "setup" ]; then
   ./bin/setupCluster/startCluster.sh
-elif [ $1 = "test" ]; then
-  cd ./bin
-  # LR
-  echo "*** TEST: LR ***"
-  echo "(./LMUserDriver.sh 1)"
-  ./LMUserDriver.sh 1 2>& 1 | tee LMUserDriver1.log
-  # Nexmark
-  echo "*** TEST: Nexmark ***"
-  echo "(./LMUserDriver.sh 2)"
-  ./LMUserDriver.sh 2 2>& 1 | tee LMUserDriver2.log
-  # NYC
-  echo "*** TEST: NYC ***"
-  echo "(./LMUserDriver.sh 3)"
-  ./LMUserDriver.sh 3 2>& 1 | tee LMUserDriver3.log
-  # YSB
-  echo "*** TEST: YSB ***"
-  echo "(./LMUserDriver.sh 4)"
-  ./LMUserDriver.sh 4 2>& 1 | tee LMUserDriver4.log
-
-  cd ./checkCorrectness
-  echo "*** Start checkCorrectness ***"
-  echo "(./auto.sh)"
-  ./auto.sh
-elif [ $1 = "dataSizeTest" ]; then
-  if [ $# -ne 3 ]; then
-    echo "Illegal Arguments (dataSizeTest)"
-    exit 1
-  fi
-  cd ./bin/dataSizeTest
-  echo "*** dataSizeTest ***"
-  echo "(./dataSizeTest.sh $2 $3)"
-  ./dataSizeTest.sh $2 $3
 else
   echo "Illegal Arguments"
   exit 1

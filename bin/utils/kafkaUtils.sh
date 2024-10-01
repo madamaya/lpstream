@@ -14,8 +14,19 @@ function stopZookeeper() {
 
 function startZookeeper() {
   if [ ${zookeeperIP} = "localhost" ]; then
-    echo "${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties"
-    ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
+    while true
+    do
+      echo "${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties"
+      ${KAFKA_HOME}/bin/zookeeper-server-start.sh -daemon ${KAFKA_HOME}/config/zookeeper.properties
+      sleep 10
+      checkZookeeperProcess=`ps aux | grep kafka | wc -l`
+      if [ ${checkZookeeperProcess} -eq 2 ]; then
+        echo "Zookeeper on ${zookeeperIP} [start] -> OK."
+        break
+      fi
+      echo "Zookeeper on ${zookeeperIP} [start] -> Failed (${checkZookeeperProcess})."
+      stopZookeeper
+    done
   else
     while true
     do
@@ -49,8 +60,19 @@ function stopBroker() {
 
 function startBroker() {
   if [ ${bootstrapServers} = "localhost:9092" ]; then
-    echo "${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties"
-    ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties
+    while true
+    do
+      echo "${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties"
+      ${KAFKA_HOME}/bin/kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties
+      sleep 10
+      checkZookeeperProcess=`ps aux | grep kafka | wc -l`
+      if [ ${checkZookeeperProcess} -eq 3 ]; then
+        echo "Broker on ${zookeeperIP} [start] -> OK."
+        break
+      fi
+      echo "Broker on ${zookeeperIP} [start] -> Failed (${checkZookeeperProcess})."
+      stopBroker
+    done
   else
       brokers=(`echo ${bootstrapServers} | sed -e "s/:9092//g" | sed -e "s/,/ /g"`)
       for broker in ${brokers[@]}

@@ -71,9 +71,9 @@ if __name__ == "__main__":
 
     current_window_time = pq[0][0] // 10000
 
-    head_drop_idx = all_data_num // 10
-    tail_drop_idx = (all_data_num * 9) // 10
-    pivot_idx = (tail_drop_idx - head_drop_idx + 1) // 10
+    head_drop_idx = all_data_num * 10 // 100
+    tail_drop_idx = all_data_num * 90 // 100
+    pivot_idx = (tail_drop_idx - head_drop_idx) * 10 // 100
     head_drop_end_idx = head_drop_idx + pivot_idx
     tail_drop_start_idx = tail_drop_idx - pivot_idx
 
@@ -81,38 +81,37 @@ if __name__ == "__main__":
     Calculate latency trends every seconds
     """
     current_idx = -1
-    with open("{}/../results/trend-{}-{}.csv".format(outputFileDir, size, approach), "w") as w:
-        latency_values_start = []
-        latency_values_end = []
-        while True:
-            if len(pq) == 0:
-                break
+    latency_values_start = []
+    latency_values_end = []
+    while True:
+        if len(pq) == 0:
+            break
 
-            # elements format in pq: [ts, data]
-            data = heapq.heappop(pq)[1]
-            partition = data[0]
+        # elements format in pq: [ts, data]
+        data = heapq.heappop(pq)[1]
+        partition = data[0]
+        ts = data[1]
+        current_idx += 1
+        if head_drop_idx <= current_idx < head_drop_end_idx:
+            latency_values_start.append(data[2])
+        elif current_idx == head_drop_end_idx:
+            start_val_med = np.median(np.array(latency_values_start))
+            latency_values_start.clear()
+        elif tail_drop_start_idx <= current_idx < tail_drop_idx:
+            latency_values_end.append(data[2])
+        elif current_idx == tail_drop_idx:
+            end_val_med = np.median(np.array(latency_values_end))
+            latency_values_end.clear()
+        elif current_idx > tail_drop_idx:
+            break
+
+        line = f_list[partition].readline()
+        if (line != ""):
+            data = list(map(int, line.split(",")))
             ts = data[1]
-            current_idx += 1
-            if head_drop_idx <= current_idx < head_drop_end_idx:
-                latency_values_start.append([data[2],])
-            elif current_idx == head_drop_end_idx:
-                start_val_med = np.median(np.array(latency_values_start))
-                latency_values_start.clear()
-            elif tail_drop_start_idx <= current_idx < tail_drop_idx:
-                latency_values_end.append([data[2],])
-            elif current_idx == tail_drop_idx:
-                end_val_med = np.median(np.array(latency_values_end))
-                latency_values_end.clear()
-            elif current_idx > tail_drop_idx:
-                break
-
-            line = f_list[partition].readline()
-            if (line != ""):
-                data = list(map(int, line.split(",")))
-                ts = data[1]
-                heapq.heappush(pq, (ts, data))
-            else:
-                f_list[partition].close()
+            heapq.heappush(pq, (ts, data))
+        else:
+            f_list[partition].close()
 
     """
     Calculate latency for whole data
