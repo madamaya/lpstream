@@ -70,8 +70,9 @@ def make_results_set_ts(path, size, chkts, flag):
                     results_set.add(element)
     return results_set
 
-def cmp_base_and_current_result(base_approach_result_set, gen_approach_result_set, approach_path, size, chkts, ws):
+def cmp_base_and_current_result(base_approach_result_set, gen_approach_result_set_out, gen_approach_result_set_out_lin, approach_path, size, chkts, ws):
     result_flag = True
+    false_exist_flag = False
     results_set = set()
     files = glob.glob("{}/{}_*.csv".format(approach_path, size))
     for file in files:
@@ -89,7 +90,7 @@ def cmp_base_and_current_result(base_approach_result_set, gen_approach_result_se
                         print("NOT_FOUND_ERROR: " + output)
 
                     if reliable_flag == "true":
-                        if output + ":::::" + lineage not in gen_approach_result_set:
+                        if output + ":::::" + lineage not in gen_approach_result_set_out_lin:
                             result_flag = False
                             print("LINEAGE_NOT_CORRECT_ERROR: " + output)
                         results_set.add(output)
@@ -98,13 +99,20 @@ def cmp_base_and_current_result(base_approach_result_set, gen_approach_result_se
                         print("RELIABLE_FLAG_ERROR: " + output)
                         results_set.add(output)
                 elif ts > chkts:
+                    if reliable_flag == "false":
+                        false_exist_flag = True
                     if output not in base_approach_result_set:
                         result_flag = False
                         print("NOT_FOUND_ERROR: " + output)
                     results_set.add(output)
+                else:
+                    if reliable_flag == "false":
+                        false_exist_flag = True
+                    if output not in gen_approach_result_set_out:
+                        print("NOT_FOUNT_ERROR_G: " + output)
 
     result_flag &= len(base_approach_result_set) == len(results_set) and len(base_approach_result_set) == len(base_approach_result_set & results_set)
-    return result_flag
+    return result_flag, false_exist_flag
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
@@ -129,21 +137,21 @@ if __name__ == "__main__":
                 ws = get_ws(query)
 
                 base_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query, "l3stream"), size, True)
-                gen_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query, "genealog"), size, True)
-                if len(base_approach_result_set) == len(gen_approach_result_set) and len(base_approach_result_set) == len(base_approach_result_set & gen_approach_result_set):
+                gen_approach_result_set_out = make_results_set("{}/{}/{}".format(outputDir, query, "genealog"), size, True)
+                if len(base_approach_result_set) == len(gen_approach_result_set_out) and len(base_approach_result_set) == len(base_approach_result_set & gen_approach_result_set_out):
                     print("L3Stream == Gen ✅")
                 else:
                     print("L3Stream == Gen ❌")
                     query_result = False
 
-                gen_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query, "genealog"), size, False)
-                for replay_idx in range(1, 5+1):
+                gen_approach_result_set_out_lin = make_results_set("{}/{}/{}".format(outputDir, query, "genealog"), size, False)
+                for replay_idx in range(2, 5+1):
                     base_approach_result_set = make_results_set_ts("{}/{}/{}".format(outputDir, query, "l3stream"), size, chktimestamps[replay_idx], True)
-                    current_result = cmp_base_and_current_result(base_approach_result_set, gen_approach_result_set, "{}/{}/l3streamlin/{}".format(outputDir, query, replay_idx), size, chktimestamps[replay_idx], ws)
+                    current_result, false_exist_flag = cmp_base_and_current_result(base_approach_result_set, gen_approach_result_set_out, gen_approach_result_set_out_lin, "{}/{}/l3streamlin/{}".format(outputDir, query, replay_idx), size, chktimestamps[replay_idx], ws)
                     if current_result == True:
-                        print("{},{}: ✅".format(query, replay_idx))
+                        print("{},{},{}: ✅".format(query, replay_idx, false_exist_flag))
                     else:
-                        print("{},{}: ❌".format(query, replay_idx))
+                        print("{},{},{}: ❌".format(query, replay_idx, false_exist_flag))
 
                     query_result &= current_result
 
