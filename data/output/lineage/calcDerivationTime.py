@@ -19,7 +19,6 @@ def get_sizes(files):
     return sorted(list(ret))
 
 def write_log(results, queries, name, w):
-    ## derivation mean
     header = name + "\n"
     for query in queries:
         for size in list(results[query].keys()):
@@ -55,19 +54,11 @@ if __name__ == "__main__":
             # init 'results'
             results[query][size] = {}
 
-            # derivation result
+            # obtain data
+            trigger_raw_data = np.loadtxt("./{}/{}-trigger.log".format(query, size), delimiter=",")
             monitor_raw_data = np.loadtxt("./{}/{}-monitor.log".format(query, size), delimiter=",")
-            monitor_data = monitor_raw_data[:,2] - monitor_raw_data[:,1]
-            results[query][size]["derivation_mean"] = np.mean(monitor_data)
-            results[query][size]["derivation_median"] = np.median(monitor_data)
-            results[query][size]["derivation_std"] = np.std(monitor_data)
-            results[query][size]["derivation_count"] = len(monitor_data)
-            plt.hist(monitor_data)
-            plt.savefig("./results/fig/{}-{}-derivation.png".format(query, size))
-            plt.close()
 
             # finding checkpoint duration
-            trigger_raw_data = np.loadtxt("./{}/{}-trigger.log".format(query, size), delimiter=",")
             trigger_data = trigger_raw_data[:,2] - trigger_raw_data[:,1]
             results[query][size]["trigger_mean"] = np.mean(trigger_data)
             results[query][size]["trigger_median"] = np.median(trigger_data)
@@ -75,6 +66,16 @@ if __name__ == "__main__":
             results[query][size]["trigger_count"] = len(trigger_data)
             plt.hist(trigger_data)
             plt.savefig("./results/fig/{}-{}-trigger.png".format(query, size))
+            plt.close()
+
+            # replay duration
+            replay_data = monitor_raw_data[:,2] - trigger_raw_data[:,2]
+            results[query][size]["replay_mean"] = np.mean(replay_data)
+            results[query][size]["replay_median"] = np.median(replay_data)
+            results[query][size]["replay_std"] = np.std(replay_data)
+            results[query][size]["replay_count"] = len(replay_data)
+            plt.hist(replay_data)
+            plt.savefig("./results/fig/{}-{}-replay.png".format(query, size))
             plt.close()
 
     # Create bar plot (mean)
@@ -85,8 +86,8 @@ if __name__ == "__main__":
     labels = []
     for query in queries:
         for size in list(results[query].keys()):
-            d_vals.append(results[query][size]["derivation_mean"])
-            std_d_vals.append(results[query][size]["derivation_std"])
+            d_vals.append(results[query][size]["replay_mean"])
+            std_d_vals.append(results[query][size]["replay_std"])
             t_vals.append(results[query][size]["trigger_mean"])
             std_t_vals.append(results[query][size]["trigger_std"])
             if size != -1:
@@ -95,7 +96,7 @@ if __name__ == "__main__":
                 labels.append("{}".format(query))
     plt.bar(labels, d_vals, yerr=std_d_vals)
     plt.xticks(rotation=45)
-    plt.savefig("./results/derivation_mean.png")
+    plt.savefig("./results/replay_mean.png")
     plt.close()
     plt.bar(labels, t_vals, yerr=std_t_vals)
     plt.xticks(rotation=45)
@@ -108,7 +109,7 @@ if __name__ == "__main__":
     labels = []
     for query in queries:
         for size in list(results[query].keys()):
-            d_vals.append(results[query][size]["derivation_median"])
+            d_vals.append(results[query][size]["replay_median"])
             t_vals.append(results[query][size]["trigger_median"])
             if size != -1:
                 labels.append("{}-{}".format(query, size))
@@ -116,7 +117,7 @@ if __name__ == "__main__":
                 labels.append("{}".format(query))
     plt.bar(labels, d_vals)
     plt.xticks(rotation=45)
-    plt.savefig("./results/derivation_median.png")
+    plt.savefig("./results/replay_median.png")
     plt.close()
     plt.bar(labels, t_vals)
     plt.xticks(rotation=45)
@@ -125,13 +126,6 @@ if __name__ == "__main__":
 
     # Write results to a file
     with open("./results/results.log", "w") as w:
-        ## derivation (mean)
-        write_log(results, queries, "derivation_mean", w)
-        ## derivation (std)
-        write_log(results, queries, "derivation_std", w)
-        ## derivation (median)
-        write_log(results, queries, "derivation_median", w)
-
         ## trigger (mean)
         write_log(results, queries, "trigger_mean", w)
         ## trigger (std)
@@ -139,7 +133,14 @@ if __name__ == "__main__":
         ## trigger (median)
         write_log(results, queries, "trigger_median", w)
 
-        ## derivation (count)
-        write_log(results, queries, "derivation_count", w)
+        ## replay (mean)
+        write_log(results, queries, "replay_mean", w)
+        ## replay (std)
+        write_log(results, queries, "replay_std", w)
+        ## replay (median)
+        write_log(results, queries, "replay_median", w)
+
         ## trigger (count)
         write_log(results, queries, "trigger_count", w)
+        ## replay (count)
+        write_log(results, queries, "replay_count", w)
