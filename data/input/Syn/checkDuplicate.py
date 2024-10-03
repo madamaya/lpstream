@@ -11,13 +11,14 @@ if __name__ == "__main__":
             for line in f:
                 elements = line.replace("\n", "").split(",")
                 if len(elements) == 4:
-                    log = line.replace("\n", "").split(",")[3]
+                    log = elements[3]
                 elif len(elements) == 5:
-                    log = line.replace("\n", "").split(",")[4]
+                    log = elements[4]
                 else:
                     raise Exception
                 if log in log_set:
                     print("Syn (idx={}, size={}): ❌ (LOG_DUPLICATE_ERROR)".format(idx, size))
+                    print(log)
                     exit(1)
                 log_set.add(log)
     print("Syn (size={}): ✅".format(size))

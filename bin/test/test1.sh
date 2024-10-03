@@ -167,6 +167,8 @@ done
 cd ${L3_HOME}/bin/test/scripts
 echo "(python test1.py "${queries}" "${approaches}" "${sizes}" ${L3_HOME}/data/output/latency)"
 python test1.py "${queries}" "${approaches}" "${sizes}" ${L3_HOME}/data/output/latency
+echo "(python test1_outputSet.py "${queries}" "${approaches}" "${sizes}" ${L3_HOME}/data/output/latency)"
+python test1_outputSet.py "${queries}" "${approaches}" "${sizes}" ${L3_HOME}/data/output/latency
 
 cd ${L3_HOME}/data/output
 mkdir -p test1
