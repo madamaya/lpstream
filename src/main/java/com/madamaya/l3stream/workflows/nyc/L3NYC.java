@@ -74,7 +74,7 @@ public class L3NYC {
                         return Tuple2.of(tuple.getVendorId(), tuple.getDropoffLocationId());
                     }
                 }), TupleTypeInfo.getBasicAndBasicValueTupleTypeInfo(Integer.class, Long.class))
-                .window(TumblingEventTimeWindows.of(Time.seconds(3)))
+                .window(TumblingEventTimeWindows.of(Time.seconds(2)))
                 .aggregate(L3.aggregateTs(new CountAndAvgDistanceL3())).uid("9");
 
         // Sink
