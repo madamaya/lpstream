@@ -23,7 +23,8 @@ public class DataParserLRL3 implements MapFunction<KafkaInputString, LinearRoadI
                 Integer.valueOf(elements[5]),
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
-                Integer.valueOf(elements[8])
+                Integer.valueOf(elements[8]),
+                elements[15]
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
         return tuple;

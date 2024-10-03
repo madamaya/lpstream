@@ -38,6 +38,7 @@ public class DataParserLRGL extends RichMapFunction<KafkaInputStringGL, LinearRo
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
                 Integer.valueOf(elements[8]),
+                elements[15],
                 input.getDominantOpTime(),
                 input.getKafkaAppandTime(),
                 input.getStimulus()
