@@ -136,18 +136,18 @@ if __name__ == "__main__":
                 chktimestamps = make_chk_ts_map(query, size)
                 ws = get_ws(query)
 
-                base_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query, "l3stream"), size, True)
-                gen_approach_result_set_out = make_results_set("{}/{}/{}".format(outputDir, query, "genealog"), size, True)
+                base_approach_result_set = make_results_set("{}/{}/{}".format(outputDir, query.lower(), "l3stream"), size, True)
+                gen_approach_result_set_out = make_results_set("{}/{}/{}".format(outputDir, query.lower(), "genealog"), size, True)
                 if len(base_approach_result_set) == len(gen_approach_result_set_out) and len(base_approach_result_set) == len(base_approach_result_set & gen_approach_result_set_out):
                     print("L3Stream == Gen ✅")
                 else:
                     print("L3Stream == Gen ❌")
                     query_result = False
 
-                gen_approach_result_set_out_lin = make_results_set("{}/{}/{}".format(outputDir, query, "genealog"), size, False)
+                gen_approach_result_set_out_lin = make_results_set("{}/{}/{}".format(outputDir, query.lower(), "genealog"), size, False)
                 for replay_idx in range(2, 5+1):
-                    base_approach_result_set = make_results_set_ts("{}/{}/{}".format(outputDir, query, "l3stream"), size, chktimestamps[replay_idx], True)
-                    current_result, false_exist_flag = cmp_base_and_current_result(base_approach_result_set, gen_approach_result_set_out, gen_approach_result_set_out_lin, "{}/{}/l3streamlin/{}".format(outputDir, query, replay_idx), size, chktimestamps[replay_idx], ws)
+                    base_approach_result_set = make_results_set_ts("{}/{}/{}".format(outputDir, query.lower(), "l3stream"), size, chktimestamps[replay_idx], True)
+                    current_result, false_exist_flag = cmp_base_and_current_result(base_approach_result_set, gen_approach_result_set_out, gen_approach_result_set_out_lin, "{}/{}/l3streamlin/{}".format(outputDir, query.lower(), replay_idx), size, chktimestamps[replay_idx], ws)
                     if current_result == True:
                         print("{},{},{}: ✅".format(query, replay_idx, false_exist_flag))
                     else:
