@@ -15,4 +15,7 @@ echo "*** Increase data volume ***"
 echo "(python increaseDataVol.py ${SF})"
 python increaseDataVol.py ${SF}
 
+echo "(python checkDuplicate.py)"
+python checkDuplicate.py
+
 echo "=*=*=*=*= End Linear Road data generation =*=*=*=*="

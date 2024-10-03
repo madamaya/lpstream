@@ -59,14 +59,14 @@ if __name__ == "__main__":
                 while all_size < minimum_generated_data_size * 1e9:
                     for current_machine_id in range(machine_num * current_parallel_id, machine_num * (current_parallel_id + 1)):
                         power = rng.normal(power_mean_dist[current_machine_id], power_mean_dist[current_parallel_id]/3)
-                        log1 = random.choices(candidate_chars, k=log_size_1)
+                        log1 = "".join(random.choices(candidate_chars, k=log_size_1))
                         dataLine = power_data_gen(current_machine_id, power, log1)
                         all_size += len(dataLine)
                         w.write(dataLine)
                     for current_sensor_id in range(sensor_num * current_parallel_id, sensor_num * (current_parallel_id + 1)):
                         for current_machine_id in range(machine_num * current_parallel_id, machine_num * (current_parallel_id + 1)):
                             temp = rng.normal(temp_mean_dist[current_machine_id], temp_mean_dist[current_parallel_id]/3)
-                            log0 = random.choices(candidate_chars, k=log_size_0)
+                            log0 = "".join(random.choices(candidate_chars, k=log_size_0))
                             dataLine = temp_data_gen(current_machine_id, current_sensor_id, temp, log0)
                             all_size += len(dataLine)
                             w.write(dataLine)

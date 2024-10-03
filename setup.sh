@@ -84,6 +84,9 @@ elif [ $1 = "mainData" ]; then
   echo "END: python dataGen.py ${parallelism}" >> ../dataGen.log
   for i in 10 100 400
   do
+    echo "START: python checkDuplicate.py"
+    python checkDuplicate.py ${parallelism} ${i}
+    echo "END: python checkDuplicate.py"
     echo "START: ./copy.sh ${parallelism} ${i}"
     ./copy.sh ${parallelism} ${i}
     echo "END: ./copy.sh ${parallelism} ${i}"

@@ -28,7 +28,7 @@ with open("../data/lr.csv", "w") as w:
             tmpLine = line.split(",")
             tmpLine[1] = str(int(tmpLine[1]) + tsShipt * i)
             line = ",".join(tmpLine)
-            log = random.choices(candidate_chars, k=10)
+            log = "".join(random.choices(candidate_chars, k=10))
             w.write("\"" + line + "," + log + "\"\n")
 
         ctime = time.time()
