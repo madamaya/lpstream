@@ -118,7 +118,7 @@ if __name__ == "__main__":
     print("Time duration: {} [s]".format(end_time-start_time))
     #w.write("Time duration: {} [s]\n".format(end_time-start_time))
 
-    start_idx = count_all * 10 // 100
+    start_idx = count_all * 25 // 100
     end_idx = count_all * 90 // 100
     pivot_idx = (end_idx - start_idx) * 10 // 100
     start_idx_end = start_idx + pivot_idx

@@ -10,7 +10,7 @@ do
 done
 
 # Synthetic dataset
-for size in 10 50 100
+for size in 10 100 400
 do
   for idx in `seq 8 10`
   do

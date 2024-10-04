@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     current_window_time = pq[0][0] // 10000
 
-    head_drop_idx = all_data_num * 10 // 100
+    head_drop_idx = all_data_num * 25 // 100
     tail_drop_idx = all_data_num * 90 // 100
     pivot_idx = (tail_drop_idx - head_drop_idx) * 10 // 100
     head_drop_end_idx = head_drop_idx + pivot_idx

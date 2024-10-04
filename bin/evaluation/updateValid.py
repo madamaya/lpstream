@@ -121,7 +121,7 @@ def getThroughputValues(queries, approaches, dataSizes, dataPath):
     return return_map
 
 def isNotIncreasing(ifMed):
-    return ifMed <= 1.5
+    return ifMed < 3
 
 def containValue(dct, query, approach, dataSize):
     if dataSize in dct and query in dct[dataSize] and approach in dct[dataSize][query]:

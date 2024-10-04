@@ -12,8 +12,8 @@ source ./thUtils/thUtils.sh
 granularityTemp=100
 queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
 approaches=(baseline genealog l3stream l3streamlin)
-sizes=(-1 10 50 100)
-sleepTime=600
+sizes=(-1 10 100 400)
+sleepTime=720
 homedir=`pwd`
 
 rm finishedComb.csv ./thLog/parameters.log

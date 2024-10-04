@@ -145,7 +145,7 @@ def calcResults(queries, approaches, filterRate, plotTrends, startTime, size):
                 for file in files:
                     df = pd.read_csv(file, header=None, names=["ts", "CPU", "Memory"])
                     # df = df.iloc[int(df.shape[0]*filterRate):]
-                    df = df.iloc[min(int(df.shape[0]*filterRate), 121):] # 最初の2分間を削除
+                    df = df.iloc[int(df.shape[0]*filterRate):]
 
                     cpuList = df["CPU"].tolist()
                     memoryList = df["Memory"].tolist()

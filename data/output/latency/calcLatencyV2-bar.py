@@ -132,7 +132,7 @@ if __name__ == "__main__":
     """
     Calculate latency for whole data
     """
-    head_drop_size = len(latency_values_all) * 10 // 100
+    head_drop_size = len(latency_values_all) * 25 // 100
     tail_drop_size = len(latency_values_all) * 90 // 100
     medians = np.median(latency_values_all[head_drop_size:tail_drop_size], axis=0)
     means = np.mean(latency_values_all[head_drop_size:tail_drop_size], axis=0)

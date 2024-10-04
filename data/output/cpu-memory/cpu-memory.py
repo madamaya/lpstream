@@ -2,7 +2,7 @@ import os, sys
 import time
 from utils import utils
 
-filterRate = 0.1
+filterRate = 0.25
 plotTrends = True
 #queries = ["Syn1", "Syn2", "Syn3", "LR", "NYC", "Nexmark", "YSB"]
 #approaches = ["baseline", "genealog", "l3stream", "l3streamlin"]
