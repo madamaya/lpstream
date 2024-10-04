@@ -57,6 +57,13 @@ do
     echo "ssh ${redisIP} redis-cli -h ${redisIP} flushdb"
     ssh ${redisIP} redis-cli -h ${redisIP} flushdb
   fi
+  echo "(stopFlinkCluster)"
+  stopFlinkCluster
+  echo "(sleep 10)"
+  sleep 10
+  echo "(startFlinkCluster)"
+  startFlinkCluster
+  sleep 10
 
   ## submit Flink job
   cd ${BIN_DIR}/templates

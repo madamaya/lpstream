@@ -43,6 +43,13 @@ do
         echo "ssh ${redisIP} redis-cli -h ${redisIP} flushdb"
         ssh ${redisIP} redis-cli -h ${redisIP} flushdb
       fi
+      echo "(stopFlinkCluster)"
+      stopFlinkCluster
+      echo "(sleep 10)"
+      sleep 10
+      echo "(startFlinkCluster)"
+      startFlinkCluster
+      sleep 10
 
       echo "*** Start test1 (query = ${query}, approach = ${approach}, size = ${size}) ***"
 
