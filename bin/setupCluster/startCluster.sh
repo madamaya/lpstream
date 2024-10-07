@@ -22,7 +22,7 @@ if [[ ${bootstrapServers} == *localhost* ]]; then
 fi
 
 # Create topics
-for i in LR NYC NYC2 YSB YSB2 Nexmark Nexmark2 Syn1 Syn2 Syn3
+for i in LR NYC NYC2 YSB YSB2 Nexmark Nexmark2 Syn1 Syn2 Syn3 Syn10
 do
   for j in i o l
   do
