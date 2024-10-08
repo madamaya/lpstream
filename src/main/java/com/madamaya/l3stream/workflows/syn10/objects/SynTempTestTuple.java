@@ -21,7 +21,7 @@ public class SynTempTestTuple extends SynTempTuple {
 
     @Override
     public String toString() {
-        return "SynTempTuple{" +
+        return "SynTempTestTuple{" +
                 "machineId=" + getMachineId() +
                 ", sensorId=" + getSensorId() +
                 ", temperature=" + getTemperature() +

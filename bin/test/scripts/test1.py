@@ -8,6 +8,13 @@ def arg_parser(elements):
     outputDir = elements[3]
     return queries, approaches, dataSizes, outputDir
 
+def remove_4th_attribute(line, syn10flag):
+    if not syn10flag:
+        return line
+    else:
+        tmp_line_elements = line.split(",")
+        return ",".join(tmp_line_elements[:3] + tmp_line_elements[4:])
+
 def make_results_set(approach_path, size, flag):
     results_set = set()
     files = glob.glob("{}/{}_*.csv".format(approach_path, size))
@@ -15,10 +22,10 @@ def make_results_set(approach_path, size, flag):
         with open(file) as f:
             for line in f:
                 if flag == True:
-                    results_set.add(line.replace("\n", "").split(":::::")[0])
+                    results_set.add(remove_4th_attribute(line.replace("\n", "").split(":::::")[0], "Syn10" in approach_path))
                 else:
                     elements = line.replace("\n", "").split(":::::")
-                    results_set.add(":::::".join(elements[:2]))
+                    results_set.add(remove_4th_attribute(":::::".join(elements[:2]), "Syn10" in approach_path))
     return results_set
 
 def cmp_base_and_current_result(base_approach_result_set, approach_path, size, flag):
@@ -29,10 +36,10 @@ def cmp_base_and_current_result(base_approach_result_set, approach_path, size, f
         with open(file) as f:
             for line in f:
                 if flag == True:
-                    element = line.replace("\n", "").split(":::::")[0]
+                    element = remove_4th_attribute(line.replace("\n", "").split(":::::")[0], "Syn10" in approach_path)
                 else:
                     elements = line.replace("\n", "").split(":::::")
-                    element = ":::::".join(elements[:2])
+                    element = remove_4th_attribute(":::::".join(elements[:2]), "Syn10" in approach_path)
 
                 current_set.add(element)
                 if element not in base_approach_result_set:

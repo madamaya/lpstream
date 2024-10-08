@@ -8,6 +8,13 @@ def arg_parser(elements):
     outputDir = elements[3]
     return queries, approaches, dataSizes, outputDir
 
+def remove_4th_attribute(line, syn10flag):
+    if not syn10flag:
+        return line
+    else:
+        tmp_line_elements = line.split(",")
+        return ",".join(tmp_line_elements[:3] + tmp_line_elements[4:])
+
 def make_results_set_list(approach_path, size):
     results_set = set()
     results_list = []
@@ -15,8 +22,8 @@ def make_results_set_list(approach_path, size):
     for file in files:
         with open(file) as f:
             for line in f:
-                results_set.add(line.replace("\n", "").split(":::::")[0])
-                results_list.append(line.replace("\n", "").split(":::::")[0])
+                results_set.add(remove_4th_attribute(line.replace("\n", "").split(":::::")[0], "Syn10" in approach_path))
+                results_list.append(remove_4th_attribute(line.replace("\n", "").split(":::::")[0], "Syn10" in approach_path))
     return results_set, results_list
 
 if __name__ == "__main__":

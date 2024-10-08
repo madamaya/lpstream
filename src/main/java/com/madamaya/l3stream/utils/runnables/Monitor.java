@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Function;
 
 public class Monitor implements Runnable {
     private long outputTs;
@@ -64,7 +65,7 @@ public class Monitor implements Runnable {
         long endTime = -1;
         boolean active = true;
         boolean lineageDerivationFlag = false;
-
+        boolean findFlag = false;
         try {
             System.out.println("Monitor.java: READY (" + partition + ")");
             while (!Thread.interrupted() && active) {
@@ -72,7 +73,19 @@ public class Monitor implements Runnable {
                 for (ConsumerRecord record : records) {
                     count++;
                     String currentRecord = (String) record.value();
-                    if (checkSame(currentRecord, outputValue, outputTs)) {
+                    if (lineageTopic.equals("Syn10-l")) {
+                        findFlag = checkSame(currentRecord, outputValue, outputTs,
+                                new Function<String, String>() {
+                                    @Override
+                                    public String apply(String s) {
+                                        String[] elements = s.split(",");
+                                        return elements[0] + "," + elements[1] + "," + elements[2] + "," + elements[4] + "," + elements[5];
+                                    }
+                                });
+                    } else {
+                        findFlag = checkSame(currentRecord, outputValue, outputTs);
+                    }
+                    if (findFlag) {
                         writeLineage(currentRecord, query, size, experimentID);
                         endTime = System.currentTimeMillis();
                         System.out.println("count = " + count + " [END] (" + partition + ")");
@@ -120,8 +133,12 @@ public class Monitor implements Runnable {
     }
 
     private static boolean checkSame(String recordValue, String outputValue, long outputTs) throws JsonProcessingException {
+        return checkSame(recordValue, outputValue, outputTs, t -> t);
+    }
+
+    private static boolean checkSame(String recordValue, String outputValue, long outputTs, Function<String, String> func) throws JsonProcessingException {
         Tuple3<String, Long, Boolean> t3 = extractOutTsFlag(recordValue);
-        return t3.f0.equals(outputValue) && t3.f1 == outputTs && t3.f2;
+        return func.apply(t3.f0).equals(func.apply(outputValue)) && t3.f1 == outputTs && t3.f2;
     }
 
     private static void writeLineage(String recordValue, String query, String size, String experimentID) {

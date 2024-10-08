@@ -7,6 +7,13 @@ def arg_parser(elements):
     outputDir = elements[2]
     return queries, dataSizes, outputDir
 
+def remove_4th_attribute(line, syn10flag):
+    if not syn10flag:
+        return line
+    else:
+        tmp_line_elements = line.split(",")
+        return ",".join(tmp_line_elements[:3] + tmp_line_elements[4:])
+
 def make_chk_ts_map(query, size):
     return_map = {}
     with open("../redis_log/{}_{}.log".format(query, size)) as f:
@@ -48,9 +55,9 @@ def make_results_set(path, size, flag):
             for line in f:
                 elements = line.replace("\n", "").split(":::::")
                 if flag == True:
-                    element = elements[0]
+                    element = remove_4th_attribute(elements[0], "syn10" in path)
                 else:
-                    element = ":::::".join(elements[:2])
+                    element = remove_4th_attribute(":::::".join(elements[:2]), "syn10" in path)
                 results_set.add(element)
     return results_set
 
@@ -62,9 +69,9 @@ def make_results_set_ts(path, size, chkts, flag):
             for line in f:
                 elements = line.replace("\n", "").split(":::::")
                 if flag == True:
-                    element = elements[0]
+                    element = remove_4th_attribute(elements[0], "syn10" in path)
                 else:
-                    element = ":::::".join(elements[:2])
+                    element = remove_4th_attribute(":::::".join(elements[:2]), "syn10" in path)
                 timestamp = int(elements[2])
                 if timestamp > chkts:
                     results_set.add(element)
@@ -79,7 +86,7 @@ def cmp_base_and_current_result(base_approach_result_set, gen_approach_result_se
         with open(file) as f:
             for line in f:
                 elements = line.replace("\n", "").split(":::::")
-                output = elements[0]
+                output = remove_4th_attribute(elements[0], "syn10" in approach_path)
                 lineage = elements[1]
                 ts = int(elements[2])
                 reliable_flag = elements[3]
