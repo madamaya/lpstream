@@ -8,7 +8,7 @@ source ../utils/cleanCache.sh
 source ../utils/logger.sh
 source ../utils/cpuMemoryLoadLogger.sh
 
-original_throughput=50000
+original_throughput=10000
 #throughput=50000
 granularityTemp=100
 queries=(LR Syn1 Nexmark NYC YSB Nexmark2 NYC2 YSB2 Syn2 Syn3)
