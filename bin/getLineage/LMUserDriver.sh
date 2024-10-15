@@ -25,7 +25,7 @@ else
 fi
 
 size=$2
-inputRate=50000
+inputRate=10000
 granularityTemp=100
 sleepTime=720
 

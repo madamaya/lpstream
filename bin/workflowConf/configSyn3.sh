@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 query="Syn3"
-maxWindowSize=10000
+maxWindowSize=9999
 numOfSourceOp=1
 mainPath="com.madamaya.l3stream.workflows.syn3.L3Syn3"
 outputTopicName="Syn3-o"
