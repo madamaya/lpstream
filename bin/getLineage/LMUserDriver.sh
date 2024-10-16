@@ -104,8 +104,10 @@ echo "*** Get jobid ***"
 echo "(jobid=\`getRunningJobID\`)"
 jobid=`getRunningJobID`
 
+cd ${BIN_DIR}/templates
 # Start CPU/Memory logger
 startCpuMemoryLogger ${L3_HOME}/data/output/cpu-memory/${qName}/l3stream ${size}.log &
+cd ${BIN_DIR}
 
 # Sleep
 echo "*** Sleep predefined time (${sleepTime} [s]) ***"
