@@ -35,6 +35,7 @@ source ../utils/flinkJob.sh
 source ../utils/kafkaUtils.sh
 source ../utils/redisUtils.sh
 source ../utils/cleanCache.sh
+source ../utils/cpuMemoryLoadLogger.sh
 
 # Call Lineage Manager (normal mode)
 # This driver emulates the call from "Program Converter" to "Lineage Manager".
