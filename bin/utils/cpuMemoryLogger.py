@@ -52,5 +52,7 @@ if __name__ == "__main__":
             w.write("{},{},{}\n".format(int(prevTime), cpuUsed, memoryUsed))
             w.flush()
 
-            time.sleep(getInterval - (time.time() - prevTime))
+            sleepTime = getInterval - (time.time() - prevTime)
+            if sleepTime > 0:
+                time.sleep(sleepTime)
             prevTime = time.time()

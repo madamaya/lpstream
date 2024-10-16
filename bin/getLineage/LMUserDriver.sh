@@ -71,8 +71,8 @@ do
   running=`getRunningJobID`
   echo "running =" ${running}
   if [ ${running} != "-1" ]; then
-    echo "(sleep 5)"
-    sleep 5
+    echo "(sleep 1)"
+    sleep 1
     echo "break"
     break
   fi
@@ -103,10 +103,16 @@ echo "*** Get jobid ***"
 echo "(jobid=\`getRunningJobID\`)"
 jobid=`getRunningJobID`
 
+# Start CPU/Memory logger
+startCpuMemoryLogger ${L3_HOME}/data/output/cpu-memory/${qName}/l3stream ${size}.log &
+
 # Sleep
 echo "*** Sleep predefined time (${sleepTime} [s]) ***"
 echo "(sleep ${sleepTime})"
 sleep ${sleepTime}
+
+# Stop CPU/Memory logger
+stopCpuMemoryLogger
 
 ## Cancel Flink job
 echo "*** Cancel Flink job ***"
