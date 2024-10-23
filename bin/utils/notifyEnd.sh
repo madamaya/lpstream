@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-sleepTimeNotifyEnd=90
+sleepTimeNotifyEnd=30
 sleepTimeNotifyMonitorEnd=30
 # $1: logFile
 function notifyEnd() {

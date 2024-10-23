@@ -4,12 +4,17 @@ import io.palyvos.provenance.genealog.GenealogData;
 import io.palyvos.provenance.genealog.GenealogTuple;
 import io.palyvos.provenance.genealog.GenealogTupleType;
 
+import java.text.SimpleDateFormat;
+
 public class NYCInputTupleGL extends NYCInputTuple implements GenealogTuple {
     private GenealogData gdata;
-    private long timestamp;
 
-    public NYCInputTupleGL(String line, long stimulus) {
-        super(line, stimulus);
+    public NYCInputTupleGL(String line, long dominantOpTime, long kafkaAppendTime, long stimulus, SimpleDateFormat sdf) {
+        super(line, dominantOpTime, kafkaAppendTime, stimulus, sdf);
+    }
+
+    public NYCInputTupleGL(NYCInputTupleGL tuple) {
+        super(tuple);
     }
 
     @Override
@@ -25,11 +30,11 @@ public class NYCInputTupleGL extends NYCInputTuple implements GenealogTuple {
 
     @Override
     public long getTimestamp() {
-        return timestamp;
+        return super.getDropoffTime();
     }
 
     @Override
     public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+        super.setDropoffTime(timestamp);
     }
 }

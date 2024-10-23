@@ -1,12 +1,5 @@
 package com.madamaya.l3stream.workflows.nexmark.objects;
 
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
 public class NexmarkInputTuple {
     /*
      Sample Input:
@@ -25,27 +18,6 @@ public class NexmarkInputTuple {
 
     public void setEventType(int eventType) {
         this.eventType = eventType;
-    }
-
-    public static long convertDateStrToLong(String dateStr) throws ParseException {
-        Date date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-
-        String[] splitted = dateStr.split("\\.");
-        if (splitted.length == 2) {
-            String millisecStr = splitted[1];
-            if (millisecStr.length() == 1) {
-                return calendar.getTimeInMillis() + Long.parseLong(millisecStr + "00");
-            } else if (millisecStr.length() == 2) {
-                return calendar.getTimeInMillis() + Long.parseLong(millisecStr + "0");
-            } else if (millisecStr.length() == 3) {
-                return calendar.getTimeInMillis() + Long.parseLong(millisecStr);
-            } else {
-                throw new IllegalStateException();
-            }
-        }
-        return calendar.getTimeInMillis();
     }
 
     @Override

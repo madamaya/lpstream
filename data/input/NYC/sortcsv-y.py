@@ -45,7 +45,7 @@ if __name__ == "__main__":
         for line in tmpList:
             cnt = cnt + 1
             #w.write('"' + line  + '"' + "\n")
-            w.write('"' + line.rstrip("\n")  + '"' + "\n")
+            w.write("\"" + line.replace("\n", "") + "\"\n")
 
             if cnt % numofonepercent == 0:
                 current_time = time.time()

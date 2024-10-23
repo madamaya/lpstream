@@ -6,7 +6,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.internals.Topic;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -15,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -73,7 +71,8 @@ public class L3DataReaderFromEarliest {
 
                 for (ConsumerRecord record : records) {
                     String recordValue = (String) record.value();
-                    bw.write(recordValue + "\n");
+                    long ts = record.timestamp();
+                    bw.write(ts + "," + recordValue + "\n");
                     if (++count % 100 == 0) {
                         System.out.print("\r" + count + " tuple(s) have been read.");
                     }
@@ -85,25 +84,5 @@ public class L3DataReaderFromEarliest {
         } catch (Exception e) {
             System.err.println(e);
         }
-
-        /*
-        int count = 0;
-        BufferedWriter bw;
-        try {
-            bw = new BufferedWriter(new FileWriter(outputFilePath));
-
-            while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
-                for (ConsumerRecord record : records) {
-                    count++;
-                    String recordValue = (String) record.value();
-                    bw.write(recordValue + "\n");
-                    bw.flush();
-                }
-            }
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-         */
     }
 }

@@ -6,10 +6,13 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 
 public class YSBInternalTupleGL extends YSBInternalTuple implements GenealogTuple {
     private GenealogData gdata;
-    private long timestamp;
 
-    public YSBInternalTupleGL(String adId, String campaignId, long eventtime, long stimulus) {
-        super(adId, campaignId, eventtime, stimulus);
+    public YSBInternalTupleGL(String adId, String campaignId, long eventtime, long dominantOpTime, long kafkaAppendTime, long stimulus) {
+        super(adId, campaignId, eventtime, dominantOpTime, kafkaAppendTime, stimulus);
+    }
+
+    public YSBInternalTupleGL(YSBInternalTupleGL tuple) {
+        super(tuple.getAdId(), tuple.getCampaignId(), tuple.getEventtime(), tuple.getDominantOpTime(), tuple.getKafkaAppendTime(), tuple.getStimulus());
     }
 
     @Override
@@ -25,11 +28,11 @@ public class YSBInternalTupleGL extends YSBInternalTuple implements GenealogTupl
 
     @Override
     public long getTimestamp() {
-        return timestamp;
+        return super.getEventtime();
     }
 
     @Override
     public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+        super.setEventtime(timestamp);
     }
 }

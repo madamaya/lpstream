@@ -1,19 +1,18 @@
 package com.madamaya.l3stream.workflows.lr.ops;
 
 import io.palyvos.provenance.l3stream.conf.L3conf;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.usecases.linearroad.noprovenance.LinearRoadInputTuple;
 import io.palyvos.provenance.util.ExperimentSettings;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
-public class DataParserLR extends RichMapFunction<ObjectNode, LinearRoadInputTuple> {
+public class DataParserLR extends RichMapFunction<KafkaInputString, LinearRoadInputTuple> {
     private static final Pattern delimiter = Pattern.compile(",");
     long start;
     long count;
@@ -24,11 +23,10 @@ public class DataParserLR extends RichMapFunction<ObjectNode, LinearRoadInputTup
     }
 
     @Override
-    public LinearRoadInputTuple map(ObjectNode jNode) throws Exception {
-        long stimulus = System.nanoTime();
-
-        String line = jNode.get("value").textValue();
-        String[] elements = delimiter.split(line.trim());
+    public LinearRoadInputTuple map(KafkaInputString input) throws Exception {
+        String inputStr = input.getStr();
+        String line = inputStr.substring(1, inputStr.length() - 1).trim();
+        String[] elements = delimiter.split(line);
         LinearRoadInputTuple tuple = new LinearRoadInputTuple(
                 Integer.valueOf(elements[0]),
                 Long.valueOf(elements[1]),
@@ -39,10 +37,12 @@ public class DataParserLR extends RichMapFunction<ObjectNode, LinearRoadInputTup
                 Integer.valueOf(elements[6]),
                 Integer.valueOf(elements[7]),
                 Integer.valueOf(elements[8]),
-                stimulus
+                elements[15],
+                input.getDominantOpTime(),
+                input.getKafkaAppandTime(),
+                input.getStimulus()
         );
         tuple.setKey(String.valueOf(tuple.getVid()));
-        tuple.setPartitionID(jNode.get("metadata").get("partition").asInt());
         count++;
         return tuple;
     }
@@ -63,7 +63,7 @@ public class DataParserLR extends RichMapFunction<ObjectNode, LinearRoadInputTup
             Files.createDirectories(Paths.get(dataPath));
         }
 
-        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + getRuntimeContext().getIndexOfThisSubtask() + ".log");
+        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + getRuntimeContext().getIndexOfThisSubtask() + "_" + settings.getDataSize() + ".log");
         pw.println(start + "," + end + "," + (end - start) + "," + count);
         pw.flush();
         pw.close();

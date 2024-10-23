@@ -3,11 +3,13 @@
 source $(dirname $0)/../config.sh
 
 # Stop Flink Server
-#echo "*** Stop flink cluster ***"
-#${FLINK_HOME}/bin/stop-cluster.sh
+if [[ ${flinkIP} == "localhost" ]]; then
+  echo "*** Stop flink cluster ***"
+  ${FLINK_HOME}/bin/stop-cluster.sh
+fi
 
 # Delete topics
-for i in LR NYC YSB Nexmark
+for i in LR NYC NYC2 YSB YSB2 Nexmark Nexmark2 Syn1 Syn2 Syn3
 do
   for j in i o l
   do
@@ -17,11 +19,13 @@ do
 done
 sleep 10
 
-# Stop kafka server
-#echo "*** Stop kafka cluster ***"
-#${KAFKA_HOME}/bin/kafka-server-stop.sh
-#sleep 30
+if [[ ${bootstrapServers} == *localhost* ]]; then
+  # Stop kafka server
+  echo "*** Stop kafka cluster ***"
+  ${KAFKA_HOME}/bin/kafka-server-stop.sh
+  sleep 30
 
-# Stop zookeeper server
-#echo "*** Stop zookeeper ***"
-#${KAFKA_HOME}/bin/zookeeper-server-stop.sh
+  # Stop zookeeper server
+  echo "*** Stop zookeeper ***"
+  ${KAFKA_HOME}/bin/zookeeper-server-stop.sh
+fi

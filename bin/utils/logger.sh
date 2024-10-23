@@ -3,12 +3,39 @@
 source $(dirname $0)/../config.sh
 
 function readOutputFromEarliest () {
+  exit 1
   logDir=$1
   logFile=$2
   outputTopicName=$3
 
   echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism})"
   java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3DataReaderFromEarliest ${outputTopicName} ${logDir}/${logFile} ${parallelism}
+}
+
+function readOutput () {
+  outputTopicName=$1
+  outputFileDir=$2
+  size=$3
+  withLineage=$4
+  isLatencyExperiment=$5
+  isRawMode=$6
+  echo "(java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeReaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${size} ${withLineage} ${isLatencyExperiment} ${isRawMode})"
+  java -cp ${JAR_PATH} com.madamaya.l3stream.utils.L3RealtimeReaderV2 ${outputTopicName} ${parallelism} ${outputFileDir} ${size} ${withLineage} ${isLatencyExperiment} ${isRawMode}
+}
+
+function latencyCalcFromKafka () {
+  outputTopicName=$1
+  outputFilePath=$2
+  echo "(java -Xmx110G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafka ${outputTopicName} ${parallelism} ${outputFilePath})"
+  java -Xmx110G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafka ${outputTopicName} ${parallelism} ${outputFilePath}
+}
+
+function latencyCalcFromKafkaDisk () {
+  outputTopicName=$1
+  outputFileDir=$2
+  key=$3
+  echo "(java -Xmx110G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafkaDisk ${outputTopicName} ${parallelism} ${outputFileDir} ${key})"
+  java -Xmx110G -cp ${JAR_PATH} com.madamaya.l3stream.utils.LatencyCalcFromKafkaDisk ${outputTopicName} ${parallelism} ${outputFileDir} ${key}
 }
 
 function startKafkaLogger () {

@@ -6,14 +6,17 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 
 public class NexmarkBidTupleGL extends NexmarkBidTuple implements GenealogTuple {
     private GenealogData gdata;
-    private long timestamp;
 
     public NexmarkBidTupleGL(int eventType) {
         super(eventType);
     }
 
-    public NexmarkBidTupleGL(int eventType, int auctionId, int bidder, long price, String channel, String url, long dateTime, String extra, long stimulus) {
-        super(eventType, auctionId, bidder, price, channel, url, dateTime, extra, stimulus);
+    public NexmarkBidTupleGL(int eventType, int auctionId, int bidder, long price, String channel, String url, long dateTime, String extra, long dominantOpTime, long kafkaAppendTime, long stimulus) {
+        super(eventType, auctionId, bidder, price, channel, url, dateTime, extra, dominantOpTime, kafkaAppendTime, stimulus);
+    }
+
+    public NexmarkBidTupleGL(NexmarkBidTupleGL tuple) {
+        super(tuple);
     }
 
     @Override
@@ -29,11 +32,11 @@ public class NexmarkBidTupleGL extends NexmarkBidTuple implements GenealogTuple 
 
     @Override
     public long getTimestamp() {
-        return timestamp;
+        return super.getDateTime();
     }
 
     @Override
     public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+        super.setDateTime(timestamp);
     }
 }

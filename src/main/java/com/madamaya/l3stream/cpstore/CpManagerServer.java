@@ -1,7 +1,5 @@
 package com.madamaya.l3stream.cpstore;
 
-import com.madamaya.l3stream.conf.L3Config;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.flink.api.common.JobID;
 
 import java.io.BufferedReader;

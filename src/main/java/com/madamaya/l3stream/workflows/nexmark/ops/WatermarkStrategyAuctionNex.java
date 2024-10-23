@@ -1,7 +1,6 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTuple;
-import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import org.apache.flink.api.common.eventtime.*;
 
 public class WatermarkStrategyAuctionNex implements WatermarkStrategy<NexmarkAuctionTuple> {
@@ -19,11 +18,11 @@ public class WatermarkStrategyAuctionNex implements WatermarkStrategy<NexmarkAuc
     @Override
     public WatermarkGenerator<NexmarkAuctionTuple> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
         return new WatermarkGenerator<NexmarkAuctionTuple>() {
-            long latest = Long.MIN_VALUE;
+            long latest = 0;
             @Override
             public void onEvent(NexmarkAuctionTuple tuple, long l, WatermarkOutput watermarkOutput) {
                 if (tuple.getDateTime() > latest) {
-                    watermarkOutput.emitWatermark(new Watermark(tuple.getDateTime() - 1));
+                    watermarkOutput.emitWatermark(new Watermark(latest));
                     latest = tuple.getDateTime();
                 }
             }

@@ -1,7 +1,6 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTupleGL;
-import com.madamaya.l3stream.workflows.nyc.objects.NYCResultTupleGL;
 import io.palyvos.provenance.genealog.GenealogGraphTraverser;
 import io.palyvos.provenance.l3stream.util.FormatLineage;
 import io.palyvos.provenance.util.ExperimentSettings;

@@ -2,27 +2,28 @@ package com.madamaya.l3stream.workflows.nyc.ops;
 
 import com.madamaya.l3stream.workflows.nyc.objects.NYCInputTuple;
 import io.palyvos.provenance.l3stream.conf.L3conf;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputString;
 import io.palyvos.provenance.util.ExperimentSettings;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 
-public class DataParserNYC extends RichMapFunction<ObjectNode, NYCInputTuple> {
+public class DataParserNYC extends RichMapFunction<KafkaInputString, NYCInputTuple> {
     long start;
     long count;
     ExperimentSettings settings;
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     public DataParserNYC(ExperimentSettings settings) {
         this.settings = settings;
     }
 
     @Override
-    public NYCInputTuple map(ObjectNode jNode) throws Exception {
+    public NYCInputTuple map(KafkaInputString input) throws Exception {
         /* Column list
         ['VendorID', 'tpep_pickup_datetime', 'tpep_dropoff_datetime',
        'passenger_count', 'trip_distance', 'RatecodeID',
@@ -30,11 +31,12 @@ public class DataParserNYC extends RichMapFunction<ObjectNode, NYCInputTuple> {
        'payment_type', 'fare_amount', 'extra', 'mta_tax', 'tip_amount',
        'tolls_amount', 'improvement_surcharge', 'total_amount',
        'congestion_surcharge', 'airport_fee'] */
-        long stimulus = System.nanoTime();
-
-        String line = jNode.get("value").textValue();
         count++;
-        return new NYCInputTuple(line, stimulus);
+        String inputStr = input.getStr();
+        String line = inputStr.substring(1, inputStr.length() - 1).trim();
+
+        NYCInputTuple tuple = new NYCInputTuple(line, input.getDominantOpTime(), input.getKafkaAppandTime(), input.getStimulus(), sdf);
+        return tuple;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class DataParserNYC extends RichMapFunction<ObjectNode, NYCInputTuple> {
             Files.createDirectories(Paths.get(dataPath));
         }
 
-        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + getRuntimeContext().getIndexOfThisSubtask() + ".log");
+        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + getRuntimeContext().getIndexOfThisSubtask() + "_" + settings.getDataSize() + ".log");
         pw.println(start + "," + end + "," + (end - start) + "," + count);
         pw.flush();
         pw.close();

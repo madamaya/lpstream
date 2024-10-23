@@ -1,28 +1,19 @@
 package com.madamaya.l3stream.workflows.lr;
 
 import com.madamaya.l3stream.conf.L3Config;
-import com.madamaya.l3stream.glCommons.InitGdataGL;
 import com.madamaya.l3stream.workflows.lr.ops.*;
-import com.madamaya.l3stream.workflows.nexmark.ops.LineageKafkaSinkNexmarkGL;
-import io.palyvos.provenance.usecases.CountTuple;
-import io.palyvos.provenance.usecases.CountTupleGL;
-import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadAccidentAggregate;
-import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadVehicleAggregate;
+import io.palyvos.provenance.l3stream.util.deserializerV2.StringDeserializerV2GL;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputStringGL;
+import io.palyvos.provenance.usecases.linearroad.provenance.LinearRoadInputTupleGL;
 import io.palyvos.provenance.util.ExperimentSettings;
+import io.palyvos.provenance.util.FlinkSerializerActivator;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.connector.base.DeliveryGuarantee;
+import org.apache.flink.connector.kafka.sink.KafkaSink;
+import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
-import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
-import org.apache.flink.streaming.util.serialization.JSONKeyValueDeserializationSchema;
-import org.apache.kafka.clients.producer.ProducerRecord;
-
-import javax.annotation.Nullable;
-import java.nio.charset.StandardCharsets;
-import java.util.Properties;
-
-import static io.palyvos.provenance.usecases.linearroad.LinearRoadConstants.*;
 
 public class GLLR {
     public static void main(String[] args) throws Exception {
@@ -30,50 +21,48 @@ public class GLLR {
         /* Define variables & Create environment */
         ExperimentSettings settings = ExperimentSettings.newInstance(args);
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        FlinkSerializerActivator.L3STREAM.activate(env, settings);
         env.getConfig().enableObjectReuse();
-        env.getCheckpointConfig().disableCheckpointing();
 
         final String queryFlag = "LR";
         final String inputTopicName = queryFlag + "-i";
         final String outputTopicName = queryFlag + "-o";
+        final String brokers = L3Config.BOOTSTRAP_IP_PORT;
 
-        Properties kafkaProperties = new Properties();
-        kafkaProperties.setProperty("bootstrap.servers", L3Config.BOOTSTRAP_IP_PORT);
-        kafkaProperties.setProperty("group.id", String.valueOf(System.currentTimeMillis()));
-        kafkaProperties.setProperty("transaction.timeout.ms", "540000");
+        KafkaSource<KafkaInputStringGL> source = KafkaSource.<KafkaInputStringGL>builder()
+                .setBootstrapServers(brokers)
+                .setTopics(inputTopicName)
+                .setGroupId(String.valueOf(System.currentTimeMillis()))
+                .setStartingOffsets(OffsetsInitializer.latest())
+                .setDeserializer(new StringDeserializerV2GL())
+                .build();
 
         /* Query */
-        DataStream<CountTupleGL> ds = env.addSource(new FlinkKafkaConsumer<>(inputTopicName, new JSONKeyValueDeserializationSchema(true), kafkaProperties).setStartFromEarliest())
-                .map(new InitGdataGL(settings))
-                .map(new DataParserLRGL())
-                .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL(settings.maxParallelism()))
-                .filter(t -> t.getType() == 0 && t.getSpeed() == 0)
-                .keyBy(t -> t.getKey())
-                .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(STOPPED_VEHICLE_WINDOW_SIZE),
-                        STOPPED_VEHICLE_WINDOW_SLIDE))
-                .aggregate(new LinearRoadVehicleAggregate(settings.aggregateStrategySupplier()))
-                .filter(t -> t.getReports() == (4 * settings.getWindowSize()) && t.isUniquePosition())
-                .keyBy(t -> t.getLatestPos())
-                .window(SlidingEventTimeWindows.of(settings.assignExperimentWindowSize(ACCIDENT_WINDOW_SIZE),
-                        ACCIDENT_WINDOW_SLIDE))
-                .aggregate(new LinearRoadAccidentAggregate(settings.aggregateStrategySupplier()))
-                //.slotSharingGroup(settings.secondSlotSharingGroup())
-                .filter(t -> t.getCount() > 1);
+        DataStream<LinearRoadInputTupleGL> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceLR")
+                .map(new DataParserLRGL(settings))
+                .assignTimestampsAndWatermarks(new WatermarkStrategyLRGL());
 
+        KafkaSink<LinearRoadInputTupleGL> sink;
         if (settings.getLatencyFlag() == 1) {
-            ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new LineageKafkaSinkLRGL(outputTopicName, settings), kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+            sink = KafkaSink.<LinearRoadInputTupleGL>builder()
+                    .setBootstrapServers(brokers)
+                    .setRecordSerializer(new LineageKafkaSinkLRGLV2(outputTopicName, settings))
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                    .build();
+        } else if (settings.getLatencyFlag() == 100) {
+            sink = KafkaSink.<LinearRoadInputTupleGL>builder()
+                    .setBootstrapServers(brokers)
+                    .setRecordSerializer(new OutputKafkaSinkLRGLV2(outputTopicName, settings))
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                    .build();
         } else {
-            ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new LatencyKafkaSinkLRGL(outputTopicName, settings), kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
+            sink = KafkaSink.<LinearRoadInputTupleGL>builder()
+                    .setBootstrapServers(brokers)
+                    .setRecordSerializer(new LatencyKafkaSinkLRGLV2(outputTopicName, settings))
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                    .build();
         }
-
-        /*
-        ds.addSink(new FlinkKafkaProducer<>(outputTopicName, new KafkaSerializationSchema<CountTupleGL>() {
-            @Override
-            public ProducerRecord<byte[], byte[]> serialize(CountTupleGL tuple, @Nullable Long aLong) {
-                return new ProducerRecord<>(outputTopicName, tuple.toString().getBytes(StandardCharsets.UTF_8));
-            }
-        }, kafkaProperties, FlinkKafkaProducer.Semantic.EXACTLY_ONCE));
-         */
+        ds.sinkTo(sink);
 
         env.execute("Query: GL" + queryFlag);
     }

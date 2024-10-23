@@ -40,6 +40,14 @@ function restartFlinkCluster() {
   sleep 15
 }
 
+function stopFlinkCluster() {
+  ${FLINK_HOME}/bin/stop-cluster.sh
+}
+
+function startFlinkCluster() {
+  ${FLINK_HOME}/bin/start-cluster.sh
+}
+
 function restartTMifNeeded() {
   num=`curl localhost:8081/taskmanagers | jq '.taskmanagers' | jq 'length' | awk '{print $1}'`
   if [ ${num} -eq 0 ]; then

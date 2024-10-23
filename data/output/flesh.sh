@@ -6,18 +6,14 @@ if [ $# -ne 1 ]; then
 fi
 
 if [ $1 = "flesh" ]; then
-  ./latency/metrics1/flesh.sh flesh
-  ./latency/metrics2/flesh.sh flesh
-  ./throughput/metrics1/flesh.sh flesh
-  ./throughput/metrics2/flesh.sh flesh
-  ./metrics34/flesh.sh flesh
+  ./cpu-memory/flesh.sh flesh
+  ./latency/flesh.sh flesh
+  ./throughput/flesh.sh flesh
 elif [ $1 = "fleshAll" ]; then
-  ./latency/metrics1/flesh.sh fleshAll
-  ./latency/metrics2/flesh.sh fleshAll
-  ./throughput/metrics1/flesh.sh fleshAll
-  ./throughput/metrics2/flesh.sh fleshAll
-  rm -rf ./throughput/169*
-  ./metrics34/flesh.sh fleshAll
+  ./cpu-memory/flesh.sh fleshAll
+  ./latency/flesh.sh fleshAll
+  ./throughput/flesh.sh fleshAll
+  rm -rf ./throughput/17*
 else
   echo "Illegal arguments (${1})"
   exit 1

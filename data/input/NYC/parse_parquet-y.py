@@ -28,6 +28,8 @@ if __name__ == "__main__":
 
     if not os.path.exists("../data/parquet"):
         os.makedirs("../data/parquet")
+    if not os.path.exists("../data/csv"):
+        os.makedirs("../data/csv")
 
     for year in range(st, ed + 1):
         if year == 2017:

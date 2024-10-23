@@ -6,10 +6,9 @@ import io.palyvos.provenance.genealog.GenealogTupleType;
 
 public class YSBResultTupleGL extends YSBResultTuple implements GenealogTuple {
     private GenealogData gdata;
-    private long timestamp;
 
-    public YSBResultTupleGL(String campaignId, long count, long ts, long stimulus) {
-        super(campaignId, count, ts, stimulus);
+    public YSBResultTupleGL(String campaignId, long count, long ts, long dominantOpTime, long kafkaAppendTime, long stimulus) {
+        super(campaignId, count, ts, dominantOpTime, kafkaAppendTime, stimulus);
     }
 
     @Override
@@ -25,11 +24,11 @@ public class YSBResultTupleGL extends YSBResultTuple implements GenealogTuple {
 
     @Override
     public long getTimestamp() {
-        return timestamp;
+        return super.getTs();
     }
 
     @Override
     public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+        super.setTs(timestamp);
     }
 }

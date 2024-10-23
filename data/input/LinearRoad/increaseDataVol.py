@@ -1,8 +1,11 @@
 import sys
 import time
+import string
+import random
 
 loop = 1
 tsShipt = 10800
+candidate_chars = string.ascii_letters + string.digits
 
 if len(sys.argv) == 2:
     loop = int(sys.argv[1])
@@ -25,7 +28,8 @@ with open("../data/lr.csv", "w") as w:
             tmpLine = line.split(",")
             tmpLine[1] = str(int(tmpLine[1]) + tsShipt * i)
             line = ",".join(tmpLine)
-            w.write('"' + line + '"' + "\n")
+            log = "".join(random.choices(candidate_chars, k=10))
+            w.write("\"" + line + "," + log + "\"\n")
 
         ctime = time.time()
         print("- Loop {} is finished.".format(i))

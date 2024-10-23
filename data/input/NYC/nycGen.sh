@@ -2,7 +2,7 @@
 
 echo "=*=*=*=*= Start NYC data generation =*=*=*=*="
 
-st=2018
+st=2017
 ed=2023
 if [ $# -eq 2 ]; then
   st=$1
@@ -28,5 +28,8 @@ python parse_parquet-y.py ${st} ${ed}
 
 echo "*** Sort data by dropoff timestamp ***"
 python sortcsv-y.py
+
+echo "cp ../data/nyc.csv ../data/nyc2.csv"
+cp ../data/nyc.csv ../data/nyc2.csv
 
 echo "=*=*=*=*= End NYC data generation =*=*=*=*="

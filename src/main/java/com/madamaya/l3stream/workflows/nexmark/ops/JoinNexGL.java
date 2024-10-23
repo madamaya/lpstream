@@ -1,13 +1,14 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
-import com.madamaya.l3stream.workflows.nexmark.objects.*;
+import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTupleGL;
+import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkBidTupleGL;
+import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkJoinedTupleGL;
 import io.palyvos.provenance.genealog.GenealogJoinHelper;
-import org.apache.flink.streaming.api.functions.co.ProcessJoinFunction;
-import org.apache.flink.util.Collector;
+import org.apache.flink.api.common.functions.JoinFunction;
 
-public class JoinNexGL extends ProcessJoinFunction<NexmarkAuctionTupleGL, NexmarkBidTupleGL, NexmarkJoinedTupleGL> {
+public class JoinNexGL implements JoinFunction<NexmarkAuctionTupleGL, NexmarkBidTupleGL, NexmarkJoinedTupleGL> {
     @Override
-    public void processElement(NexmarkAuctionTupleGL auctionTuple, NexmarkBidTupleGL bidTuple, ProcessJoinFunction<NexmarkAuctionTupleGL, NexmarkBidTupleGL, NexmarkJoinedTupleGL>.Context context, Collector<NexmarkJoinedTupleGL> collector) throws Exception {
+    public NexmarkJoinedTupleGL join(NexmarkAuctionTupleGL auctionTuple, NexmarkBidTupleGL bidTuple) throws Exception {
         NexmarkJoinedTupleGL out = new NexmarkJoinedTupleGL(
                 bidTuple.getAuctionId(),
                 bidTuple.getBidder(),
@@ -25,10 +26,13 @@ public class JoinNexGL extends ProcessJoinFunction<NexmarkAuctionTupleGL, Nexmar
                 auctionTuple.getSeller(),
                 auctionTuple.getCategory(),
                 auctionTuple.getExtra(),
+                Math.max(bidTuple.getDateTime(), auctionTuple.getDateTime()),
+                System.nanoTime() - Math.max(bidTuple.getDominantOpTime(), auctionTuple.getDominantOpTime()),
+                Math.max(bidTuple.getKafkaAppendTime(), auctionTuple.getKafkaAppendTime()),
                 Math.max(bidTuple.getStimulus(), auctionTuple.getStimulus())
         );
         GenealogJoinHelper.INSTANCE.annotateResult(auctionTuple, bidTuple, out);
 
-        collector.collect(out);
+        return out;
     }
 }

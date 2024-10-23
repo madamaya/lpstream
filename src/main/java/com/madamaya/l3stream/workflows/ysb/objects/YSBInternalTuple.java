@@ -4,12 +4,16 @@ public class YSBInternalTuple {
     private String adId;
     private String campaignId;
     private long eventtime;
+    private long dominantOpTime = Long.MAX_VALUE;
+    private long kafkaAppendTime = Long.MAX_VALUE;
     private long stimulus = Long.MAX_VALUE;
 
-    public YSBInternalTuple(String adId, String campaignId, long eventtime, long stimulus) {
+    public YSBInternalTuple(String adId, String campaignId, long eventtime, long dominantOpTime, long kafkaAppendTime, long stimulus) {
         this.adId = adId;
         this.campaignId = campaignId;
         this.eventtime = eventtime;
+        this.dominantOpTime = dominantOpTime;
+        this.kafkaAppendTime = kafkaAppendTime;
         this.stimulus = stimulus;
     }
 
@@ -17,6 +21,15 @@ public class YSBInternalTuple {
         this.adId = adId;
         this.campaignId = campaignId;
         this.eventtime = eventtime;
+    }
+
+    public YSBInternalTuple(YSBInternalTuple tuple) {
+        this.adId = tuple.getAdId();
+        this.campaignId = tuple.getCampaignId();
+        this.eventtime = tuple.getEventtime();
+        this.dominantOpTime = tuple.getDominantOpTime();
+        this.kafkaAppendTime = tuple.getKafkaAppendTime();
+        this.stimulus = tuple.getStimulus();
     }
 
     public String getAdId() {
@@ -41,6 +54,22 @@ public class YSBInternalTuple {
 
     public void setEventtime(Long eventtime) {
         this.eventtime = eventtime;
+    }
+
+    public long getDominantOpTime() {
+        return dominantOpTime;
+    }
+
+    public void setDominantOpTime(long dominantOpTime) {
+        this.dominantOpTime = dominantOpTime;
+    }
+
+    public long getKafkaAppendTime() {
+        return kafkaAppendTime;
+    }
+
+    public void setKafkaAppendTime(long kafkaAppendTime) {
+        this.kafkaAppendTime = kafkaAppendTime;
     }
 
     public long getStimulus() {

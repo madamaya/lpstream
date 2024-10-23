@@ -1,46 +1,109 @@
 package com.madamaya.l3stream.workflows.nexmark.ops;
 
-import com.madamaya.l3stream.glCommons.ObjectNodeGL;
+import com.madamaya.l3stream.conf.L3Config;
 import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkAuctionTupleGL;
-import com.madamaya.l3stream.workflows.nexmark.objects.NexmarkInputTuple;
 import io.palyvos.provenance.genealog.GenealogMapHelper;
-import org.apache.flink.api.common.functions.MapFunction;
+import io.palyvos.provenance.l3stream.wrappers.objects.KafkaInputStringGL;
+import io.palyvos.provenance.util.ExperimentSettings;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonNode;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.ObjectMapper;
 
-public class AuctionDataParserNexGL implements MapFunction<ObjectNodeGL, NexmarkAuctionTupleGL> {
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+public class AuctionDataParserNexGL extends RichMapFunction<KafkaInputStringGL, NexmarkAuctionTupleGL> {
+    long start;
+    long count;
+    ExperimentSettings settings;
+    ObjectMapper om;
+    final SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    final SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    public AuctionDataParserNexGL(ExperimentSettings settings) {
+        this.settings = settings;
+        this.om = new ObjectMapper();
+    }
+
     /*
      Sample Input:
     {"event_type":1,"person":null,"auction":{"id":1001,"itemName":"pc","description":"gbyf","initialBid":2940,"reserve":4519,"dateTime":"2023-10-03 05:31:34.28","expires":"2023-10-03 05:31:34.292","seller":1010,"category":13,"extra":""},"bid":null}
     auction: id, itemname, description, initialBid, reserve, dateTime, expires, seller, category, extra
      */
     @Override
-    public NexmarkAuctionTupleGL map(ObjectNodeGL jsonNodesGL) throws Exception {
-        ObjectNode jsonNodes = jsonNodesGL.getObjectNode();
-
-        int eventType = jsonNodes.get("value").get("event_type").asInt();
-
+    public NexmarkAuctionTupleGL map(KafkaInputStringGL input) throws Exception {
+        JsonNode jsonNodes = om.readTree(input.getStr());
+        int eventType = jsonNodes.get("event_type").asInt();
+        count++;
         // eventType is auction
         // id, itemname, description, initialBid, reserve, dateTime, expires, seller, category, extra
         if (eventType == 1) {
-            JsonNode jnode = jsonNodes.get("value").get("auction");
+            JsonNode jnode = jsonNodes.get("auction");
             int auctionId = jnode.get("id").asInt();
             String itemName = jnode.get("itemName").asText();
             String desc = jnode.get("description").asText();
             int initBid = jnode.get("initialBid").asInt();
             int reserve = jnode.get("reserve").asInt();
-            long dateTime = NexmarkInputTuple.convertDateStrToLong(jnode.get("dateTime").asText());
-            long expires = NexmarkInputTuple.convertDateStrToLong(jnode.get("expires").asText());
+            long dateTime = convertDateFormat(jnode.get("dateTime").asText(), sdf1);
+            long expires = convertDateFormat(jnode.get("expires").asText(), sdf2);
             int seller = jnode.get("seller").asInt();
             int category = jnode.get("category").asInt();
             String extra = jnode.get("extra").asText();
 
-            NexmarkAuctionTupleGL out = new NexmarkAuctionTupleGL(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, jsonNodesGL.getStimulus());
-            GenealogMapHelper.INSTANCE.annotateResult(jsonNodesGL, out);
-
+            NexmarkAuctionTupleGL out = new NexmarkAuctionTupleGL(eventType, auctionId, itemName, desc, initBid, reserve, dateTime, expires, seller, category, extra, input.getDominantOpTime(), input.getKafkaAppandTime(), input.getStimulus());
+            GenealogMapHelper.INSTANCE.annotateResult(input, out);
             return out;
         } else {
-            return new NexmarkAuctionTupleGL(eventType);
+            NexmarkAuctionTupleGL out = new NexmarkAuctionTupleGL(eventType);
+            GenealogMapHelper.INSTANCE.annotateResult(input, out);
+            return out;
         }
+    }
+
+    @Override
+    public void open(Configuration parameters) throws Exception {
+        super.open(parameters);
+        start = System.nanoTime();
+        count = 0L;
+    }
+
+    @Override
+    public void close() throws Exception {
+        long end = System.nanoTime();
+
+        String dataPath = L3Config.L3_HOME + "/data/output/throughput/" + settings.getQueryName();
+        if (Files.notExists(Paths.get(dataPath))) {
+            Files.createDirectories(Paths.get(dataPath));
+        }
+
+        PrintWriter pw = new PrintWriter(dataPath + "/" + settings.getStartTime() + "_" + 0 + "_" + getRuntimeContext().getIndexOfThisSubtask() + "_" + settings.getDataSize() + ".log");
+        pw.println(start + "," + end + "," + (end - start) + "," + count);
+        pw.flush();
+        pw.close();
+        super.close();
+    }
+
+    private long convertDateFormat(String dateLine, SimpleDateFormat sdf) {
+        Date date;
+        Calendar calendar;
+        try {
+            date = sdf.parse(dateLine);
+            calendar = Calendar.getInstance();
+            calendar.setTime(date);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        } catch (NumberFormatException e) {
+            System.out.println(sdf);
+            System.out.println(dateLine);
+            throw new RuntimeException(e);
+        }
+
+        return calendar.getTimeInMillis();
     }
 }
