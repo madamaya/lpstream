@@ -20,8 +20,12 @@ elif [ $1 = "throughput" ]; then
   cd ./thConf
   mv config.csv config-phase1.csv
   python confGen.py ../finishedComb.csv.*
+  cd ../../../data/output
+  mv thEval thEval_phase1
+  cd ../../bin/evaluation
   ./throughput.sh |& tee throughput.log
-  #./throughput.sh |& tee throughput.log
+  cd ../../data/output
+  mv thEval thEval_phase2
 elif [ $1 = "duration" ]; then
   cd ./bin/getLineage
   ./lineageDuration.sh

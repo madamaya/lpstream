@@ -1,15 +1,20 @@
 #!/bin/zsh
 
 source ./bin/config.sh
-#LRScaleFactor=1
-LRScaleFactor=10
-#NexmarkTupleNum=1000000
-NexmarkTupleNum=275000000
-#NYCstartYear=2022
-NYCstartYear=2017
+
+# Small size (for local test)
+LRScaleFactor=1
+NexmarkTupleNum=1000000
+NYCstartYear=2022
 NYCendYear=2023
-#YSBTupleNum=60933230
-YSBTupleNum=360000000
+YSBTupleNum=60933230
+
+# Large size (for experiments)
+#LRScaleFactor=10
+#NexmarkTupleNum=275000000
+#NYCstartYear=2017
+#NYCendYear=2023
+#YSBTupleNum=360000000
 
 if [ $# -ne 1 ]; then
   echo "Illegal Arguments."

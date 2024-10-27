@@ -95,7 +95,7 @@ if __name__ == "__main__":
                 if ("Syn" in query and size == -1) or ("Syn" not in query and size != -1):
                     continue
 
-                filePath = "./{}/results/result-{}-{}.json".format(query, size, approach)
+                filePath = "./{}/results-bar/result-{}-{}.json".format(query, size, approach)
                 if os.path.exists(filePath):
                     with open(filePath) as f:
                         j_data = json.load(f)
