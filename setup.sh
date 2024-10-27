@@ -39,12 +39,12 @@ if [ $1 = "downloads" ]; then
 
   echo "*** END ***"
 elif [ $1 = "compile" ]; then
-  git clone -b experiments git@github.com:madamaya/l3stream-genealog.git
+  git clone -b experiments git@github.com:madamaya/lpstream-genealog.git
   python configGenSh2Java.py
-  cd l3stream-genealog
+  cd lpstream-genealog
   mvn package
   cd ../
-  cp l3stream-genealog/target/ananke-1.0-SNAPSHOT.jar ./lib/l3stream-genealog.jar
+  cp lpstream-genealog/target/ananke-1.0-SNAPSHOT.jar ./lib/lpstream-genealog.jar
   mvn package
 elif [ $1 = "mainData" ]; then
   # Generate data

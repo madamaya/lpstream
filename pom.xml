@@ -75,7 +75,7 @@
             <resource>
                 <directory>${project.basedir}</directory>
                 <includes>
-                    <include>lib/l3stream-genealog.jar</include>
+                    <include>lib/lpstream-genealog.jar</include>
                 </includes>
             </resource>
         </resources>

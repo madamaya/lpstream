@@ -8,7 +8,7 @@ def convertElement2Line(key, value, type):
         assert 1 == 0
 
 def writeConf(confStr):
-    confPathList = ["./src/main/java/com/madamaya/l3stream/conf/L3Config.java", "./l3stream-genealog/src/main/java/io/palyvos/provenance/l3stream/conf/L3conf.java"]
+    confPathList = ["./src/main/java/com/madamaya/l3stream/conf/L3Config.java", "./lpstream-genealog/src/main/java/io/palyvos/provenance/l3stream/conf/L3conf.java"]
     for confPath in confPathList:
         with open(confPath) as f:
             lines = f.readlines()
