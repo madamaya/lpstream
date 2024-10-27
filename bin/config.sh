@@ -2,7 +2,7 @@
 
 # path
 # Please fill in the path of l3steram
-L3_HOME="~~~/l3stream"
+L3_HOME="~~~/lpstream"
 FLINK_HOME="${L3_HOME}/flink"
 KAFKA_HOME="${L3_HOME}/kafka"
 BIN_DIR="${L3_HOME}/bin"
