@@ -6,7 +6,7 @@ L3_HOME="~~~/l3stream"
 FLINK_HOME="${L3_HOME}/flink"
 KAFKA_HOME="${L3_HOME}/kafka"
 BIN_DIR="${L3_HOME}/bin"
-JAR_PATH="${L3_HOME}/target/l3stream-1.0-SNAPSHOT.jar"
+JAR_PATH="${L3_HOME}/target/lpstream-1.0-SNAPSHOT.jar"
 CHECKPOINT_DIR="${L3_HOME}/data/checkpoints"
 
 # cluster
