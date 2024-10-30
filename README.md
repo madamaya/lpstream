@@ -42,9 +42,14 @@ Running experiments for all workflows takes too much time.
 You can select workflows to evaluate performance by editing the following scripts. 
 - `./bin/evaluate/latency.sh` (for latency experiments)
 - `./bin/evaluate/throughput.sh` (for throughput experiments)
-- `./bin /getLineage/lineageDuration.sh` (for duration experiments).
+- `./bin/getLineage/lineageDuration.sh` (for duration experiments).
 
 ### Prototype implementation
+#### Dependency
+The prototype system also uses a repository [[here](https://github.com/madamaya/lpstream-genealog)] as an external library.
+It contains GeneaLog programs extended for our system.
+`./setup.sh compile` listed above clones and compiles it automatically, so you do not care anything.
+
 #### Workflow programs
 Programs for experimental workflows are placed at `./src/main/java/com/madamaya/l3stream/workflows`.
 When the workflow name is xxx, programs for the workflow are placed at `./src/main/java/com/madamaya/l3stream/workflows/xxx`.
