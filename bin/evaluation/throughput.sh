@@ -39,23 +39,15 @@ do
           fi
         fi
 
-        if [ ${query} = "LR" ] && [ ${size} -eq -1 ] && { [ ${approach} = "baseline" ] || [ ${approach} = "genealog" ] }; then
+        if [ ${query} = "LR" ] && [ ${size} -eq -1 ] && [ ${approach} = "baseline" ]; then
           # pass
         elif [ ${query} = "Syn1" ] && [ ${size} -eq 10 ] && [ ${approach} = "genealog" ]; then
           # pass
         elif [ ${query} = "Syn1" ] && [ ${size} -eq 100 ] && [ ${approach} = "l3streamlin" ]; then
           # pass
-        elif [ ${query} = "Nexmark" ] && [ ${size} -eq -1 ] && [ ${approach} = "l3stream" ]; then
+        elif [ ${query} = "NYC" ] && [ ${size} -eq -1 ] && [ ${approach} = "genealog" ]; then
           # pass
-        elif [ ${query} = "Nexmark2" ] && [ ${size} -eq -1 ] && [ ${approach} = "baseline" ]; then
-          # pass
-        elif [ ${query} = "NYC" ] && [ ${size} -eq -1 ] && { [ ${approach} = "genealog" ] || [ ${approach} = "l3streamlin" ] }; then
-          # pass
-        elif [ ${query} = "NYC2" ] && [ ${size} -eq -1 ] && { [ ${approach} = "genealog" ] || [ ${approach} = "l3stream" ] }; then
-          # pass
-        elif [ ${query} = "YSB" ] && [ ${size} -eq -1 ] && [ ${approach} = "l3streamlin" ]; then
-          # pass
-        elif [ ${query} = "Syn3" ] && [ ${size} -eq 400 ] && { [ ${approach} = "baseline" ] || [ ${approach} = "l3stream" ] }; then
+        elif [ ${query} = "NYC2" ] && [ ${size} -eq -1 ] && [ ${approach} = "genealog" ]; then
           # pass
         else
           continue
