@@ -19,7 +19,7 @@ homedir=`pwd`
 rm finishedComb.csv ./thLog/parameters.log
 touch finishedComb.csv ./thLog/parameters.log
 
-for inputRateIdx in `seq 0 9`
+for inputRateIdx in `seq 0 20`
 do
   for size in ${sizes[@]}
   do
@@ -39,6 +39,20 @@ do
           fi
         fi
 
+        if [ ${query} = "LR" ] && [ ${size} -eq -1 ] && [ ${approach} = "baseline" ]; then
+          # pass
+        elif [ ${query} = "Syn1" ] && [ ${size} -eq 10 ] && [ ${approach} = "genealog" ]; then
+          # pass
+        elif [ ${query} = "Syn1" ] && [ ${size} -eq 100 ] && [ ${approach} = "l3streamlin" ]; then
+          # pass
+        elif [ ${query} = "NYC" ] && [ ${size} -eq -1 ] && [ ${approach} = "genealog" ]; then
+          # pass
+        elif [ ${query} = "NYC2" ] && [ ${size} -eq -1 ] && [ ${approach} = "genealog" ]; then
+          # pass
+        else
+          continue
+        fi
+
         # Skip unstable cases
         echo "isValid" ${query} ${approach} ${size}
         isValid ${query} ${approach} ${size}
@@ -52,11 +66,11 @@ do
         end_value=`echo ${line} | awk -F, '{print $5}'`
         increment_value=`echo ${line} | awk -F, '{print $6}'`
         tmpinputRate=$((start_value + increment_value * inputRateIdx))
-        if [ ${increment_value} -lt 100000 ] && [ ${tmpinputRate} -gt 100000 ]; then
-          inputRate=$(((tmpinputRate - 100000) * 10 + 100000))
-        else
-          inputRate=${tmpinputRate}
-        fi
+        #if [ ${increment_value} -lt 100000 ] && [ ${tmpinputRate} -gt 100000 ]; then
+          #inputRate=$(((tmpinputRate - 100000) * 10 + 100000))
+        #else
+        inputRate=${tmpinputRate}
+        #fi
 
         # Skip some cases
         if [ ${inputRateIdx} -eq 0 ]; then
