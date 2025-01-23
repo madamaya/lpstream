@@ -10,9 +10,11 @@ source ../utils/cpuMemoryLoadLogger.sh
 source ./thUtils/thUtils.sh
 
 granularityTemp=100
-queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
+#queries=(Syn1 Syn2 Syn3 LR Nexmark NYC YSB Nexmark2 NYC2 YSB2)
+queries=(Syn1 NYC YSB NYC2 YSB2)
 approaches=(baseline genealog l3stream l3streamlin)
-sizes=(-1 10 100 400)
+#sizes=(-1 10 100 400)
+sizes=(-1 400)
 sleepTime=720
 homedir=`pwd`
 
@@ -39,15 +41,23 @@ do
           fi
         fi
 
-        if [ ${query} = "LR" ] && [ ${size} -eq -1 ] && [ ${approach} = "baseline" ]; then
+        if [ ${query} = "Syn1" ] && [ ${size} -eq 400 ] && [ ${approach} = "baseline" ]; then
           # pass
-        elif [ ${query} = "Syn1" ] && [ ${size} -eq 10 ] && [ ${approach} = "genealog" ]; then
+        elif [ ${query} = "Syn1" ] && [ ${size} -eq 400 ] && [ ${approach} = "genealog" ]; then
           # pass
-        elif [ ${query} = "Syn1" ] && [ ${size} -eq 100 ] && [ ${approach} = "l3streamlin" ]; then
+        elif [ ${query} = "Syn1" ] && [ ${size} -eq 400 ] && [ ${approach} = "l3stream" ]; then
+          #pass
+        elif [ ${query} = "NYC" ] && [ ${size} -eq -1 ] && [ ${approach} = "baseline" ]; then
           # pass
-        elif [ ${query} = "NYC" ] && [ ${size} -eq -1 ] && [ ${approach} = "genealog" ]; then
+        elif [ ${query} = "NYC2" ] && [ ${size} -eq -1 ] && [ ${approach} = "baseline" ]; then
           # pass
-        elif [ ${query} = "NYC2" ] && [ ${size} -eq -1 ] && [ ${approach} = "genealog" ]; then
+        elif [ ${query} = "YSB" ] && [ ${size} -eq -1 ] && [ ${approach} = "baseline" ]; then
+          # pass
+        elif [ ${query} = "YSB" ] && [ ${size} -eq -1 ] && [ ${approach} = "l3stream" ]; then
+          # pass
+        elif [ ${query} = "YSB2" ] && [ ${size} -eq -1 ] && [ ${approach} = "baseline" ]; then
+          # pass
+        elif [ ${query} = "YSB2" ] && [ ${size} -eq -1 ] && [ ${approach} = "l3stream" ]; then
           # pass
         else
           continue
