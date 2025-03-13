@@ -49,13 +49,15 @@ public class L3YSB {
         DataStream<L3StreamTupleContainer<YSBInputTuple>> ds = env.fromSource(source, WatermarkStrategy.noWatermarks(), "KafkaSourceYSB").uid("1")
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserYSBL3())).uid("3");
+        /*
         DataStream<L3StreamTupleContainer<YSBInputTuple>> ds2;
         if (L3.getClass() == NonLineageModeStrategy.class) {
             ds2 = ds.map(L3.assignChkTs(new WatermarkStrategyYSB(), 0)).uid("4");
         } else {
             ds2 = ds.map(L3.extractInputTs(new WatermarkStrategyYSB())).uid("5");
         }
-        DataStream<L3StreamTupleContainer<YSBResultTuple>> ds3 = ds2
+         */
+        DataStream<L3StreamTupleContainer<YSBResultTuple>> ds3 = ds
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyYSB(), settings.readPartitionNum(env.getParallelism()))).uid("6")
                 .filter(L3.filter(t -> t.getEventType().equals("view"))).uid("7")
                 .map(L3.map(new ProjectAttributeYSBL3())).uid("8")

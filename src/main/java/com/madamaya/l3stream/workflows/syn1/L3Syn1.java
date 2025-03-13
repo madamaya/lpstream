@@ -46,14 +46,16 @@ public class L3Syn1 {
                 .map(L3.map(new TempParserSynL3())).uid("3")
                 .filter(L3.filter(t -> t.getType() == 0)).uid("4");
         // Additional operator (assignChkTs or extractInputTs)
+        /*
         DataStream<L3StreamTupleContainer<SynTempTuple>> ds2;
         if (L3.getClass() == NonLineageModeStrategy.class) {
             ds2 = ds.map(L3.assignChkTs(new WatermarkStrategyTempSyn(), 0)).uid("5");
         } else {
             ds2 = ds.map(L3.extractInputTs(new WatermarkStrategyTempSyn())).uid("6");
         }
+         */
         // Main process
-        DataStream<L3StreamTupleContainer<SynTempTuple>> ds3 = ds2
+        DataStream<L3StreamTupleContainer<SynTempTuple>> ds3 = ds
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn(), settings.readPartitionNum(env.getParallelism()))).uid("7");
 
         // Sink
