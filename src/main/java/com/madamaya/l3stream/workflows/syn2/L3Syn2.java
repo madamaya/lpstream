@@ -52,14 +52,16 @@ public class L3Syn2 {
                 .map(L3.map(new TempParserSynL3())).uid("3")
                 .filter(L3.filter(t -> t.getType() == 0)).uid("4");
         // Additional operator (assignChkTs or extractInputTs)
+        /*
         DataStream<L3StreamTupleContainer<SynTempTuple>> temp2;
         if (L3.getClass() == NonLineageModeStrategy.class) {
             temp2 = temp.map(L3.assignChkTs(new WatermarkStrategyTempSyn(), 0)).uid("5");
         } else {
             temp2 = temp.map(L3.extractInputTs(new WatermarkStrategyTempSyn())).uid("6");
         }
+         */
         // Main process
-        DataStream<L3StreamTupleContainer<SynTempTuple>> temp3 = temp2
+        DataStream<L3StreamTupleContainer<SynTempTuple>> temp3 = temp
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyTempSyn(), settings.readPartitionNum(env.getParallelism()))).uid("7")
                 .map(L3.mapTs(new TsAssignTempMapL3())).uid("8");
 
@@ -69,14 +71,16 @@ public class L3Syn2 {
                 .map(L3.map(new PowerParserSynL3())).uid("10")
                 .filter(L3.filter(t -> t.getType() == 1)).uid("11");
         // Additional operator (assignChkTs or extractInputTs)
+        /*
         DataStream<L3StreamTupleContainer<SynPowerTuple>> power2;
         if (L3.getClass() == NonLineageModeStrategy.class) {
             power2 = power.map(L3.assignChkTs(new WatermarkStrategyPowerSyn(), 1)).uid("12");
         } else {
             power2 = power.map(L3.extractInputTs(new WatermarkStrategyPowerSyn())).uid("13");
         }
+         */
         // Main process
-        DataStream<L3StreamTupleContainer<SynPowerTuple>> power3 = power2
+        DataStream<L3StreamTupleContainer<SynPowerTuple>> power3 = power
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyPowerSyn(), settings.readPartitionNum(env.getParallelism()))).uid("14")
                 .map(L3.mapTs(new TsAssignPowerMapL3())).uid("15");
 

@@ -52,14 +52,16 @@ public class L3Nexmark {
                 .map(L3.map(new AuctionDataParserNexL3())).uid("3")
                 .filter(L3.filter(t -> t.getEventType() == 1)).uid("4");
         // Additional operator (assignChkTs or extractInputTs)
+        /*
         DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction2;
         if (L3.getClass() == NonLineageModeStrategy.class) {
             auction2 = auction.map(L3.assignChkTs(new WatermarkStrategyAuctionNex(), 0)).uid("5");
         } else {
             auction2 = auction.map(L3.extractInputTs(new WatermarkStrategyAuctionNex())).uid("6");
         }
+         */
         // Main process
-        DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction3 = auction2
+        DataStream<L3StreamTupleContainer<NexmarkAuctionTuple>> auction3 = auction
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyAuctionNex(), settings.readPartitionNum(env.getParallelism()))).uid("7")
                 .map(L3.mapTs(new TsAssignAuctionNexL3())).uid("8");
 
@@ -69,14 +71,16 @@ public class L3Nexmark {
                 .map(L3.map(new BidderDataParserNexL3())).uid("10")
                 .filter(L3.filter(t -> t.getEventType() == 2)).uid("11");
         // Additional operator (assignChkTs or extractInputTs)
+        /*
         DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid2;
         if (L3.getClass() == NonLineageModeStrategy.class) {
             bid2 = bid.map(L3.assignChkTs(new WatermarkStrategyBidNex(), 1)).uid("12");
         } else {
             bid2 = bid.map(L3.extractInputTs(new WatermarkStrategyBidNex())).uid("13");
         }
+         */
         // Main process
-        DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid3 = bid2
+        DataStream<L3StreamTupleContainer<NexmarkBidTuple>> bid3 = bid
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyBidNex(), settings.readPartitionNum(env.getParallelism()))).uid("14")
                 .map(L3.mapTs(new TsAssignBidderNexL3())).uid("15");
 

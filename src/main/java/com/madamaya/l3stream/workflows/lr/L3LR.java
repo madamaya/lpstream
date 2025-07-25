@@ -45,14 +45,16 @@ public class L3LR {
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserLRL3())).uid("3");
         // Additional operator (assignChkTs or extractInputTs)
+        /*
         DataStream<L3StreamTupleContainer<LinearRoadInputTuple>> ds2;
         if (L3.getClass() == NonLineageModeStrategy.class) {
             ds2 = ds.map(L3.assignChkTs(new WatermarkStrategyLR(), 0)).uid("4");
         } else {
             ds2 = ds.map(L3.extractInputTs(new WatermarkStrategyLR())).uid("5");
         }
+         */
         // Main process
-        DataStream<L3StreamTupleContainer<LinearRoadInputTuple>> ds3 = ds2
+        DataStream<L3StreamTupleContainer<LinearRoadInputTuple>> ds3 = ds
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyLR(), settings.readPartitionNum(env.getParallelism()))).uid("6");
 
         // Sink
