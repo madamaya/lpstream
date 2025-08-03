@@ -57,14 +57,16 @@ public class L3NYC2 {
                 .map(L3.initMap(settings)).uid("2")
                 .map(L3.map(new DataParserNYCL3())).uid("3");
         // Additional operator (assignChkTs or extractInputTs)
+        /*
         DataStream<L3StreamTupleContainer<NYCInputTuple>> ds2;
         if (L3.getClass() == NonLineageModeStrategy.class) {
             ds2 = ds.map(L3.assignChkTs(new WatermarkStrategyNYC(), 0)).uid("4");
         } else {
             ds2 = ds.map(L3.extractInputTs(new WatermarkStrategyNYC())).uid("5");
         }
+         */
         // Main process
-        DataStream<L3StreamTupleContainer<NYCResultTuple>> ds3 = ds2
+        DataStream<L3StreamTupleContainer<NYCResultTuple>> ds3 = ds
                 .assignTimestampsAndWatermarks(L3.assignTimestampsAndWatermarks(new WatermarkStrategyNYC(), settings.readPartitionNum(env.getParallelism()))).uid("6")
                 .filter(L3.filter(t -> t.getTripDistance() > 5)).uid("7")
                 .map(L3.mapTs(new TsAssignNYCL3())).uid("8")
