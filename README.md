@@ -1,6 +1,9 @@
 # L3Stream
 
 ## How to run the experiments
+Basically, please refer to version `6822e0d`.
+For ordinary# experiments only, please use the latest version.
+
 ### Dependencies
 The following Python packages and commands are required.
 - Python packages
